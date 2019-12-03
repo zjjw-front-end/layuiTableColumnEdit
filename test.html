@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>示例demo</title>
+    <link rel="stylesheet" href="layui/css/layui.css">
+</head>
+<body>
+<table class="layui-hide" id="tableId" lay-filter="tableEvent"></table>
+</body>
+<script src="layui/layui.js"></script>
+<script>
+    layui.config({
+        base: 'module/'
+    }).extend({
+        layuiTableColumnSelect:'js/layuiTableColumnSelect'
+    }).use(['table','layuiTableColumnSelect','layer'], function () {
+        var table = layui.table,layer = layui.layer;
+        var layuiTableColumnSelect = layui.layuiTableColumnSelect;
+
+        var selectParams = [
+            {name:1,value:"张三1"},
+            {name:2,value:"张三2"},
+            {name:3,value:"张三3"},
+            {name:4,value:"张三4"},
+            {name:5,value:"张三5"}
+        ];
+
+        table.render({
+            elem: '#tableId'
+            ,id:'id'
+            ,url:'tableData.json'
+            ,height: 'full-90'
+            ,page: true
+            ,cols: [[
+                {type:'checkbox'}
+                ,{field:'name',title: 'table输入框',width:120,edit:'text'}
+                ,{field:'age', title: 'table点击事件',width:120,event:'age'}
+                ,{field:'state', title: 'ajax传参',width:120}
+                ,{field:'test', title: '数组传参',width:120}
+            ]],
+            done:function (e) {
+                layuiTableColumnSelect.render({
+                    id:'#tableId',
+                    field:'state',
+                    url:'selectData.json',
+                    where:{},
+                    callback:function (obj) {
+                        layer.msg(JSON.stringify(obj));
+                    }
+                });
+
+                layuiTableColumnSelect.render({
+                    id:'#tableId',
+                    field:'test',
+                    data:selectParams,
+                    callback:function (obj) {
+                        layer.msg(JSON.stringify(obj));
+                    }
+                });
+            }
+        });
+
+        table.on('tool(tableEvent)',function (obj) {
+            layer.msg("1111111");
+        });
+
+        table.on('edit(tableEvent)',function (obj) {
+            layer.msg("edit");
+        });
+    });
+</script>
+</html>
