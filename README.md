@@ -94,6 +94,7 @@ layui.config({
 
 > 注意：<br>
 > &emsp;&emsp;可以使用url传递数据，也可以使用data传递数据，如果使用url传递数据，参数是where字段为ajax后台请求参数。
+> &emsp;&emsp;表格绑定下拉框必须在表格异步加载数据完成后进行，否则绑定失败。
 
 <br/>
 
@@ -138,20 +139,9 @@ callback | callback | 是 | 下拉框选择事件发生后的回调函数。
 
 ### 4.效果图
 &emsp;&emsp;输入框效果图：<br/>
-![输入框图](https://images.gitee.com/uploads/images/2019/1201/005900_e688a657_1588195.png "1.png")
-<br/>
-<br/>
 &emsp;&emsp;数组形式传参：<br/>
 ![数组图1](https://images.gitee.com/uploads/images/2019/1201/005920_6bd870bd_1588195.png "2.png")
 <br/>
 ![数组图2](https://images.gitee.com/uploads/images/2019/1201/005950_d701b34f_1588195.png "3.png")
 <br/>
 ![数组图3](https://images.gitee.com/uploads/images/2019/1201/010015_121379ce_1588195.png "4.png")
-<br>
-<br/>
-&emsp;&emsp;ajax请求后台：<br/>
-![ajax图](https://images.gitee.com/uploads/images/2019/1201/010043_f8ab6cc5_1588195.png "5.png")
-<br/>
-<br/>
-&emsp;&emsp;点击事件图：<br/>
-![点击事件图](https://images.gitee.com/uploads/images/2019/1201/010118_35560aa1_1588195.png "6.png")
