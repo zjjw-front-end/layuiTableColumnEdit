@@ -135,7 +135,7 @@ data | array | 否 | 数组形式传参，如果同时存在data和url，默认�
 url | string | 否 | ajax请求后台url，如果同时存在data和url，默认使用data。
 where | object | 否 | ajax请求后台参数，与url参数配合使用。
 parseData | function | 否 | 对ajax请求返回的数据在前端页面进行解析。
-callback | callback | 是 | 下拉框选择事件发生后的回调函数。
+callback | function | 是 | 下拉框选择事件发生后的回调函数。
 
 ### 4.效果图
 &emsp;&emsp;输入框效果图：<br/>
