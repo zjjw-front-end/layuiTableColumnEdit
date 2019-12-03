@@ -93,7 +93,7 @@ layui.config({
 ```
 
 > 注意：<br>
-> &emsp;&emsp;可以使用url传递数据，也可以使用data传递数据，如果使用url传递数据，参数是where字段为ajax后台请求参数。
+> &emsp;&emsp;可以使用url传递数据，也可以使用data传递数据，如果使用url传递数据，参数是where字段为ajax后台请求参数。<br>
 > &emsp;&emsp;表格绑定下拉框必须在表格异步加载数据完成后进行，否则绑定失败。
 
 <br/>
