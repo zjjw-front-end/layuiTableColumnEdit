@@ -2,6 +2,7 @@ layui.define(["jquery"],function(exports) {
     "use strict";
 
     var $ = layui.jquery,
+        tableData = [],
         Class = function () {
         };
 
@@ -102,9 +103,21 @@ layui.define(["jquery"],function(exports) {
             var name = $(this).attr('lay-value');
             othis.deleteSelect(that);
             if(othis.callback){
+                var thisIndex = $(that).parent().data('index');
+                thisIndex = parseInt(thisIndex);
+                var thisData = tableData[thisIndex];
                 var update = {name:name,value:$(this).text()};
-                $(that).find("div.layui-table-cell").eq(0).text(update.value);
-                othis.callback(update);
+                var thisObj = {
+                    data:thisData,
+                    select:update,
+                    td:that,
+                    update:function (o) {
+                        $.extend(this.data,o);
+                        var v = this.data[$(this.td).data('field')];
+                        $(this.td).find("div.layui-table-cell").eq(0).text(othis.getOption(v));
+                    }
+                };
+                othis.callback(thisObj);
             }
         });
     };
@@ -187,6 +200,9 @@ layui.define(["jquery"],function(exports) {
     var active = {
         render:function (options) {
             new Class().render(options);
+        },
+        initTableData:function (data) {
+            tableData = data;
         }
     };
     layui.link(layui.cache.base + 'css/layuiTableColumnSelect.css');

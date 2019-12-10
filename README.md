@@ -59,13 +59,24 @@ layui.config({
                 ,{field:'state', title: 'ajax传参',width:120}
                 ,{field:'test', title: '数组传参',width:120}
             ]],
-            done:function (e) {
+            done:function (res, curr, count) {
+                /**
+                 * 初始化表格数据方法，此方法必须调用，否则下拉列表显示失败。
+                 * 
+                 * 数据为此表格的数据。
+                 */
+                layuiTableColumnSelect.initTableData(res.data);
+
                 layuiTableColumnSelect.render({
                     id:'#tableId',
                     field:'state',
                     url:'selectData.json',
                     where:{},
                     callback:function (obj) {
+                        console.log(obj.data); //当前行数据
+                        console.log(obj.select); //下拉选项数据
+                        console.log(obj.td); //当前单元格（td）DOM元素
+                        obj.update({state:parseInt(obj.select.name)}); // 更新当前列数据和单元格显示数据，与layui表格更新单元格方法原理一致。
                         layer.msg(JSON.stringify(obj));
                     }
                 });
@@ -75,6 +86,10 @@ layui.config({
                     field:'test',
                     data:selectParams,
                     callback:function (obj) {
+                        console.log(obj.data); //当前行数据
+                        console.log(obj.select); //下拉选项数据
+                        console.log(obj.td); //当前单元格（td）DOM元素
+                        obj.update({test:parseInt(obj.select.name)}); // 更新当前列数据和单元格显示数据，与layui表格更新单元格方法原理一致。
                         layer.msg(JSON.stringify(obj));
                     }
                 });
