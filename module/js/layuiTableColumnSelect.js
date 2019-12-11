@@ -2,7 +2,7 @@ layui.define(["jquery"],function(exports) {
     "use strict";
 
     var $ = layui.jquery,
-        tableData = [],
+        tableData = {},
         Class = function () {
         };
 
@@ -105,7 +105,7 @@ layui.define(["jquery"],function(exports) {
             if(othis.callback){
                 var thisIndex = $(that).parent().data('index');
                 thisIndex = parseInt(thisIndex);
-                var thisData = tableData[thisIndex];
+                var thisData = tableData[othis.id][thisIndex];
                 var update = {name:name,value:$(this).text()};
                 var thisObj = {
                     data:thisData,
@@ -202,7 +202,7 @@ layui.define(["jquery"],function(exports) {
             new Class().render(options);
         },
         initTableData:function (data) {
-            tableData = data;
+            tableData[data.id] = data.data;
         }
     };
     layui.link(layui.cache.base + 'css/layuiTableColumnSelect.css');

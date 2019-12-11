@@ -42,9 +42,13 @@
             ]],
             done:function (res, curr, count) {
                 /**
-                 * 初始化表格数据
+                 * 可兼容多个表格
+                 * 初始化表格数据，每个表调用一次。
                  */
-                layuiTableColumnSelect.initTableData(res.data);
+                layuiTableColumnSelect.initTableData({
+                    id:'#tableId', //表格id
+                    data:res.data  //表格数据
+                });
 
                 layuiTableColumnSelect.render({
                     id:'#tableId',
