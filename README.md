@@ -61,11 +61,13 @@ layui.config({
             ]],
             done:function (res, curr, count) {
                 /**
-                 * 初始化表格数据方法，此方法必须调用，否则下拉列表显示失败。
-                 * 
-                 * 数据为此表格的数据。
+                * 可兼容多个表格
+                 * 初始化表格数据方法，每个表调用一次，否则下拉列表显示失败。
                  */
-                layuiTableColumnSelect.initTableData(res.data);
+                layuiTableColumnSelect.initTableData({
+                    id:'#tableId', //表格id
+                    data:res.data  //表格数据
+                });
 
                 layuiTableColumnSelect.render({
                     id:'#tableId',
