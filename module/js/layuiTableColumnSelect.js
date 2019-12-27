@@ -35,12 +35,14 @@ layui.define(["jquery"],function(exports) {
         othis.callback = options.callback;
 
         //解决下拉框超出表格最大高度时，被覆盖的问题。
-        $(options.id).next().find("div.layui-table-body,div.layui-table-box,div.layui-table-header").css('overflow', 'visible');
         tdDOM.bind('click',function (e) {
             var that = this;
+            othis.td = that;
             if(!othis.deleteAll(that)){
                 return;
             }
+            othis.tdLeaveStat = false;
+            othis.selectLeaveStat = true;
             var input = $('<input class="layui-input layui-table-edit layui-table-select-input" placeholder="关键字搜索">');
             var icon = $('<i class="layui-icon layui-table-select-edge" data-td-text="'+$(that).find("div.layui-table-cell").eq(0).text()+'" >&#xe625;</i>');
             $(that).append(input);
@@ -48,7 +50,7 @@ layui.define(["jquery"],function(exports) {
             input.focus();
             input.bind('input propertychange', function(){
                 var val = this.value;
-                var dl = $(that).find('dl').eq(0);
+                var dl = $('div.layui-table-select-div').find('dl').eq(0);
                 var searchDDs = [];
                 if(val === null || val === '' || val.length === 0){
                     searchDDs = othis.createHtml(othis.data);
@@ -61,56 +63,85 @@ layui.define(["jquery"],function(exports) {
             });
             icon.bind('click',function () {
                 layui.stope();
-                var thisTd = $(this.parentNode);
-                othis.deleteSelect(thisTd);
+                var icon = $(that).find('i.layui-table-select-edge');
+                icon = icon.eq(0);
+                var text = icon.attr('data-td-text');
+                $(that).find("div.layui-table-cell").eq(0).text(text);
+                othis.deleteSelect();
             });
             //layui.stope(input);
-            var divClass;
-            var thisY = othis.getElementY(that)+that.offsetHeight;
+            var thisY = that.getBoundingClientRect().top; //y坐标
+            var thisX = that.getBoundingClientRect().left; //x坐标
+            var tdHeight = that.offsetHeight;
+            var tdWidth = that.offsetWidth;
+            var tdInfo = {
+                x:thisX,
+                y:thisY,
+                width:tdWidth,
+                height:tdHeight,
+                type:'',
+                td:that
+            };
             var winHeight = $(window).height();
             //当前y坐标大于窗口0.55倍的高度则往上延伸，否则往下延伸。
-            if(thisY > 0.55*winHeight){
+            if(thisY+tdHeight > 0.55*winHeight){
                 //往上延伸
-                divClass = othis.getBrowser() === 'chrome'?"layui-table-select-div-chrome-up":"layui-table-select-div-ie-up";
+                tdInfo.type = 'up';
             }else {
                 //往下延伸
-                divClass = othis.getBrowser() === 'chrome'?"layui-table-select-div-chrome-down":"layui-table-select-div-ie-down";
+                tdInfo.type = 'down';
             }
-            var divHtml = $('<div class="layui-table-select-div '+divClass+'"></div>');
-            var selectHtml = [];
-            selectHtml.push('<dl>');
-            othis.createHtml(othis.data,selectHtml);
-            selectHtml.push('</dl>');
-            divHtml.append(selectHtml.join(" "));
-            $(that).append(divHtml);
-            othis.ddClick(that);
-            $(that).mouseleave(function () {
-                othis.deleteSelect(that);
+            othis.dynamicGenerationSelect(othis.data,tdInfo);
+            var divDom = $('div.layui-table-select-div')[0];
+            var divHeight = divDom.offsetHeight;
+
+            var maxY,maxX,minY,minX;
+            //计算出最大y坐标、最小y坐标、最大x坐标，最小x坐标。
+            if('down' === tdInfo.type){
+                //往下延伸
+                maxY = thisY+tdHeight+divHeight;
+                maxX = thisX + tdWidth;
+                minY = thisY;
+                minX = thisX;
+            }else {
+                //往上延伸
+                maxY = thisY+tdHeight;
+                maxX = thisX + tdWidth;
+                minY = thisY-divHeight;
+                minX = thisX;
+            }
+            //再次绑定鼠标移动事件
+            $(document).bind('mousemove',function (e) {
+                e = e || window.event;
+                if(e.pageX || e.pageY) {
+                    var xy = {x:e.pageX,y:e.pageY};
+                    if(xy.x > maxX || xy.x < minX || xy.y > maxY || xy.y < minY){
+                        //此范围内删除所有下拉框和input
+                        othis.deleteAll();
+                        //取消绑定的鼠标移动事件
+                        $(document).unbind('mousemove');
+                    }
+                }
             });
         });
     };
 
-    //获取元素y坐标
-    Class.prototype.getElementY = function(el){
-        return el.offsetParent ? el.offsetTop + this.getElementY(el.offsetParent) : el.offsetTop;
-    };
-
     //给下拉列表注册点击事件
-    Class.prototype.ddClick = function(that){
+    Class.prototype.ddClick = function(){
         var othis = this;
-        $(that).find('dl dd').bind('click',function (e) {
+        $('div.layui-table-select-div').find('dd').bind('click',function (e) {
             layui.stope(e);
             var name = $(this).attr('lay-value');
-            othis.deleteSelect(that);
+            othis.deleteAll();
             if(othis.callback){
-                var thisIndex = $(that).parent().data('index');
+                var thisIndex = $(othis.td).parent().data('index');
                 thisIndex = parseInt(thisIndex);
                 var thisData = tableData[othis.id][thisIndex];
                 var update = {name:name,value:$(this).text()};
                 var thisObj = {
                     data:thisData,
                     select:update,
-                    td:that,
+                    td:othis.td,
                     update:function (o) {
                         $.extend(this.data,o);
                         var v = this.data[$(this.td).data('field')];
@@ -122,20 +153,6 @@ layui.define(["jquery"],function(exports) {
         });
     };
 
-    //获得的浏览器
-    Class.prototype.getBrowser = function(){
-        var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
-        if (userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Edge") <= -1){
-            return "chrome";
-        }
-        if (userAgent.indexOf('NET') > -1 && userAgent.indexOf("rv") > -1) {
-            return "ie";
-        }
-        if(userAgent.indexOf('Edge') > -1){
-            return "edge";
-        }
-        return  "chrome";
-    };
 
     //生成下拉选择框的html代码
     Class.prototype.createHtml = function(selectData,data){
@@ -170,31 +187,59 @@ layui.define(["jquery"],function(exports) {
         return '';
     };
 
-    //删除所有临时生成的div和input
+    //删除所有删除下拉框和input和div
     Class.prototype.deleteAll = function(td){
         var othis = this;
-        var passStat = true;
-        var tableDOM = $(othis.id).next().find('div.layui-table-body table');
-        $(tableDOM).find('td').each(function () {
-            var input = $(this).find('input.layui-table-select-input');
-            if(td === this && input.length > 0){
-                passStat = false;
-                return;
-            }
-            othis.deleteSelect(this);
-        });
-        return passStat;
+        var divDom = $('div.layui-table-select-div');
+        if(divDom.length == 0){
+            return true;
+        }
+        divDom = divDom[0];
+        if(othis.getKey(td) === $(divDom).data('key')){
+            //同一个td元素不动态生成下拉列表
+            return false;
+        }else {
+            $('div.layui-table-body').find('td').each(function () {
+                var icon = $(this).find('i.layui-table-select-edge');
+                if(icon.length === 0){
+                    return;
+                }
+                $(this).find('input.layui-table-select-input').blur();
+                $(this).find('input.layui-table-select-input').remove();
+                icon = icon.eq(0);
+                var text = icon.attr('data-td-text');
+                $(this).find("div.layui-table-cell").eq(0).text(text);
+                icon.remove();
+            });
+            divDom.remove();
+            return true;
+        }
     };
 
-    //删除当前临时生成的div和input
-    Class.prototype.deleteSelect = function(that){
-        $(that).find('div.layui-table-select-div').remove();
-        $(that).find('input.layui-table-select-input').blur();
-        $(that).find('input.layui-table-select-input').remove();
-        var icon = $(that).find('i.layui-table-select-edge').eq(0);
-        var text = icon.attr('data-td-text');
-        $(that).find("div.layui-table-cell").eq(0).text(text);
-        icon.remove();
+    //动态生成下拉框
+    Class.prototype.dynamicGenerationSelect = function(data,tdInfo){
+        var othis = this;
+        var domArr = [];
+        var winHeight = $(window).height();
+        var type = tdInfo.type === 'up'?'top:auto;bottom: '+(winHeight-tdInfo.y)+'px;':'bottom:auto;top:'+(tdInfo.y+tdInfo.height)+'px;';
+        var width = tdInfo.width;
+        var left = tdInfo.x;
+        domArr.push('<div class="layui-table-select-div" data-key="'+othis.getKey(tdInfo.td)+'" style="z-index: 19910908;'+type+' width:'+width+'px;position: absolute; left: '+left+'px;">');
+            domArr.push('<dl style="top: 0px; position: relative;">');
+                if(data){
+                    othis.createHtml(data,domArr);
+                }else {
+                    domArr.push('<dd lay-value="" class="">无数据</dd>');
+                }
+            domArr.push('</dl>');
+        domArr.push('</div>');
+        $('body').append(domArr.join(" "));
+        othis.ddClick();
+    };
+
+    Class.prototype.getKey = function (that) {
+        var othis = this;
+        return othis.id+'-'+$(that).parent().data('index')+$(that).data('key');
     };
 
     var active = {
