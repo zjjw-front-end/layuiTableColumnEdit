@@ -63,11 +63,7 @@ layui.define(["jquery"],function(exports) {
             });
             icon.bind('click',function () {
                 layui.stope();
-                var icon = $(that).find('i.layui-table-select-edge');
-                icon = icon.eq(0);
-                var text = icon.attr('data-td-text');
-                $(that).find("div.layui-table-cell").eq(0).text(text);
-                othis.deleteSelect();
+                othis.deleteAll();
             });
             //layui.stope(input);
             var thisY = that.getBoundingClientRect().top; //y坐标
