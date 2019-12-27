@@ -211,7 +211,8 @@ layui.define(["jquery"],function(exports) {
                 $(this).find("div.layui-table-cell").eq(0).text(text);
                 icon.remove();
             });
-            divDom.remove();
+
+            $(divDom).remove();
             return true;
         }
     };
