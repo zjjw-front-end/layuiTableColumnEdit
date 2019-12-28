@@ -220,7 +220,7 @@ layui.define(["jquery"],function(exports) {
         var width = tdInfo.width;
         var left = tdInfo.x;
         domArr.push('<div class="layui-table-select-div" data-key="'+othis.getKey(tdInfo.td)+'" style="z-index: 19910908;'+type+' width:'+width+'px;position: absolute; left: '+left+'px;">');
-            domArr.push('<dl style="top: 0px; position: relative;">');
+            domArr.push('<dl>');
                 if(data){
                     othis.createHtml(data,domArr);
                 }else {

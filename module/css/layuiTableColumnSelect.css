@@ -1,5 +1,4 @@
 .layui-table-select-div{
-    position: relative;
     margin:0;
     background-color: #fff;
     font: 14px Helvetica Neue,Helvetica,PingFang SC,Tahoma,Arial,sans-serif;
@@ -10,7 +9,6 @@
 }
 
 .layui-table-select-dd{
-    display: block;
     padding: 0 10px;
     line-height: 36px;
     white-space: nowrap;
