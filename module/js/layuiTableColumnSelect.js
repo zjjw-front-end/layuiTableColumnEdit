@@ -105,15 +105,16 @@ layui.define(["jquery"],function(exports) {
                 minX = thisX;
             }
             //再次绑定鼠标移动事件
-            $(document).bind('mousemove',function (e) {
+            $(window).bind('mousemove',function (e) {
                 e = e || window.event;
                 if(e.pageX || e.pageY) {
                     var xy = {x:e.pageX,y:e.pageY};
+                    console.log(xy);
                     if(xy.x > maxX || xy.x < minX || xy.y > maxY || xy.y < minY){
                         //此范围内删除所有下拉框和input
                         othis.deleteAll();
                         //取消绑定的鼠标移动事件
-                        $(document).unbind('mousemove');
+                        $(window).unbind('mousemove');
                     }
                 }
             });
