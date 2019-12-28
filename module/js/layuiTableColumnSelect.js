@@ -41,8 +41,6 @@ layui.define(["jquery"],function(exports) {
             if(!othis.deleteAll(that)){
                 return;
             }
-            othis.tdLeaveStat = false;
-            othis.selectLeaveStat = true;
             var input = $('<input class="layui-input layui-table-edit layui-table-select-input" placeholder="关键字搜索">');
             var icon = $('<i class="layui-icon layui-table-select-edge" data-td-text="'+$(that).find("div.layui-table-cell").eq(0).text()+'" >&#xe625;</i>');
             $(that).append(input);
