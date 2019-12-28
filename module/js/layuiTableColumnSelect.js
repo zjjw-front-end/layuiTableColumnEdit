@@ -58,6 +58,9 @@ layui.define(["jquery"],function(exports) {
                 dl.html("");
                 dl.prepend(searchDDs.join(" "));
                 othis.ddClick(that);
+                //重新注册鼠标移动事件
+                $(window).unbind('mousemove'); //解绑注册事件
+                othis.registermMousemove(that,tdInfo.type); //注册事件
             });
             icon.bind('click',function () {
                 layui.stope();
@@ -86,38 +89,7 @@ layui.define(["jquery"],function(exports) {
                 tdInfo.type = 'down';
             }
             othis.dynamicGenerationSelect(othis.data,tdInfo);
-            var divDom = $('div.layui-table-select-div')[0];
-            var divHeight = divDom.offsetHeight;
-
-            var maxY,maxX,minY,minX;
-            //计算出最大y坐标、最小y坐标、最大x坐标，最小x坐标。
-            if('down' === tdInfo.type){
-                //往下延伸
-                maxY = thisY+tdHeight+divHeight;
-                maxX = thisX + tdWidth;
-                minY = thisY;
-                minX = thisX;
-            }else {
-                //往上延伸
-                maxY = thisY+tdHeight;
-                maxX = thisX + tdWidth;
-                minY = thisY-divHeight;
-                minX = thisX;
-            }
-            //再次绑定鼠标移动事件
-            $(window).bind('mousemove',function (e) {
-                e = e || window.event;
-                if(e.pageX || e.pageY) {
-                    var xy = {x:e.pageX,y:e.pageY};
-                    console.log(xy);
-                    if(xy.x > maxX || xy.x < minX || xy.y > maxY || xy.y < minY){
-                        //此范围内删除所有下拉框和input
-                        othis.deleteAll();
-                        //取消绑定的鼠标移动事件
-                        $(window).unbind('mousemove');
-                    }
-                }
-            });
+            othis.registermMousemove(that,tdInfo.type);
         });
     };
 
@@ -233,9 +205,50 @@ layui.define(["jquery"],function(exports) {
         othis.ddClick();
     };
 
+    //生成key -> 表id+行索引+列索引，中间以“-”相连，用于识别是否是点击同一个单元格。
     Class.prototype.getKey = function (that) {
         var othis = this;
         return othis.id+'-'+$(that).parent().data('index')+$(that).data('key');
+    };
+
+    //注册鼠标移动事件
+    Class.prototype.registermMousemove = function (that,type) {
+        var othis = this;
+        var divDom = $('div.layui-table-select-div')[0];
+        var divHeight = divDom.offsetHeight;
+        var thisY = that.getBoundingClientRect().top; //y坐标
+        var thisX = that.getBoundingClientRect().left; //x坐标
+        var tdHeight = that.offsetHeight;
+        var tdWidth = that.offsetWidth;
+        var maxY,maxX,minY,minX;
+        //计算出最大y坐标、最小y坐标、最大x坐标，最小x坐标。
+        if('down' === type){
+            //往下延伸
+            maxY = thisY+tdHeight+divHeight;
+            maxX = thisX + tdWidth;
+            minY = thisY;
+            minX = thisX;
+        }else {
+            //往上延伸
+            maxY = thisY+tdHeight;
+            maxX = thisX + tdWidth;
+            minY = thisY-divHeight;
+            minX = thisX;
+        }
+        //再次绑定鼠标移动事件
+        $(window).bind('mousemove',function (e) {
+            e = e || window.event;
+            if(e.pageX || e.pageY) {
+                var xy = {x:e.pageX,y:e.pageY};
+                console.log(xy);
+                if(xy.x > maxX || xy.x < minX || xy.y > maxY || xy.y < minY){
+                    //此范围内删除所有下拉框和input
+                    othis.deleteAll();
+                    //取消绑定的鼠标移动事件
+                    $(window).unbind('mousemove');
+                }
+            }
+        });
     };
 
     var active = {
