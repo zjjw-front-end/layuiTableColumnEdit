@@ -240,7 +240,6 @@ layui.define(["jquery"],function(exports) {
             e = e || window.event;
             if(e.pageX || e.pageY) {
                 var xy = {x:e.pageX,y:e.pageY};
-                console.log(xy);
                 if(xy.x > maxX || xy.x < minX || xy.y > maxY || xy.y < minY){
                     //此范围内删除所有下拉框和input
                     othis.deleteAll();
