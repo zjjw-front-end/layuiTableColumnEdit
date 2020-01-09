@@ -45,7 +45,9 @@ layui.config({
             {name:4,value:"张三4"},
             {name:5,value:"张三5"}
         ];
-
+        
+        var rowData; //当前行数据
+        
         table.render({
             elem: '#tableId'
             ,id:'id'
@@ -55,30 +57,22 @@ layui.config({
             ,cols: [[
                 {type:'checkbox'}
                 ,{field:'name',title: 'table输入框',width:120,edit:'text'}
-                ,{field:'age', title: 'table点击事件',width:120,event:'age'}
+                ,{field:'age', title: 'table点击事件',width:120,event:'age',sort:'true'}
                 ,{field:'state', title: 'ajax传参',width:120}
-                ,{field:'test', title: '数组传参',width:120}
+                ,{field:'test', title: '数组传参',width:120,sort:'true'}
             ]],
             done:function (res, curr, count) {
-                /**
-                * 可兼容多个表格
-                 * 初始化表格数据方法，每个表调用一次，否则下拉列表显示失败。
-                 */
-                layuiTableColumnSelect.initTableData({
-                    id:'#tableId', //表格id
-                    data:res.data  //表格数据
-                });
-
                 layuiTableColumnSelect.render({
                     id:'#tableId',
                     field:'state',
                     url:'selectData.json',
                     where:{},
                     callback:function (obj) {
-                        console.log(obj.data); //当前行数据
                         console.log(obj.select); //下拉选项数据
                         console.log(obj.td); //当前单元格（td）DOM元素
-                        obj.update({state:parseInt(obj.select.name)}); // 更新当前列数据和单元格显示数据，与layui表格更新单元格方法原理一致。
+                        //修改当前行字段state对应的值
+                        rowData['state'] = parseInt(obj.select.name);
+                        obj.update(); // 更新当前列数据和单元格显示数据，与layui表格更新单元格方法原理一致。
                         layer.msg(JSON.stringify(obj));
                     }
                 });
@@ -88,14 +82,25 @@ layui.config({
                     field:'test',
                     data:selectParams,
                     callback:function (obj) {
-                        console.log(obj.data); //当前行数据
                         console.log(obj.select); //下拉选项数据
                         console.log(obj.td); //当前单元格（td）DOM元素
-                        obj.update({test:parseInt(obj.select.name)}); // 更新当前列数据和单元格显示数据，与layui表格更新单元格方法原理一致。
+                        //修改当前行字段test对应的值
+                        rowData['test'] = parseInt(obj.select.name);
+                        obj.update(); // 更新当前列数据和单元格显示数据，与layui表格更新单元格方法原理一致。
                         layer.msg(JSON.stringify(obj));
                     }
                 });
             }
+        });
+
+        //解决前端页面排序出现的bug
+        table.on('sort(tableEvent)', function(obj){
+            layuiTableColumnSelect.reload("#tableId");//参数为表格id
+        });
+
+        //监听行单击事件（双击事件为：rowDouble）
+        table.on('row(tableEvent)', function(obj){
+            rowData = obj.data;
         });
 
         table.on('tool(tableEvent)',function (obj) {

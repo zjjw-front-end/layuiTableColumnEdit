@@ -2,12 +2,13 @@ layui.define(["jquery"],function(exports) {
     "use strict";
 
     var $ = layui.jquery,
-        tableData = {},
+        classList = new Array(),
         Class = function () {
         };
 
     Class.prototype.render = function(options){
         var othis = this;
+        othis.cacheOptions = options;
         othis.id = options.id;
         var dataTableDOM = $(options.id).next().find('div.layui-table-body table')[0];
         var tdDOM = $(dataTableDOM).find("td[data-field='"+options.field+"']");
@@ -101,18 +102,12 @@ layui.define(["jquery"],function(exports) {
             var name = $(this).attr('lay-value');
             othis.deleteAll();
             if(othis.callback){
-                var thisIndex = $(othis.td).parent().data('index');
-                thisIndex = parseInt(thisIndex);
-                var thisData = tableData[othis.id][thisIndex];
                 var update = {name:name,value:$(this).text()};
                 var thisObj = {
-                    data:thisData,
                     select:update,
                     td:othis.td,
-                    update:function (o) {
-                        $.extend(this.data,o);
-                        var v = this.data[$(this.td).data('field')];
-                        $(this.td).find("div.layui-table-cell").eq(0).text(othis.getOption(v));
+                    update:function () {
+                        $(this.td).find("div.layui-table-cell").eq(0).text(update.value);
                     }
                 };
                 othis.callback(thisObj);
@@ -252,10 +247,16 @@ layui.define(["jquery"],function(exports) {
 
     var active = {
         render:function (options) {
-            new Class().render(options);
+            var thisClass = new Class();
+            classList.push(thisClass);
+            thisClass.render(options);
         },
-        initTableData:function (data) {
-            tableData[data.id] = data.data;
+        reload:function (tableId) {
+            classList.forEach(function (e) {
+                if(e.id === tableId){
+                    e.render(e.cacheOptions);
+                }
+            });
         }
     };
     layui.link(layui.cache.base + 'css/layuiTableColumnSelect.css');
