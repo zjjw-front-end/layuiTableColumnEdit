@@ -45,11 +45,12 @@ layui.config({
             {name:4,value:"张三4"},
             {name:5,value:"张三5"}
         ];
-        
+
         var rowData; //当前行数据
-        
+
         table.render({
             elem: '#tableId'
+            ,toolbar: '#toolbarDemo'
             ,id:'id'
             ,url:'tableData.json'
             ,height: 'full-90'
@@ -70,10 +71,10 @@ layui.config({
                     callback:function (obj) {
                         console.log(obj.select); //下拉选项数据
                         console.log(obj.td); //当前单元格（td）DOM元素
-                        //修改当前行字段state对应的值
-                        rowData['state'] = parseInt(obj.select.name);
-                        obj.update(); // 更新当前列数据和单元格显示数据，与layui表格更新单元格方法原理一致。
-                        layer.msg(JSON.stringify(obj));
+                        //把选择的数据更新到行数据中
+                        rowData.update({state:parseInt(obj.select.name)});
+                        //把选择的显示数据更新到单元格中显示
+                        obj.update();
                     }
                 });
 
@@ -84,10 +85,10 @@ layui.config({
                     callback:function (obj) {
                         console.log(obj.select); //下拉选项数据
                         console.log(obj.td); //当前单元格（td）DOM元素
-                        //修改当前行字段test对应的值
-                        rowData['test'] = parseInt(obj.select.name);
-                        obj.update(); // 更新当前列数据和单元格显示数据，与layui表格更新单元格方法原理一致。
-                        layer.msg(JSON.stringify(obj));
+                        //把选择的数据更新到行数据中
+                        rowData.update({test:parseInt(obj.select.name)});
+                        //把选择的显示数据更新到单元格中显示
+                        obj.update();
                     }
                 });
             }
@@ -100,7 +101,7 @@ layui.config({
 
         //监听行单击事件（双击事件为：rowDouble）
         table.on('row(tableEvent)', function(obj){
-            rowData = obj.data;
+            rowData = obj;
         });
 
         table.on('tool(tableEvent)',function (obj) {
@@ -109,6 +110,14 @@ layui.config({
 
         table.on('edit(tableEvent)',function (obj) {
             layer.msg("edit");
+        });
+
+        //获取选中行事件
+        table.on('toolbar(tableEvent)', function(obj){
+            if(obj.event === 'getCheckData'){
+                var checkStatus = table.checkStatus(obj.config.id);
+                console.log(checkStatus.data)
+            }
         });
     });
 </script>
