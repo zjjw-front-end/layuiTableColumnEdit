@@ -93,9 +93,6 @@ layui.config({
                             rowData.update({test:parseInt(obj.select.name)});
                             //把选择的显示数据更新到单元格中显示
                             obj.update();
-                            rowData.tr.find('div.layui-form-checkbox').addClass("layui-form-checked")
-                            var checkStatus = table.checkStatus('id');
-                            console.log(checkStatus.data)
                         }
                     });
     
