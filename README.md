@@ -198,3 +198,5 @@ dateType | string | 否 | 日期时间选择器的类型：datetime（日期时�
 ![数组图2](https://images.gitee.com/uploads/images/2019/1201/005950_d701b34f_1588195.png "3.png")
 <br/>
 ![数组图3](https://images.gitee.com/uploads/images/2019/1201/010015_121379ce_1588195.png "4.png")
+<br/>
+![日期时间选择器](https://images.gitee.com/uploads/images/2020/0309/222505_589db2d6_1588195.png "123333.png")
