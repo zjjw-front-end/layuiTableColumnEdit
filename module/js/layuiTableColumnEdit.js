@@ -1,7 +1,7 @@
-layui.define(["jquery"],function(exports) {
+layui.define(["jquery","laydate"],function(exports) {
     "use strict";
 
-    var $ = layui.jquery,
+    var $ = layui.jquery,laydate = layui.laydate,
         classList = new Array(),
         Class = function () {
         };
@@ -10,8 +10,70 @@ layui.define(["jquery"],function(exports) {
         var othis = this;
         othis.cacheOptions = options;
         othis.id = options.id;
+        othis.callback = options.callback;
         var dataTableDOM = $(options.id).next().find('div.layui-table-body table')[0];
         var tdDOM = $(dataTableDOM).find("td[data-field='"+options.field+"']");
+        if('select' === options.type){
+            othis.select(options,tdDOM);
+        }else if('date' === options.type){
+            othis.date(tdDOM);
+        }
+    };
+
+    Class.prototype.date = function(tdDOM){
+        var othis = this;
+        othis.cacheOptions.dateType =  othis.isEmpty(othis.cacheOptions.dateType) ? "datetime":othis.cacheOptions.dateType;
+        tdDOM.bind('click',function (e) {
+            var that = this;
+            var thisTrIndex = $(that).parent().data('index');
+            var thisField = $(that).data('field');
+            var oldTrIndex = $(othis.td).parent().data('index');
+            var oldField = $(othis.td).data('field');
+            if((thisTrIndex+thisField) !== (oldTrIndex+oldField)){
+                othis.deleteDate();
+            }
+            othis.td = that;
+            if ($(that).find('input').length>0) {
+                return;
+            }
+            var input = $('<input class="layui-input layui-table-select-input" type="text" id="thisDate">');
+            $(that).append(input);
+            var icon = $('<i class="layui-icon layui-table-select-edge">&#x1006;</i>');
+            $(that).append(icon);
+            icon.bind('click',function () {
+                layui.stope();
+                othis.deleteDate();
+            });
+            //日期时间选择器
+            laydate.render({
+                elem: '#thisDate'
+                ,type: othis.cacheOptions.dateType
+                ,done:function (value, date) {
+                    othis.deleteDate();
+                    if(othis.callback){
+                        othis.callback({value:value,td:that});
+                    }
+                }
+            });
+        });
+    };
+
+    Class.prototype.isEmpty = function(dataStr){
+        if(typeof dataStr === 'undefined' || dataStr === null || dataStr.length <= 0){
+            return true;
+        }else {
+            return false;
+        }
+    };
+
+    Class.prototype.deleteDate = function(){
+        $("#thisDate").next().remove();
+        $("#thisDate").remove();
+        $("div.layui-laydate").remove();
+    };
+
+    Class.prototype.select = function(options,tdDOM){
+        var othis = this;
         if(!options.data){
             $.getJSON(options.url,options.where,function (result) {
                 if(options.parseData){
@@ -33,9 +95,7 @@ layui.define(["jquery"],function(exports) {
                 $(this).find("div.layui-table-cell").eq(0).text(text);
             });
         }
-        othis.callback = options.callback;
 
-        //解决下拉框超出表格最大高度时，被覆盖的问题。
         tdDOM.bind('click',function (e) {
             var that = this;
             othis.td = that;
@@ -146,12 +206,13 @@ layui.define(["jquery"],function(exports) {
                 return e.value;
             }
         }
-        return '';
+        return '无数据';
     };
 
     //删除所有删除下拉框和input和div
     Class.prototype.deleteAll = function(td){
         var othis = this;
+        othis.deleteDate();
         var divDom = $('div.layui-table-select-div');
         if(divDom.length == 0){
             return true;
@@ -259,6 +320,6 @@ layui.define(["jquery"],function(exports) {
             });
         }
     };
-    layui.link(layui.cache.base + 'css/layuiTableColumnSelect.css');
-    exports('layuiTableColumnSelect', active);
+    layui.link(layui.cache.base + 'css/layuiTableColumnEdit.css');
+    exports('layuiTableColumnEdit', active);
 });

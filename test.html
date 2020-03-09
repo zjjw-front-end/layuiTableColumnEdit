@@ -19,10 +19,10 @@
     layui.config({
         base: 'module/'
     }).extend({
-        layuiTableColumnSelect:'js/layuiTableColumnSelect'
-    }).use(['table','layuiTableColumnSelect','layer'], function () {
+        layuiTableColumnEdit:'js/layuiTableColumnEdit'
+    }).use(['table','layuiTableColumnEdit','layer'], function () {
         var table = layui.table,layer = layui.layer;
-        var layuiTableColumnSelect = layui.layuiTableColumnSelect;
+        var layuiTableColumnEdit = layui.layuiTableColumnEdit;
 
         var selectParams = [
             {name:1,value:"张三1"},
@@ -43,14 +43,15 @@
             ,page: true
             ,cols: [[
                 {type:'checkbox'}
-                ,{field:'name',title: 'table输入框',width:120,edit:'text'}
+                ,{field:'name',title: 'table输入框',width:120}
                 ,{field:'age', title: 'table点击事件',width:120,event:'age',sort:'true'}
                 ,{field:'state', title: 'ajax传参',width:120}
                 ,{field:'test', title: '数组传参',width:120,sort:'true'}
             ]],
             done:function (res, curr, count) {
-                layuiTableColumnSelect.render({
+                layuiTableColumnEdit.render({
                     id:'#tableId',
+                    type:'select',
                     field:'state',
                     url:'selectData.json',
                     where:{},
@@ -64,8 +65,9 @@
                     }
                 });
 
-                layuiTableColumnSelect.render({
+                layuiTableColumnEdit.render({
                     id:'#tableId',
+                    type:'select',
                     field:'test',
                     data:selectParams,
                     callback:function (obj) {
@@ -75,6 +77,22 @@
                         rowData.update({test:parseInt(obj.select.name)});
                         //把选择的显示数据更新到单元格中显示
                         obj.update();
+                        rowData.tr.find('div.layui-form-checkbox').addClass("layui-form-checked")
+                        var checkStatus = table.checkStatus('id');
+                        console.log(checkStatus.data)
+                    }
+                });
+
+                layuiTableColumnEdit.render({
+                    id:'#tableId',
+                    type:'date',
+                    field:'name',
+                    dateType:'datetime',
+                    callback:function (obj) {
+                        console.log(obj.value); //时间值
+                        console.log(obj.td); //当前单元格（td）DOM元素
+                        //把时间更新到行数据中
+                        rowData.update({name:obj.value});
                     }
                 });
             }
@@ -82,7 +100,7 @@
 
         //解决前端页面排序出现的bug
         table.on('sort(tableEvent)', function(obj){
-            layuiTableColumnSelect.reload("#tableId");//参数为表格id
+            layuiTableColumnEdit.reload("#tableId");//参数为表格id
         });
 
         //监听行单击事件（双击事件为：rowDouble）
@@ -94,9 +112,6 @@
             layer.msg("1111111");
         });
 
-        table.on('edit(tableEvent)',function (obj) {
-            layer.msg("edit");
-        });
 
         //获取选中行事件
         table.on('toolbar(tableEvent)', function(obj){

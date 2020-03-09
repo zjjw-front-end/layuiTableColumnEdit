@@ -1,6 +1,6 @@
 .layui-table-select-div{
     margin:0;
-    background-color: #fff;
+    background-color: #b8ffaf;
     font: 14px Helvetica Neue,Helvetica,PingFang SC,Tahoma,Arial,sans-serif;
     border: 1px solid #d2d2d2;
     overflow-y: auto;
@@ -26,7 +26,7 @@
     position: absolute;
     right: 3px;
     top: 50%;
-    margin-top: -13px;
+    margin-top: -15px;
     cursor: pointer;
     border-width: 6px;
     border-top-color: #c2c2c2;

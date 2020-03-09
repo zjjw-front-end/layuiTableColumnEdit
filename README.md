@@ -1,14 +1,16 @@
-# layuiTableColumnSelect
-&emsp;在layui table的基础上对表格列进行扩展：点击单元格显示可搜索下拉列表。
+# layuiTableColumnEdit
+&emsp;在layui table的基础上对表格列进行扩展：点击单元格显示可搜索下拉列表及日期时间选择器。
 
 ## 一、介绍
-&emsp;&emsp;此项目是为了解决layui table表格单元格（column）点击事件中无下拉列表（select）功能的问题。
+&emsp;&emsp;此项目是为了解决layui table表格单元格（column）点击事件中无下拉列表（select）及日期时间选择器功能的问题。
 <br/>
 &emsp;&emsp;a.可异步ajax请求后台数据。
 <br/>
 &emsp;&emsp;b.可直接以数组形式传参
 <br/>
 &emsp;&emsp;c.可输入关键字搜索下拉框数据
+<br/>
+&emsp;&emsp;d.可加入日期时间选择器
 
 ## 二、使用说明
 
@@ -18,9 +20,9 @@
 layui.config({
     base: 'module/'
 }).extend({
-        layuiTableColumnSelect:'js/layuiTableColumnSelect'
-}).use(['table','layuiTableColumnSelect'], function () {
-    var layuiTableColumnSelect= layui.layuiTableColumnSelect;
+        layuiTableColumnEdit:'js/layuiTableColumnEdit'
+}).use(['table','layuiTableColumnEdit'], function () {
+    var layuiTableColumnEdit= layui.layuiTableColumnEdit;
     
 });
 ```
@@ -30,96 +32,111 @@ layui.config({
 ```html
 <table class="layui-hide" id="tableId" lay-filter="tableEvent"></table>
 <script>
-    layui.config({
-        base: 'module/'
-    }).extend({
-        layuiTableColumnSelect:'js/layuiTableColumnSelect'
-    }).use(['table','layuiTableColumnSelect','layer'], function () {
-        var table = layui.table,layer = layui.layer;
-        var layuiTableColumnSelect = layui.layuiTableColumnSelect;
-
-        var selectParams = [
-            {name:1,value:"张三1"},
-            {name:2,value:"张三2"},
-            {name:3,value:"张三3"},
-            {name:4,value:"张三4"},
-            {name:5,value:"张三5"}
-        ];
-
-        var rowData; //当前行数据
-
-        table.render({
-            elem: '#tableId'
-            ,toolbar: '#toolbarDemo'
-            ,id:'id'
-            ,url:'tableData.json'
-            ,height: 'full-90'
-            ,page: true
-            ,cols: [[
-                {type:'checkbox'}
-                ,{field:'name',title: 'table输入框',width:120,edit:'text'}
-                ,{field:'age', title: 'table点击事件',width:120,event:'age',sort:'true'}
-                ,{field:'state', title: 'ajax传参',width:120}
-                ,{field:'test', title: '数组传参',width:120,sort:'true'}
-            ]],
-            done:function (res, curr, count) {
-                layuiTableColumnSelect.render({
-                    id:'#tableId',
-                    field:'state',
-                    url:'selectData.json',
-                    where:{},
-                    callback:function (obj) {
-                        console.log(obj.select); //下拉选项数据
-                        console.log(obj.td); //当前单元格（td）DOM元素
-                        //把选择的数据更新到行数据中
-                        rowData.update({state:parseInt(obj.select.name)});
-                        //把选择的显示数据更新到单元格中显示
-                        obj.update();
-                    }
-                });
-
-                layuiTableColumnSelect.render({
-                    id:'#tableId',
-                    field:'test',
-                    data:selectParams,
-                    callback:function (obj) {
-                        console.log(obj.select); //下拉选项数据
-                        console.log(obj.td); //当前单元格（td）DOM元素
-                        //把选择的数据更新到行数据中
-                        rowData.update({test:parseInt(obj.select.name)});
-                        //把选择的显示数据更新到单元格中显示
-                        obj.update();
-                    }
-                });
-            }
+        layui.config({
+            base: 'module/'
+        }).extend({
+            layuiTableColumnEdit:'js/layuiTableColumnEdit'
+        }).use(['table','layuiTableColumnEdit','layer'], function () {
+            var table = layui.table,layer = layui.layer;
+            var layuiTableColumnEdit = layui.layuiTableColumnEdit;
+    
+            var selectParams = [
+                {name:1,value:"张三1"},
+                {name:2,value:"张三2"},
+                {name:3,value:"张三3"},
+                {name:4,value:"张三4"},
+                {name:5,value:"张三5"}
+            ];
+    
+            var rowData; //当前行数据
+    
+            table.render({
+                elem: '#tableId'
+                ,toolbar: '#toolbarDemo'
+                ,id:'id'
+                ,url:'tableData.json'
+                ,height: 'full-90'
+                ,page: true
+                ,cols: [[
+                    {type:'checkbox'}
+                    ,{field:'name',title: '日期时间选择器',width:120}
+                    ,{field:'age', title: 'table点击事件',width:120,event:'age',sort:'true'}
+                    ,{field:'state', title: 'ajax传参',width:120}
+                    ,{field:'test', title: '数组传参',width:120,sort:'true'}
+                ]],
+                done:function (res, curr, count) {
+                    layuiTableColumnEdit.render({
+                        id:'#tableId',
+                        type:'select',
+                        field:'state',
+                        url:'selectData.json',
+                        where:{},
+                        callback:function (obj) {
+                            console.log(obj.select); //下拉选项数据
+                            console.log(obj.td); //当前单元格（td）DOM元素
+                            //把选择的数据更新到行数据中
+                            rowData.update({state:parseInt(obj.select.name)});
+                            //把选择的显示数据更新到单元格中显示
+                            obj.update();
+                        }
+                    });
+    
+                    layuiTableColumnEdit.render({
+                        id:'#tableId',
+                        type:'select',
+                        field:'test',
+                        data:selectParams,
+                        callback:function (obj) {
+                            console.log(obj.select); //下拉选项数据
+                            console.log(obj.td); //当前单元格（td）DOM元素
+                            //把选择的数据更新到行数据中
+                            rowData.update({test:parseInt(obj.select.name)});
+                            //把选择的显示数据更新到单元格中显示
+                            obj.update();
+                            rowData.tr.find('div.layui-form-checkbox').addClass("layui-form-checked")
+                            var checkStatus = table.checkStatus('id');
+                            console.log(checkStatus.data)
+                        }
+                    });
+    
+                    layuiTableColumnEdit.render({
+                        id:'#tableId',
+                        type:'date',
+                        field:'name',
+                        dateType:'datetime',
+                        callback:function (obj) {
+                            console.log(obj.value); //时间值
+                            console.log(obj.td); //当前单元格（td）DOM元素
+                            //把时间更新到行数据中
+                            rowData.update({name:obj.value});
+                        }
+                    });
+                }
+            });
+    
+            //解决前端页面排序出现的bug
+            table.on('sort(tableEvent)', function(obj){
+                layuiTableColumnEdit.reload("#tableId");//参数为表格id
+            });
+    
+            //监听行单击事件（双击事件为：rowDouble）
+            table.on('row(tableEvent)', function(obj){
+                rowData = obj;
+            });
+    
+            table.on('tool(tableEvent)',function (obj) {
+                layer.msg("1111111");
+            });
+    
+    
+            //获取选中行事件
+            table.on('toolbar(tableEvent)', function(obj){
+                if(obj.event === 'getCheckData'){
+                    var checkStatus = table.checkStatus(obj.config.id);
+                    console.log(checkStatus.data)
+                }
+            });
         });
-
-        //解决前端页面排序出现的bug
-        table.on('sort(tableEvent)', function(obj){
-            layuiTableColumnSelect.reload("#tableId");//参数为表格id
-        });
-
-        //监听行单击事件（双击事件为：rowDouble）
-        table.on('row(tableEvent)', function(obj){
-            rowData = obj;
-        });
-
-        table.on('tool(tableEvent)',function (obj) {
-            layer.msg("1111111");
-        });
-
-        table.on('edit(tableEvent)',function (obj) {
-            layer.msg("edit");
-        });
-
-        //获取选中行事件
-        table.on('toolbar(tableEvent)', function(obj){
-            if(obj.event === 'getCheckData'){
-                var checkStatus = table.checkStatus(obj.config.id);
-                console.log(checkStatus.data)
-            }
-        });
-    });
 </script>
 ```
 
@@ -161,12 +178,17 @@ layui.config({
 参数 | 类型 | 是否必填 | 描述 |
 --- | --- | --- | ---
 id | string | 是 | table表格的id值。
-field | string | 是 | table表格中需要绑定下拉选择框的字段。
-data | array | 否 | 数组形式传参，如果同时存在data和url，默认使用data。
-url | string | 否 | ajax请求后台url，如果同时存在data和url，默认使用data。
-where | object | 否 | ajax请求后台参数，与url参数配合使用。
-parseData | function | 否 | 对ajax请求返回的数据在前端页面进行解析。
-callback | function | 是 | 下拉框选择事件发生后的回调函数。
+field | string | 是 | table表格中需要绑定下拉选择框或日期时间选择器的字段。
+data | array | 否 | 数组形式传参，如果同时存在data和url，默认使用data（select）。
+url | string | 否 | ajax请求后台url，如果同时存在data和url，默认使用data（select）。
+where | object | 否 | ajax请求后台参数，与url参数配合使用（select）。
+parseData | function | 否 | 对ajax请求返回的数据在前端页面进行解析（select）。
+callback | function | 是 | 点击事件发生后的回调函数。
+type | string | 是 | 可选择为：select（下拉框）、date（日期时间选择器）。
+dateType | string | 否 | 日期时间选择器的类型：datetime（日期时间）、date（日期）和time（时间），默认datetime。
+
+> 注意：<br>
+> &emsp;&emsp;带"（select）"字样的为下拉选择框参数。<br>
 
 ### 4.效果图
 &emsp;&emsp;输入框效果图：<br/>
