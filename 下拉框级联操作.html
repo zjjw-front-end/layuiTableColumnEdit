@@ -7,11 +7,6 @@
     <link rel="stylesheet" href="layui/css/layui.css">
 </head>
 <body>
-<script type="text/html" id="toolbarDemo">
-    <div class="layui-btn-container">
-        <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
-    </div>
-</script>
 <table class="layui-hide" id="tableId" lay-filter="tableEvent"></table>
 </body>
 <script src="layui/layui.js"></script>
@@ -23,20 +18,12 @@
     }).use(['table','layuiTableColumnEdit','layer'], function () {
         var table = layui.table,layer = layui.layer;
         var layuiTableColumnEdit = layui.layuiTableColumnEdit;
-
-        var selectParams = [
-            {name:1,value:"张三1"},
-            {name:2,value:"张三2"},
-            {name:3,value:"张三3"},
-            {name:4,value:"张三4"},
-            {name:5,value:"张三5"}
-        ];
+        var $ = layui.$;
 
         var rowData; //当前行数据
 
         table.render({
             elem: '#tableId'
-            ,toolbar: '#toolbarDemo'
             ,id:'id'
             ,url:'tableData.json'
             ,height: 'full-90'
@@ -59,37 +46,31 @@
                         console.log(obj.select); //下拉选项数据
                         console.log(obj.td); //当前单元格（td）DOM元素
                         //把选择的数据更新到行数据中
-                        rowData.update({state:parseInt(obj.select.name)});
+                        //rowData.update({state:parseInt(obj.select.name)});
                         //把选择的显示数据更新到单元格中显示
                         obj.update();
-                    }
-                });
-
-                layuiTableColumnEdit.render({
-                    id:'#tableId',
-                    type:'select',
-                    field:'test',
-                    data:selectParams,
-                    callback:function (obj) {
-                        console.log(obj.select); //下拉选项数据
-                        console.log(obj.td); //当前单元格（td）DOM元素
-                        //把选择的数据更新到行数据中
-                        rowData.update({test:parseInt(obj.select.name)});
-                        //把选择的显示数据更新到单元格中显示
-                        obj.update();
-                    }
-                });
-
-                layuiTableColumnEdit.render({
-                    id:'#tableId',
-                    type:'date',
-                    field:'name',
-                    dateType:'datetime',
-                    callback:function (obj) {
-                        console.log(obj.value); //时间值
-                        console.log(obj.td); //当前单元格（td）DOM元素
-                        //把时间更新到行数据中
-                        rowData.update({name:obj.value});
+                        var testTd = $(obj.td.parentNode).find("td[data-field='test']").eq(0);
+                        var selectParams = [
+                            {name:1,value:"张三1"},
+                            {name:2,value:"张三2"},
+                            {name:3,value:"张三3"},
+                            {name:4,value:"张三4"},
+                            {name:5,value:"张三5"}
+                        ];
+                        layuiTableColumnEdit.render({
+                            id:'#tableId',
+                            type:'tdSelect',
+                            element:testTd,
+                            data:selectParams,
+                            callback:function (obj) {
+                                console.log(obj.select); //下拉选项数据
+                                console.log(obj.td); //当前单元格（td）DOM元素
+                                //把选择的数据更新到行数据中
+                                rowData.update({test:parseInt(obj.select.name)});
+                                //把选择的显示数据更新到单元格中显示
+                                obj.update();
+                            }
+                        });
                     }
                 });
             }
@@ -103,19 +84,6 @@
         //监听行单击事件（双击事件为：rowDouble）
         table.on('row(tableEvent)', function(obj){
             rowData = obj;
-        });
-
-        table.on('tool(tableEvent)',function (obj) {
-            layer.msg("1111111");
-        });
-
-
-        //获取选中行事件
-        table.on('toolbar(tableEvent)', function(obj){
-            if(obj.event === 'getCheckData'){
-                var checkStatus = table.checkStatus(obj.config.id);
-                console.log(checkStatus.data)
-            }
         });
     });
 </script>

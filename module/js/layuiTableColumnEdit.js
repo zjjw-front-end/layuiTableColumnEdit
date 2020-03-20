@@ -12,11 +12,15 @@ layui.define(["jquery","laydate"],function(exports) {
         othis.id = options.id;
         othis.callback = options.callback;
         var dataTableDOM = $(options.id).next().find('div.layui-table-body table')[0];
-        var tdDOM = $(dataTableDOM).find("td[data-field='"+options.field+"']");
         if('select' === options.type){
+            var tdDOM = $(dataTableDOM).find("td[data-field='"+options.field+"']");
             othis.select(options,tdDOM);
         }else if('date' === options.type){
+            var tdDOM = $(dataTableDOM).find("td[data-field='"+options.field+"']");
             othis.date(tdDOM);
+        }else if('tdSelect' === options.type){
+            othis.data = options.data;
+            othis.tdSelect(othis.cacheOptions.element);
         }
     };
 
@@ -97,18 +101,35 @@ layui.define(["jquery","laydate"],function(exports) {
         }
 
         tdDOM.bind('click',function (e) {
-            var that = this;
-            othis.td = that;
-            if(!othis.deleteAll(that)){
-                return;
-            }
-            var input = $('<input class="layui-input layui-table-select-input" placeholder="关键字搜索">');
-            var icon = $('<i class="layui-icon layui-table-select-edge" data-td-text="'+$(that).find("div.layui-table-cell").eq(0).text()+'" >&#xe625;</i>');
-            $(that).append(input);
-            $(that).append(icon);
-            input.focus();
-            input.bind('input propertychange', function(){
-                var val = this.value;
+            othis.register(this);
+        });
+    };
+
+    Class.prototype.register = function(that){
+        var othis = this;
+        othis.td = that;
+        if(!othis.deleteAll(that)){
+            return;
+        }
+        var input = $('<input class="layui-input layui-table-select-input" placeholder="关键字搜索">');
+        var icon = $('<i class="layui-icon layui-table-select-edge" data-td-text="'+$(that).find("div.layui-table-cell").eq(0).text()+'" >&#xe625;</i>');
+        $(that).append(input);
+        $(that).append(icon);
+        input.focus();
+        input.bind('input propertychange', function(){
+            var val = this.value;
+            if(othis.cacheOptions.enabled === true){
+                var ul = $('div.layui-table-select-div').find('ul.ul-edit-data').eq(0);
+                var searchDDs = [];
+                if(val === null || val === '' || val.length === 0){
+                    searchDDs = othis.createHtml(othis.data);
+                }else {
+                    searchDDs = othis.searchHtml(othis.data,val);
+                }
+                ul.html("");
+                ul.prepend(searchDDs.join(" "));
+                othis.liClick(that);
+            }else {
                 var dl = $('div.layui-table-select-div').find('dl').eq(0);
                 var searchDDs = [];
                 if(val === null || val === '' || val.length === 0){
@@ -119,38 +140,45 @@ layui.define(["jquery","laydate"],function(exports) {
                 dl.html("");
                 dl.prepend(searchDDs.join(" "));
                 othis.ddClick(that);
-                //重新注册鼠标移动事件
-                $(window).unbind('mousemove'); //解绑注册事件
-                othis.registermMousemove(that,tdInfo.type); //注册事件
-            });
-            icon.bind('click',function () {
-                layui.stope();
-                othis.deleteAll();
-            });
-            //layui.stope(input);
-            var thisY = that.getBoundingClientRect().top; //y坐标
-            var thisX = that.getBoundingClientRect().left; //x坐标
-            var tdHeight = that.offsetHeight;
-            var tdWidth = that.offsetWidth;
-            var tdInfo = {
-                x:thisX,
-                y:thisY,
-                width:tdWidth,
-                height:tdHeight,
-                type:'',
-                td:that
-            };
-            var winHeight = $(window).height();
-            //当前y坐标大于窗口0.55倍的高度则往上延伸，否则往下延伸。
-            if(thisY+tdHeight > 0.55*winHeight){
-                //往上延伸
-                tdInfo.type = 'up';
-            }else {
-                //往下延伸
-                tdInfo.type = 'down';
             }
-            othis.dynamicGenerationSelect(othis.data,tdInfo);
-            othis.registermMousemove(that,tdInfo.type);
+            //重新注册鼠标移动事件
+            $(window).unbind('mousemove'); //解绑注册事件
+            othis.registerMousemove(that,tdInfo.type); //注册事件
+        });
+        icon.bind('click',function () {
+            layui.stope();
+            othis.deleteAll();
+        });
+        //layui.stope(input);
+        var thisY = that.getBoundingClientRect().top; //y坐标
+        var thisX = that.getBoundingClientRect().left; //x坐标
+        var tdHeight = that.offsetHeight;
+        var tdWidth = that.offsetWidth;
+        var tdInfo = {
+            x:thisX,
+            y:thisY,
+            width:tdWidth,
+            height:tdHeight,
+            type:'',
+            td:that
+        };
+        var winHeight = $(window).height();
+        //当前y坐标大于窗口0.55倍的高度则往上延伸，否则往下延伸。
+        if(thisY+tdHeight > 0.55*winHeight){
+            //往上延伸
+            tdInfo.type = 'up';
+        }else {
+            //往下延伸
+            tdInfo.type = 'down';
+        }
+        othis.dynamicGenerationSelect(othis.data,tdInfo);
+        othis.registerMousemove(that,tdInfo.type);
+    };
+
+    Class.prototype.tdSelect = function(element){
+        var ohtis = this;
+        $(element).bind('click',function () {
+            ohtis.register(this);
         });
     };
 
@@ -175,6 +203,22 @@ layui.define(["jquery","laydate"],function(exports) {
         });
     };
 
+    //给下拉列表注册点击事件
+    Class.prototype.liClick = function(){
+        $('div.layui-table-select-div').find('li').bind('click',function (e) {
+            layui.stope(e);
+            var icon = $(this).find("i");
+            var liClass = $(this).attr("class");
+            if(liClass && liClass.indexOf("li-checked") > -1){
+                icon.css("background-color","#fff");
+                $(this).removeClass("li-checked");
+            }else {
+                icon.css("background-color","#60b979");
+                $(this).addClass("li-checked");
+            }
+        });
+    };
+
 
     //生成下拉选择框的html代码
     Class.prototype.createHtml = function(selectData,data){
@@ -190,6 +234,26 @@ layui.define(["jquery","laydate"],function(exports) {
         selectData.forEach(function (e) {
             if((e.value+'').indexOf(search)>-1){
                 data.push('<dd lay-value="'+e.name+'" class="layui-table-select-dd">'+e.value+'</dd>');
+            }
+        });
+        return data;
+    };
+
+
+    //生成下拉选择框的html代码
+    Class.prototype.createHtmlLi = function(selectData,data){
+        if(!data)data = [];
+        selectData.forEach(function (e) {
+            data.push('<li class="define-edit-checkbox" data-name="'+e.name+'" data-value="'+e.value+'"><div class="define-edit-checkbox" lay-skin="primary"><span>'+e.value+'</span><i class="layui-icon layui-icon-ok"></i></div></li>');
+        });
+        return data;
+    };
+    //生成根据关键字搜索的下拉选择框
+    Class.prototype.searchHtmlLi = function(selectData,search,data){
+        if(!data)data = [];
+        selectData.forEach(function (e) {
+            if((e.value+'').indexOf(search)>-1){
+                data.push('<li class="define-edit-checkbox" data-name="'+e.name+'" data-value="'+e.value+'"><div class="define-edit-checkbox" lay-skin="primary"><span>'+e.value+'</span><i class="layui-icon layui-icon-ok"></i></div></li>');
             }
         });
         return data;
@@ -248,17 +312,92 @@ layui.define(["jquery","laydate"],function(exports) {
         var type = tdInfo.type === 'up'?'top:auto;bottom: '+(winHeight-tdInfo.y)+'px;':'bottom:auto;top:'+(tdInfo.y+tdInfo.height)+'px;';
         var width = tdInfo.width;
         var left = tdInfo.x;
+        if(othis.cacheOptions.enabled === true){
+            othis.createDivli(domArr,tdInfo,width,left,type);
+        }else {
+            domArr.push('<div class="layui-table-select-div div-style" data-key="'+othis.getKey(tdInfo.td)+'" style="z-index: 19910908;'+type+' width:'+width+'px;position: absolute; left: '+left+'px;">');
+                domArr.push('<dl>');
+                    if(data){
+                        othis.createHtml(data,domArr);
+                    }else {
+                        domArr.push('<dd lay-value="" class="">无数据</dd>');
+                    }
+                domArr.push('</dl>');
+            domArr.push('</div>');
+            $('body').append(domArr.join(" "));
+            othis.ddClick();
+        }
+    };
+
+    Class.prototype.createDivli = function(domArr,tdInfo,width,left,type){
+        var othis = this;
         domArr.push('<div class="layui-table-select-div" data-key="'+othis.getKey(tdInfo.td)+'" style="z-index: 19910908;'+type+' width:'+width+'px;position: absolute; left: '+left+'px;">');
-            domArr.push('<dl>');
-                if(data){
-                    othis.createHtml(data,domArr);
-                }else {
-                    domArr.push('<dd lay-value="" class="">无数据</dd>');
-                }
-            domArr.push('</dl>');
+            domArr.push('<div><spn style="text-align: left"><button type="button" id="selectAll" class="layui-btn layui-btn-sm layui-btn-primary">全选</button></spn><span style="float: right"><button id="confirmBtn" type="button" class="layui-btn layui-btn-sm layui-btn-primary">确定</button></span></div>');
+                domArr.push('<div style="margin:0;background-color: #93f3ff;border: 1px solid #d2d2d2;max-height: 290px;overflow-y: auto;font: 14px Helvetica Neue,Helvetica,PingFang SC,Tahoma,Arial,sans-serif;">');
+                domArr.push('<ul class="ul-edit-data" >');
+                    if(othis.data){
+                        othis.createHtmlLi(othis.data,domArr);
+                    }else {
+                        domArr.push('<li>无数据</li>');
+                    }
+                domArr.push('</ul>');
+            domArr.push('</div>');
         domArr.push('</div>');
         $('body').append(domArr.join(" "));
-        othis.ddClick();
+        othis.liClick();
+        othis.btnClick();
+    };
+
+    Class.prototype.btnClick = function(){
+        var othis = this;
+        $('#confirmBtn').bind('click',function (e) {
+            var dataList = new Array();
+            $("div.layui-table-select-div").find("div li").each(function (e) {
+                var liClass = $(this).attr("class");
+                if(!liClass || liClass.indexOf("li-checked") <= -1){
+                    return;
+                }
+                var name = $(this).data("name");
+                var value = $(this).data("value");
+                var update = {name:name,value:value};
+                dataList.push(update);
+            });
+            othis.deleteAll();
+            if(othis.callback){
+                var thisObj = {
+                    select:dataList,
+                    td:othis.td,
+                    update:function () {
+                        var text = '';
+                        dataList.forEach(function (e) {
+                            text += ','+e.value;
+                        });
+                        if(text.length > 0){
+                            text = text.substr(1);
+                        }
+                        $(this.td).find("div.layui-table-cell").eq(0).text(text);
+                    }
+                };
+                othis.callback(thisObj);
+            }
+        });
+
+        $('#selectAll').bind('click',function () {
+            var btn = this;
+            var status = $(this).attr('data-status');
+            $('ul.ul-edit-data').find('li').each(function (e) {
+                var icon = $(this).find("i");
+                if(othis.isEmpty(status) || status === 'false'){
+                    icon.css("background-color","#60b979");
+                    $(this).addClass("li-checked");
+                    $(btn).attr("data-status","true");
+                }else {
+                    icon.css("background-color","#fff");
+                    $(this).removeClass("li-checked");
+                    $(btn).attr("data-status","false");
+                }
+            });
+        });
     };
 
     //生成key -> 表id+行索引+列索引，中间以“-”相连，用于识别是否是点击同一个单元格。
@@ -268,7 +407,7 @@ layui.define(["jquery","laydate"],function(exports) {
     };
 
     //注册鼠标移动事件
-    Class.prototype.registermMousemove = function (that,type) {
+    Class.prototype.registerMousemove = function (that,type) {
         var othis = this;
         var divDom = $('div.layui-table-select-div')[0];
         var divHeight = divDom.offsetHeight;
