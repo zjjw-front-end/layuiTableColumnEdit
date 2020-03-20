@@ -120,13 +120,23 @@ layui.define(["jquery","laydate"],function(exports) {
             var val = this.value;
             if(othis.cacheOptions.enabled === true){
                 var ul = $('div.layui-table-select-div').find('ul.ul-edit-data').eq(0);
-                var searchDDs = [];
                 if(val === null || val === '' || val.length === 0){
-                    searchDDs = othis.createHtml(othis.data);
-                }else {
-                    searchDDs = othis.searchHtml(othis.data,val);
+                    return;
                 }
-                ul.html("");
+                var searchDDs = [];
+                $(ul).find('li').each(function () {
+                    var thisValue = $(this).data('value');
+                    thisValue = othis.isEmpty(thisValue)?"":thisValue;
+                    if(thisValue.indexOf(val) > -1){
+                        var classText = $(this).attr("class");
+                        var backgroundColor = "";
+                        if(classText.indexOf("li-checked") > -1){
+                            backgroundColor = "background-color: #60b979";
+                        }
+                        searchDDs.push('<li class="'+$(this).attr("class")+'" data-name="'+$(this).data('name')+'" data-value="'+thisValue+'"><div class="define-edit-checkbox" lay-skin="primary"><span>'+thisValue+'</span><i style="'+backgroundColor+'" class="layui-icon layui-icon-ok"></i></div></li>');
+                        $(this).remove();
+                    }
+                });
                 ul.prepend(searchDDs.join(" "));
                 othis.liClick(that);
             }else {
@@ -205,6 +215,7 @@ layui.define(["jquery","laydate"],function(exports) {
 
     //给下拉列表注册点击事件
     Class.prototype.liClick = function(){
+        $('div.layui-table-select-div').find('li').unbind('click');
         $('div.layui-table-select-div').find('li').bind('click',function (e) {
             layui.stope(e);
             var icon = $(this).find("i");
@@ -245,16 +256,6 @@ layui.define(["jquery","laydate"],function(exports) {
         if(!data)data = [];
         selectData.forEach(function (e) {
             data.push('<li class="define-edit-checkbox" data-name="'+e.name+'" data-value="'+e.value+'"><div class="define-edit-checkbox" lay-skin="primary"><span>'+e.value+'</span><i class="layui-icon layui-icon-ok"></i></div></li>');
-        });
-        return data;
-    };
-    //生成根据关键字搜索的下拉选择框
-    Class.prototype.searchHtmlLi = function(selectData,search,data){
-        if(!data)data = [];
-        selectData.forEach(function (e) {
-            if((e.value+'').indexOf(search)>-1){
-                data.push('<li class="define-edit-checkbox" data-name="'+e.name+'" data-value="'+e.value+'"><div class="define-edit-checkbox" lay-skin="primary"><span>'+e.value+'</span><i class="layui-icon layui-icon-ok"></i></div></li>');
-            }
         });
         return data;
     };
