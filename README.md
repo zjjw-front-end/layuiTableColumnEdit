@@ -1,5 +1,6 @@
 # layuiTableColumnEdit
 &emsp;在layui table的基础上对表格列进行扩展：点击单元格显示可搜索下拉列表及日期时间选择器。
+<br/>
 &emsp;不会使用请加qq群：940796171
 
 ## 一、介绍
