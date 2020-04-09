@@ -29,17 +29,11 @@ layui.define(["jquery","laydate"],function(exports) {
         othis.cacheOptions.dateType =  othis.isEmpty(othis.cacheOptions.dateType) ? "datetime":othis.cacheOptions.dateType;
         tdDOM.bind('click',function (e) {
             var that = this;
-            var thisTrIndex = $(that).parent().data('index');
-            var thisField = $(that).data('field');
-            var oldTrIndex = $(othis.td).parent().data('index');
-            var oldField = $(othis.td).data('field');
-            if((thisTrIndex+thisField) !== (oldTrIndex+oldField)){
-                othis.deleteDate();
-            }
             othis.td = that;
             if ($(that).find('input').length>0) {
                 return;
             }
+            othis.deleteDate();
             var input = $('<input class="layui-input layui-table-select-input" type="text" id="thisDate">');
             $(that).append(input);
             var icon = $('<i class="layui-icon layui-table-select-edge">&#x1006;</i>');
