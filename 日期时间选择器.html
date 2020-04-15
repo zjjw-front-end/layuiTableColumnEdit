@@ -45,11 +45,11 @@
                     id:'#tableId',
                     dateType:'datetime',
                     element:nameTd,
-                    callback:function (obj) {
-                        console.log(obj.value); //时间值
-                        console.log(obj.td); //当前单元格（td）DOM元素
+                    callback:function (obj1) {
+                        console.log(obj1.value); //时间值
+                        console.log(obj1.td); //当前单元格（td）DOM元素
                         //把时间更新到行数据中
-                        layuiTableColumnEdit.update({element:nameTd,value:obj.value});
+                        obj.update({name:obj1.value});
                     }
                 });
             }else if(obj.event === 'age'){
@@ -59,11 +59,11 @@
                     type:'date',
                     dateType:'datetime',
                     element:ageTd,
-                    callback:function (obj) {
-                        console.log(obj.value); //时间值
-                        console.log(obj.td); //当前单元格（td）DOM元素
+                    callback:function (obj1) {
+                        console.log(obj1.value); //时间值
+                        console.log(obj1.td); //当前单元格（td）DOM元素
                         //把时间更新到行数据中
-                        layuiTableColumnEdit.update({element:ageTd,value:obj.value});
+                        obj.update({age:obj1.value});
                     }
                 });
             }

@@ -73,6 +73,7 @@ layui.config({
           });
           table.on('tool(tableEvent)', function(obj){
               if(obj.event === 'state'){
+                  //td必须为原生的DOM元素对象，不能为jquery元素对象。
                   var td = $(obj.tr).find("td[data-field='state']")[0];
                   $.getJSON('selectData.json',{},function (result) {
                       layuiTableColumnEdit.createSelect({
@@ -88,21 +89,6 @@ layui.config({
                               layuiTableColumnEdit.update({element:td,value:obj1.select.value});
                           }
                       });
-                  });
-              }else if(obj.event === 'test'){
-                  var testTd = $(obj.tr).find("td[data-field='test']")[0];
-                  layuiTableColumnEdit.createSelect({
-                      id: '#tableId',
-                      element: this,
-                      data: selectParams,
-                      callback: function (obj2) {
-                          console.log(obj2.select); //下拉选项数据
-                          console.log(obj2.td); //当前单元格（td）DOM元素
-                          //把选择的数据更新到行数据中
-                          obj.update({test: parseInt(obj2.select.name)});
-                          //把选择的显示数据更新到单元格中显示
-                          layuiTableColumnEdit.update({element:testTd,value:obj2.select.value});
-                      }
                   });
               }
           });
@@ -125,9 +111,16 @@ layui.config({
 ]
 ```
 
-### 3.参数说明
+### 3.方法说明
+方法名 | 描述 |
+---          | ----
+createSelect | 动态生成下拉框
+createDate   | 动态生成时间日期选择框
+update       | 更新单元格显示数据 注意：只更新显示的值，不更新所对应的行的值。
+
+### 4.参数说明
 参数 | 类型 | 是否必填 | 描述 |
---- | --- | --- | ---
+--- | --- | --- | ----
 id        | string | 是 | table表格的id值。
 data      | array | 是 | 数组。
 element   | DOM元素 | 是 | 该参数必须为原生的DOM元素对象，不能为jquery元素对象。
@@ -136,7 +129,7 @@ enabled   | boolean | 否 | 下拉框参数。多选（true），单选（false�
 dateType  | string | 否 | 日期时间选择器的类型：datetime（日期时间）、date（日期）<br/>和time（时间），默认datetime。
 
 
-### 4.效果图
+### 5.效果图
 &emsp;&emsp;输入框效果图：<br/>
 &emsp;&emsp;数组形式传参：<br/>
 ![数组图1](https://images.gitee.com/uploads/images/2019/1201/005920_6bd870bd_1588195.png "2.png")
