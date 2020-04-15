@@ -106,7 +106,7 @@ createDate   | 动态生成时间日期选择框
 update       | 更新单元格显示数据 注意：只更新显示的值，不更新所对应的行的值。
 
 ### 4.参数说明
-#### 下拉框参数
+#### createSelect
 参数 | 类型 | 是否必填 | 描述 |
 --- | --- | --- | ----
 id        | string | 是 | table表格的id值。
@@ -127,13 +127,18 @@ enabled   | boolean | 否 | 多选（true），单选（false），默认为fals
 ]
 ```
 
-#### 日期选择框参数
+#### createDate
 参数 | 类型 | 是否必填 | 描述 |
 --- | --- | --- | ----
 element   | DOM元素 | 是 | 单元格（td）元素，该参数必须为原生的DOM元素对象，不能为<br/>jquery元素对象。
 callback  | function | 是 | 事件发生后的回调函数。
 dateType  | string | 否 | 日期时间选择器的类型：datetime（日期时间）、date（日期）<br/>和time（时间），默认datetime。
 
+#### update
+参数 | 类型 | 是否必填 | 描述 |
+--- | --- | --- | ----
+element   | DOM元素 | 是 | 单元格（td）元素，该参数必须为原生的DOM元素对象，不能为<br/>jquery元素对象。
+value  | string | 是 | 单元格（td）的显示值。
 
 ### 5.效果图
 &emsp;&emsp;输入框效果图：<br/>
