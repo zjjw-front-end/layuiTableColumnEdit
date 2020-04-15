@@ -40,122 +40,81 @@ layui.config({
 ```html
 <table class="layui-hide" id="tableId" lay-filter="tableEvent"></table>
 <script>
-        layui.config({
-            base: 'module/'
-        }).extend({
-            layuiTableColumnEdit:'js/layuiTableColumnEdit'
-        }).use(['table','layuiTableColumnEdit','layer'], function () {
-            var table = layui.table,layer = layui.layer;
-            var layuiTableColumnEdit = layui.layuiTableColumnEdit;
-    
-            var selectParams = [
-                {name:1,value:"张三1"},
-                {name:2,value:"张三2"},
-                {name:3,value:"张三3"},
-                {name:4,value:"张三4"},
-                {name:5,value:"张三5"}
-            ];
-    
-            var rowData; //当前行数据
-    
-            table.render({
-                elem: '#tableId'
-                ,toolbar: '#toolbarDemo'
-                ,id:'id'
-                ,url:'tableData.json'
-                ,height: 'full-90'
-                ,page: true
-                ,cols: [[
-                    {type:'checkbox'}
-                    ,{field:'name',title: '日期时间选择器',width:120}
-                    ,{field:'age', title: 'table点击事件',width:120,event:'age',sort:'true'}
-                    ,{field:'state', title: 'ajax传参',width:120}
-                    ,{field:'test', title: '数组传参',width:120,sort:'true'}
-                ]],
-                done:function (res, curr, count) {
-                    layuiTableColumnEdit.render({
-                        id:'#tableId',
-                        type:'select',
-                        field:'state',
-                        url:'selectData.json',
-                        where:{},
-                        callback:function (obj) {
-                            console.log(obj.select); //下拉选项数据
-                            console.log(obj.td); //当前单元格（td）DOM元素
-                            //把选择的数据更新到行数据中
-                            rowData.update({state:parseInt(obj.select.name)});
-                            //把选择的显示数据更新到单元格中显示
-                            obj.update();
-                        }
-                    });
-    
-                    layuiTableColumnEdit.render({
-                        id:'#tableId',
-                        type:'select',
-                        field:'test',
-                        data:selectParams,
-                        callback:function (obj) {
-                            console.log(obj.select); //下拉选项数据
-                            console.log(obj.td); //当前单元格（td）DOM元素
-                            //把选择的数据更新到行数据中
-                            rowData.update({test:parseInt(obj.select.name)});
-                            //把选择的显示数据更新到单元格中显示
-                            obj.update();
-                        }
-                    });
-    
-                    layuiTableColumnEdit.render({
-                        id:'#tableId',
-                        type:'date',
-                        field:'name',
-                        dateType:'datetime',
-                        callback:function (obj) {
-                            console.log(obj.value); //时间值
-                            console.log(obj.td); //当前单元格（td）DOM元素
-                            //把时间更新到行数据中
-                            rowData.update({name:obj.value});
-                        }
-                    });
-                }
-            });
-    
-            //解决前端页面排序出现的bug
-            table.on('sort(tableEvent)', function(obj){
-                layuiTableColumnEdit.reload("#tableId");//参数为表格id
-            });
-    
-            //监听行单击事件（双击事件为：rowDouble）
-            table.on('row(tableEvent)', function(obj){
-                rowData = obj;
-            });
-    
-            table.on('tool(tableEvent)',function (obj) {
-                layer.msg("1111111");
-            });
-    
-    
-            //获取选中行事件
-            table.on('toolbar(tableEvent)', function(obj){
-                if(obj.event === 'getCheckData'){
-                    var checkStatus = table.checkStatus(obj.config.id);
-                    console.log(checkStatus.data)
-                }
-            });
-        });
+      layui.config({
+          base: 'module/'
+      }).extend({
+          layuiTableColumnEdit:'js/layuiTableColumnEdit'
+      }).use(['table','layuiTableColumnEdit','layer'], function () {
+          var table = layui.table,layer = layui.layer;
+          var layuiTableColumnEdit = layui.layuiTableColumnEdit;
+          var $ = layui.$;
+          var selectParams = [
+              {name:1,value:"张三1"},
+              {name:2,value:"张三2"},
+              {name:3,value:"张三3"},
+              {name:4,value:"张三4"},
+              {name:5,value:"张三5"}
+          ];
+          table.render({
+              elem: '#tableId'
+              ,id:'id'
+              ,url:'tableData.json'
+              ,height: 'full-90'
+              ,page: true
+              ,cols: [[
+                  {type:'checkbox'}
+                  ,{field:'name',title: 'table输入框',width:120}
+                  ,{field:'age', title: 'table点击事件',width:120,sort:'true'}
+                  ,{field:'state', title: 'ajax传参',width:120,event:'state'}
+                  ,{field:'test', title: '数组传参',width:120,event:'test',sort:'true'}
+              ]],
+              done:function (res, curr, count) {
+              }
+          });
+          table.on('tool(tableEvent)', function(obj){
+              if(obj.event === 'state'){
+                  var td = $(obj.tr).find("td[data-field='state']")[0];
+                  $.getJSON('selectData.json',{},function (result) {
+                      layuiTableColumnEdit.createSelect({
+                          id:'#tableId',
+                          data:result.data,
+                          element:td,
+                          //enabled:true,//true：开启多选，false：单选。默认为false
+                          callback:function (obj1) {
+                              console.log(obj1.select); //下拉选项数据
+                              console.log(obj1.td); //当前单元格（td）DOM元素
+                              obj.update({age: parseInt(obj1.select.name)});
+                              //把选择的显示数据更新到单元格中显示
+                              layuiTableColumnEdit.update({element:td,value:obj1.select.value});
+                          }
+                      });
+                  });
+              }else if(obj.event === 'test'){
+                  var testTd = $(obj.tr).find("td[data-field='test']")[0];
+                  layuiTableColumnEdit.createSelect({
+                      id: '#tableId',
+                      element: this,
+                      data: selectParams,
+                      callback: function (obj2) {
+                          console.log(obj2.select); //下拉选项数据
+                          console.log(obj2.td); //当前单元格（td）DOM元素
+                          //把选择的数据更新到行数据中
+                          obj.update({test: parseInt(obj2.select.name)});
+                          //把选择的显示数据更新到单元格中显示
+                          layuiTableColumnEdit.update({element:testTd,value:obj2.select.value});
+                      }
+                  });
+              }
+          });
+      });
 </script>
 ```
 
-> 注意：<br>
-> &emsp;&emsp;可以使用url传递数据，也可以使用data传递数据，如果使用url传递数据，参数是where字段为ajax后台请求参数。<br>
-> &emsp;&emsp;表格绑定下拉框必须在表格异步加载数据完成后进行，否则绑定失败。
 
 <br/>
 
 &emsp;**数据格式**
 
-&emsp;&emsp;data数据格式为name和value字段。
-<br/>
-&emsp;&emsp;数组形式传参时格式：
 ```json
 [
     {name:1,value:"测试1"},
@@ -166,30 +125,14 @@ layui.config({
 ]
 ```
 
-&emsp;&emsp;ajax请求后台时格式：
-```json
-{
-    data:[
-        {name:1,value:"测试1"},
-        {name:2,value:"测试2"},
-        {name:3,value:"测试3"},
-        {name:4,value:"测试4"},
-        {name:5,value:"测试5"}
-    ]
-}
-```
-
 ### 3.参数说明
 参数 | 类型 | 是否必填 | 描述 |
 --- | --- | --- | ---
 id | string | 是 | table表格的id值。
-field | string | 是 | table表格中需要绑定下拉选择框或日期时间选择器的字段。
-data | array | 否 | 数组形式传参，如果同时存在data和url，默认使用data（select）。
-url | string | 否 | ajax请求后台url，如果同时存在data和url，默认使用data（select）。
-where | object | 否 | ajax请求后台参数，与url参数配合使用（select）。
-parseData | function | 否 | 对ajax请求返回的数据在前端页面进行解析（select）。
-callback | function | 是 | 点击事件发生后的回调函数。
-type | string | 是 | 可选择为：select（下拉框）、date（日期时间选择器）。
+data | array | 是 | 数组。
+element | DOM元素 | 是 | 该参数必须为原生的DOM元素对象，不能为jquery元素对象。
+callback | function | 是 | 事件发生后的回调函数。
+enabled | boolean | 否 | 下拉框参数。多选（true），单选（false），默认为false。
 dateType | string | 否 | 日期时间选择器的类型：datetime（日期时间）、date（日期）和time（时间），默认datetime。
 
 > 注意：<br>

@@ -18,7 +18,7 @@
     }).use(['table','layuiTableColumnEdit','layer'], function () {
         var table = layui.table,layer = layui.layer;
         var layuiTableColumnEdit = layui.layuiTableColumnEdit;
-        var rowData; //当前行数据
+        var $ = layui.$;
 
         table.render({
             elem: '#tableId'
@@ -28,30 +28,45 @@
             ,page: true
             ,cols: [[
                 {type:'checkbox'}
-                ,{field:'name',title: 'table输入框',width:120}
+                ,{field:'name',title: 'table输入框',width:120,event:'name'}
                 ,{field:'age', title: 'table点击事件',width:120,event:'age',sort:'true'}
                 ,{field:'state', title: 'ajax传参',width:120}
                 ,{field:'test', title: '数组传参',width:120,sort:'true'}
             ]],
             done:function (res, curr, count) {
-                layuiTableColumnEdit.render({
+
+            }
+        });
+
+        table.on('tool(tableEvent)', function(obj){
+            if(obj.event === 'name'){
+                var nameTd = $(obj.tr).find("td[data-field='name']")[0];
+                layuiTableColumnEdit.createDate({
                     id:'#tableId',
-                    type:'date',
-                    field:'name',
                     dateType:'datetime',
+                    element:nameTd,
                     callback:function (obj) {
                         console.log(obj.value); //时间值
                         console.log(obj.td); //当前单元格（td）DOM元素
                         //把时间更新到行数据中
-                        rowData.update({name:obj.value});
+                        layuiTableColumnEdit.update({element:nameTd,value:obj.value});
+                    }
+                });
+            }else if(obj.event === 'age'){
+                var ageTd = $(obj.tr).find("td[data-field='age']")[0];
+                layuiTableColumnEdit.createDate({
+                    id:'#tableId',
+                    type:'date',
+                    dateType:'datetime',
+                    element:ageTd,
+                    callback:function (obj) {
+                        console.log(obj.value); //时间值
+                        console.log(obj.td); //当前单元格（td）DOM元素
+                        //把时间更新到行数据中
+                        layuiTableColumnEdit.update({element:ageTd,value:obj.value});
                     }
                 });
             }
-        });
-
-        //监听行单击事件（双击事件为：rowDouble）
-        table.on('row(tableEvent)', function(obj){
-            rowData = obj;
         });
     });
 </script>

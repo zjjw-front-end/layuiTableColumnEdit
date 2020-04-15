@@ -2,57 +2,39 @@ layui.define(["jquery","laydate"],function(exports) {
     "use strict";
 
     var $ = layui.jquery,laydate = layui.laydate,
-        classList = new Array(),
         Class = function () {
         };
 
-    Class.prototype.render = function(options){
+    Class.prototype.date = function(options){
         var othis = this;
         othis.cacheOptions = options;
         othis.id = options.id;
         othis.callback = options.callback;
-        var dataTableDOM = $(options.id).next().find('div.layui-table-body table')[0];
-        if('select' === options.type){
-            var tdDOM = $(dataTableDOM).find("td[data-field='"+options.field+"']");
-            othis.select(options,tdDOM);
-        }else if('date' === options.type){
-            var tdDOM = $(dataTableDOM).find("td[data-field='"+options.field+"']");
-            othis.date(tdDOM);
-        }else if('tdSelect' === options.type){
-            othis.data = options.data;
-            othis.tdSelect(othis.cacheOptions.element);
-        }
-    };
-
-    Class.prototype.date = function(tdDOM){
-        var othis = this;
         othis.cacheOptions.dateType =  othis.isEmpty(othis.cacheOptions.dateType) ? "datetime":othis.cacheOptions.dateType;
-        tdDOM.bind('click',function (e) {
-            var that = this;
-            othis.td = that;
-            if ($(that).find('input').length>0) {
-                return;
-            }
+        var that = options.element;
+        othis.td = that;
+        if ($(that).find('input').length>0) {
+            return;
+        }
+        othis.deleteDate();
+        var input = $('<input class="layui-input layui-table-select-input" type="text" id="thisDate">');
+        $(that).append(input);
+        var icon = $('<i class="layui-icon layui-table-select-edge">&#x1006;</i>');
+        $(that).append(icon);
+        icon.bind('click',function () {
+            layui.stope();
             othis.deleteDate();
-            var input = $('<input class="layui-input layui-table-select-input" type="text" id="thisDate">');
-            $(that).append(input);
-            var icon = $('<i class="layui-icon layui-table-select-edge">&#x1006;</i>');
-            $(that).append(icon);
-            icon.bind('click',function () {
-                layui.stope();
+        });
+        //日期时间选择器
+        laydate.render({
+            elem: '#thisDate'
+            ,type: othis.cacheOptions.dateType
+            ,done:function (value, date) {
                 othis.deleteDate();
-            });
-            //日期时间选择器
-            laydate.render({
-                elem: '#thisDate'
-                ,type: othis.cacheOptions.dateType
-                ,done:function (value, date) {
-                    othis.deleteDate();
-                    if(othis.callback){
-                        othis.callback({value:value,td:that});
-                    }
+                if(othis.callback){
+                    othis.callback({value:value,td:that});
                 }
-            });
+            }
         });
     };
 
@@ -70,37 +52,13 @@ layui.define(["jquery","laydate"],function(exports) {
         $("div.layui-laydate").remove();
     };
 
-    Class.prototype.select = function(options,tdDOM){
+    Class.prototype.register = function(options){
         var othis = this;
-        if(!options.data){
-            $.getJSON(options.url,options.where,function (result) {
-                if(options.parseData){
-                    othis.data = options.parseData(result.data);
-                }else {
-                    othis.data = result.data;
-                }
-                tdDOM.each(function () {
-                    var text = $(this).find("div.layui-table-cell").eq(0).text();
-                    text = othis.getOption(text);
-                    $(this).find("div.layui-table-cell").eq(0).text(text);
-                });
-            });
-        }else {
-            othis.data = options.data;
-            tdDOM.each(function () {
-                var text = $(this).find("div.layui-table-cell").eq(0).text();
-                text = othis.getOption(text);
-                $(this).find("div.layui-table-cell").eq(0).text(text);
-            });
-        }
-
-        tdDOM.bind('click',function (e) {
-            othis.register(this);
-        });
-    };
-
-    Class.prototype.register = function(that){
-        var othis = this;
+        othis.cacheOptions = options;
+        othis.id = options.id;
+        othis.callback = options.callback;
+        othis.data = options.data;
+        var that = options.element;
         othis.td = that;
         if(!othis.deleteAll(that)){
             return;
@@ -179,13 +137,6 @@ layui.define(["jquery","laydate"],function(exports) {
         othis.registerMousemove(that,tdInfo.type);
     };
 
-    Class.prototype.tdSelect = function(element){
-        var ohtis = this;
-        $(element).bind('click',function () {
-            ohtis.register(this);
-        });
-    };
-
     //给下拉列表注册点击事件
     Class.prototype.ddClick = function(){
         var othis = this;
@@ -197,10 +148,7 @@ layui.define(["jquery","laydate"],function(exports) {
                 var update = {name:name,value:$(this).text()};
                 var thisObj = {
                     select:update,
-                    td:othis.td,
-                    update:function () {
-                        $(this.td).find("div.layui-table-cell").eq(0).text(update.value);
-                    }
+                    td:othis.td
                 };
                 othis.callback(thisObj);
             }
@@ -254,20 +202,6 @@ layui.define(["jquery","laydate"],function(exports) {
         return data;
     };
 
-    //获取一个下拉框的数据
-    Class.prototype.getOption = function(value){
-        var othis = this;
-        var dataArr = othis.data;
-        if(!dataArr)return '';
-        for(var i=0;i<dataArr.length;i++){
-            var e = dataArr[i];
-            if((e.name+'') === (value+'')){
-                return e.value;
-            }
-        }
-        return '无数据';
-    };
-
     //删除所有删除下拉框和input和div
     Class.prototype.deleteAll = function(td){
         var othis = this;
@@ -303,7 +237,7 @@ layui.define(["jquery","laydate"],function(exports) {
     Class.prototype.dynamicGenerationSelect = function(data,tdInfo){
         var othis = this;
         var domArr = [];
-        var winHeight = $(window).height();
+        var winHeight = $(window).height()+window.scrollY;//加上滚动条滚动高度
         var type = tdInfo.type === 'up'?'top:auto;bottom: '+(winHeight-tdInfo.y)+'px;':'bottom:auto;top:'+(tdInfo.y+tdInfo.height)+'px;';
         var width = tdInfo.width;
         var left = tdInfo.x;
@@ -361,17 +295,7 @@ layui.define(["jquery","laydate"],function(exports) {
             if(othis.callback){
                 var thisObj = {
                     select:dataList,
-                    td:othis.td,
-                    update:function () {
-                        var text = '';
-                        dataList.forEach(function (e) {
-                            text += ','+e.value;
-                        });
-                        if(text.length > 0){
-                            text = text.substr(1);
-                        }
-                        $(this.td).find("div.layui-table-cell").eq(0).text(text);
-                    }
+                    td:othis.td
                 };
                 othis.callback(thisObj);
             }
@@ -440,18 +364,22 @@ layui.define(["jquery","laydate"],function(exports) {
         });
     };
 
+    Class.prototype.update = function (options) {
+        $(options.element).find("div.layui-table-cell").eq(0).text(options.value);
+    };
+
+    //单列
+    var singleInstance = new Class();
+
     var active = {
-        render:function (options) {
-            var thisClass = new Class();
-            classList.push(thisClass);
-            thisClass.render(options);
+        createSelect:function (options) {
+            singleInstance.register(options);
         },
-        reload:function (tableId) {
-            classList.forEach(function (e) {
-                if(e.id === tableId){
-                    e.render(e.cacheOptions);
-                }
-            });
+        update:function (options) {
+            singleInstance.update(options);
+        },
+        createDate:function (options) {
+            singleInstance.date(options);
         }
     };
     layui.link(layui.cache.base + 'css/layuiTableColumnEdit.css');

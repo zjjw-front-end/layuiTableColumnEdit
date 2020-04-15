@@ -18,6 +18,7 @@
     }).use(['table','layuiTableColumnEdit','layer'], function () {
         var table = layui.table,layer = layui.layer;
         var layuiTableColumnEdit = layui.layuiTableColumnEdit;
+        var $ = layui.$;
         var selectParams = [
             {name:1,value:"张三1"},
             {name:2,value:"张三2"},
@@ -25,7 +26,6 @@
             {name:4,value:"张三4"},
             {name:5,value:"张三5"}
         ];
-        var rowData; //当前行数据
         table.render({
             elem: '#tableId'
             ,id:'id'
@@ -35,52 +35,47 @@
             ,cols: [[
                 {type:'checkbox'}
                 ,{field:'name',title: 'table输入框',width:120}
-                ,{field:'age', title: 'table点击事件',width:120,event:'age',sort:'true'}
-                ,{field:'state', title: 'ajax传参',width:120}
-                ,{field:'test', title: '数组传参',width:120,sort:'true'}
+                ,{field:'age', title: 'table点击事件',width:120,sort:'true'}
+                ,{field:'state', title: 'ajax传参',width:120,event:'state'}
+                ,{field:'test', title: '数组传参',width:120,event:'test',sort:'true'}
             ]],
             done:function (res, curr, count) {
-                layuiTableColumnEdit.render({
-                    id:'#tableId',
-                    type:'select',
-                    field:'state',
-                    url:'selectData.json',
-                    where:{},
-                    callback:function (obj) {
-                        console.log(obj.select); //下拉选项数据
-                        console.log(obj.td); //当前单元格（td）DOM元素
-                        //把选择的数据更新到行数据中
-                        rowData.update({state:parseInt(obj.select.name)});
-                        //把选择的显示数据更新到单元格中显示
-                        obj.update();
-                    }
+            }
+        });
+        table.on('tool(tableEvent)', function(obj){
+            if(obj.event === 'state'){
+                var td = $(obj.tr).find("td[data-field='state']")[0];
+                $.getJSON('selectData.json',{},function (result) {
+                    layuiTableColumnEdit.createSelect({
+                        id:'#tableId',
+                        data:result.data,
+                        element:td,
+                        //enabled:true,//true：开启多选，false：单选。默认为false
+                        callback:function (obj1) {
+                            console.log(obj1.select); //下拉选项数据
+                            console.log(obj1.td); //当前单元格（td）DOM元素
+                            obj.update({age: parseInt(obj1.select.name)});
+                            //把选择的显示数据更新到单元格中显示
+                            layuiTableColumnEdit.update({element:td,value:obj1.select.value});
+                        }
+                    });
                 });
-
-                layuiTableColumnEdit.render({
-                    id:'#tableId',
-                    type:'select',
-                    field:'test',
-                    data:selectParams,
-                    callback:function (obj) {
-                        console.log(obj.select); //下拉选项数据
-                        console.log(obj.td); //当前单元格（td）DOM元素
+            }else if(obj.event === 'test'){
+                var testTd = $(obj.tr).find("td[data-field='test']")[0];
+                layuiTableColumnEdit.createSelect({
+                    id: '#tableId',
+                    element: this,
+                    data: selectParams,
+                    callback: function (obj2) {
+                        console.log(obj2.select); //下拉选项数据
+                        console.log(obj2.td); //当前单元格（td）DOM元素
                         //把选择的数据更新到行数据中
-                        //rowData.update({test:parseInt(obj.select.name)});
+                        obj.update({test: parseInt(obj2.select.name)});
                         //把选择的显示数据更新到单元格中显示
-                        obj.update();
+                        layuiTableColumnEdit.update({element:testTd,value:obj2.select.value});
                     }
                 });
             }
-        });
-
-        //解决前端页面排序出现的bug
-        table.on('sort(tableEvent)', function(obj){
-            layuiTableColumnEdit.reload("#tableId");//参数为表格id
-        });
-
-        //监听行单击事件（双击事件为：rowDouble）
-        table.on('row(tableEvent)', function(obj){
-            rowData = obj;
         });
     });
 </script>
