@@ -84,6 +84,7 @@ layui.config({
                           callback:function (obj1) {
                               console.log(obj1.select); //下拉选项数据
                               console.log(obj1.td); //当前单元格（td）DOM元素
+                              //把obj1.select中的name属性对应的值更新到行数据中。
                               obj.update({age: parseInt(obj1.select.name)});
                               //把选择的显示数据更新到单元格中显示
                               layuiTableColumnEdit.update({element:td,value:obj1.select.value});
@@ -110,7 +111,7 @@ update       | 更新单元格显示数据 注意：只更新显示的值，不�
 --- | --- | --- | ----
 id        | string | 是 | table表格的id值。
 data      | array | 是 | 下拉数据。格式见（data格式）说明。
-element   | DOM元素 | 是 | 该参数必须为原生的DOM元素对象，不能为jquery元素对象。
+element   | DOM元素 | 是 | 单元格（td）元素，该参数必须为原生的DOM元素对象，不能为<br/>jquery元素对象。
 callback  | function | 是 | 事件发生后的回调函数。
 enabled   | boolean | 否 | 多选（true），单选（false），默认为false。
 
@@ -129,7 +130,7 @@ enabled   | boolean | 否 | 多选（true），单选（false），默认为fals
 #### 日期选择框参数
 参数 | 类型 | 是否必填 | 描述 |
 --- | --- | --- | ----
-element   | DOM元素 | 是 | 该参数必须为原生的DOM元素对象，不能为jquery元素对象。
+element   | DOM元素 | 是 | 单元格（td）元素，该参数必须为原生的DOM元素对象，不能为<br/>jquery元素对象。
 callback  | function | 是 | 事件发生后的回调函数。
 dateType  | string | 否 | 日期时间选择器的类型：datetime（日期时间）、date（日期）<br/>和time（时间），默认datetime。
 
