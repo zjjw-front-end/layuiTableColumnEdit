@@ -128,12 +128,12 @@ layui.config({
 ### 3.参数说明
 参数 | 类型 | 是否必填 | 描述 |
 --- | --- | --- | ---
-id | string | 是 | table表格的id值。
-data | array | 是 | 数组。
-element | DOM元素 | 是 | 该参数必须为原生的DOM元素对象，不能为jquery元素对象。
-callback | function | 是 | 事件发生后的回调函数。
-enabled | boolean | 否 | 下拉框参数。多选（true），单选（false），默认为false。
-dateType | string | 否 | 日期时间选择器的类型：datetime（日期时间）、date（日期）和time（时间），默认datetime。
+id        | string | 是 | table表格的id值。
+data      | array | 是 | 数组。
+element   | DOM元素 | 是 | 该参数必须为原生的DOM元素对象，不能为jquery元素对象。
+callback  | function | 是 | 事件发生后的回调函数。
+enabled   | boolean | 否 | 下拉框参数。多选（true），单选（false），默认为false。
+dateType  | string | 否 | 日期时间选择器的类型：datetime（日期时间）、date（日期）<br/>和time（时间），默认datetime。
 
 > 注意：<br>
 > &emsp;&emsp;带"（select）"字样的为下拉选择框参数。<br>
