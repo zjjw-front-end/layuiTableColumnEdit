@@ -1,7 +1,7 @@
 # layuiTableColumnEdit
 &emsp;在layui table的基础上对表格列进行扩展：点击单元格显示可搜索下拉列表及日期时间选择器。
 <br/>
-&emsp;不会使用请加qq群：940796171
+&emsp;不会使用请加qq：374506838
 
 ## 一、介绍
 &emsp;&emsp;此项目是为了解决layui table表格单元格（column）点击事件中无下拉列表（select）及日期时间选择器功能的问题。
@@ -18,7 +18,7 @@
 <br/>
 &emsp;&emsp;f.下拉框支持单选或多选级联操作
 <br/>
-&emsp;&emsp;不会使用请加qq群：940796171
+&emsp;&emsp;不会使用请加qq：374506838
 
 ## 二、使用说明
 
@@ -135,8 +135,6 @@ callback  | function | 是 | 事件发生后的回调函数。
 enabled   | boolean | 否 | 下拉框参数。多选（true），单选（false），默认为false。
 dateType  | string | 否 | 日期时间选择器的类型：datetime（日期时间）、date（日期）<br/>和time（时间），默认datetime。
 
-> 注意：<br>
-> &emsp;&emsp;带"（select）"字样的为下拉选择框参数。<br>
 
 ### 4.效果图
 &emsp;&emsp;输入框效果图：<br/>

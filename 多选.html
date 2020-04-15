@@ -28,7 +28,6 @@
             {name:5,value:"张三5"}
         ];
 
-        var rowData; //当前行数据
 
         table.render({
             elem: '#tableId'
@@ -59,7 +58,7 @@
                         callback:function (obj1) {
                             console.log(obj1.select); //下拉选项数据
                             console.log(obj1.td); //当前单元格（td）DOM元素
-                            obj.update({age: parseInt(obj1.select.name)});
+                            obj.update({state: parseInt(obj1.select.name)});
                             //把选择的显示数据更新到单元格中显示
                             layuiTableColumnEdit.update({element:td,value:obj1.select.value});
                         }
