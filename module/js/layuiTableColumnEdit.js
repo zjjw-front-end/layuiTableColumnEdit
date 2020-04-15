@@ -8,7 +8,6 @@ layui.define(["jquery","laydate"],function(exports) {
     Class.prototype.date = function(options){
         var othis = this;
         othis.cacheOptions = options;
-        othis.id = options.id;
         othis.callback = options.callback;
         othis.cacheOptions.dateType =  othis.isEmpty(othis.cacheOptions.dateType) ? "datetime":othis.cacheOptions.dateType;
         var that = options.element;

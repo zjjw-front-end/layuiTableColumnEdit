@@ -97,9 +97,24 @@ layui.config({
 ```
 
 
-<br/>
+### 3.方法说明
+方法名 | 描述 |
+---          | ----
+createSelect | 动态生成下拉框
+createDate   | 动态生成时间日期选择框
+update       | 更新单元格显示数据 注意：只更新显示的值，不更新所对应的行的值。
 
-&emsp;**数据格式**
+### 4.参数说明
+#### 下拉框参数
+参数 | 类型 | 是否必填 | 描述 |
+--- | --- | --- | ----
+id        | string | 是 | table表格的id值。
+data      | array | 是 | 下拉数据。格式见（data格式）说明。
+element   | DOM元素 | 是 | 该参数必须为原生的DOM元素对象，不能为jquery元素对象。
+callback  | function | 是 | 事件发生后的回调函数。
+enabled   | boolean | 否 | 多选（true），单选（false），默认为false。
+
+&emsp;**data格式**
 
 ```json
 [
@@ -111,21 +126,11 @@ layui.config({
 ]
 ```
 
-### 3.方法说明
-方法名 | 描述 |
----          | ----
-createSelect | 动态生成下拉框
-createDate   | 动态生成时间日期选择框
-update       | 更新单元格显示数据 注意：只更新显示的值，不更新所对应的行的值。
-
-### 4.参数说明
+#### 日期选择框参数
 参数 | 类型 | 是否必填 | 描述 |
 --- | --- | --- | ----
-id        | string | 是 | table表格的id值。
-data      | array | 是 | 数组。
 element   | DOM元素 | 是 | 该参数必须为原生的DOM元素对象，不能为jquery元素对象。
 callback  | function | 是 | 事件发生后的回调函数。
-enabled   | boolean | 否 | 下拉框参数。多选（true），单选（false），默认为false。
 dateType  | string | 否 | 日期时间选择器的类型：datetime（日期时间）、date（日期）<br/>和time（时间），默认datetime。
 
 
