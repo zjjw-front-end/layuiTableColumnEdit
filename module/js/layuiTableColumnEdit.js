@@ -232,7 +232,7 @@ layui.define(["jquery","laydate"],function(exports) {
                 $(this).find("div.layui-table-cell").eq(0).text(text);
                 icon.remove();
             });
-
+            delete othis.leaveStatus;
             $(divDom).remove();
             return true;
         }
