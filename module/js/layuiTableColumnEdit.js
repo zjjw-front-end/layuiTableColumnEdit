@@ -5,6 +5,7 @@ layui.define(["jquery","laydate"],function(exports) {
         Class = function () {
         };
 
+    //日期选择框
     Class.prototype.date = function(options){
         var othis = this;
         othis.cacheOptions = options;
@@ -37,6 +38,7 @@ layui.define(["jquery","laydate"],function(exports) {
         });
     };
 
+    //判断是否为空函数
     Class.prototype.isEmpty = function(dataStr){
         if(typeof dataStr === 'undefined' || dataStr === null || dataStr.length <= 0){
             return true;
@@ -45,18 +47,21 @@ layui.define(["jquery","laydate"],function(exports) {
         }
     };
 
+    //删除td中的input和时间选择器
     Class.prototype.deleteDate = function(){
         $("#thisDate").next().remove();
         $("#thisDate").remove();
         $("div.layui-laydate").remove();
     };
 
+    //生成下拉框函数入口
     Class.prototype.register = function(options){
         var othis = this;
         othis.cacheOptions = options;
         othis.id = options.id;
         othis.callback = options.callback;
         othis.data = options.data;
+        othis.leaveStatus = true;
         var that = options.element;
         othis.td = that;
         if(!othis.deleteAll(that)){
@@ -134,6 +139,7 @@ layui.define(["jquery","laydate"],function(exports) {
         }
         othis.dynamicGenerationSelect(othis.data,tdInfo);
         othis.registerMousemove(that,tdInfo.type);
+        othis.registerHover();
     };
 
     //给下拉列表注册点击事件
@@ -172,7 +178,7 @@ layui.define(["jquery","laydate"],function(exports) {
     };
 
 
-    //生成下拉选择框的html代码
+    //生成下拉选择框的html代码(单选)
     Class.prototype.createHtml = function(selectData,data){
         if(!data)data = [];
         selectData.forEach(function (e) {
@@ -180,7 +186,7 @@ layui.define(["jquery","laydate"],function(exports) {
         });
         return data;
     };
-    //生成根据关键字搜索的下拉选择框
+    //生成根据关键字搜索的下拉选择框(单选)
     Class.prototype.searchHtml = function(selectData,search,data){
         if(!data)data = [];
         selectData.forEach(function (e) {
@@ -192,7 +198,7 @@ layui.define(["jquery","laydate"],function(exports) {
     };
 
 
-    //生成下拉选择框的html代码
+    //生成下拉选择框的html代码(多选)
     Class.prototype.createHtmlLi = function(selectData,data){
         if(!data)data = [];
         selectData.forEach(function (e) {
@@ -257,6 +263,7 @@ layui.define(["jquery","laydate"],function(exports) {
         }
     };
 
+    //生成多选下拉框
     Class.prototype.createDivli = function(domArr,tdInfo,width,left,type){
         var othis = this;
         domArr.push('<div class="layui-table-select-div" data-key="'+othis.getKey(tdInfo.td)+'" style="z-index: 19910908;'+type+' width:'+width+'px;position: absolute; left: '+left+'px;">');
@@ -276,8 +283,10 @@ layui.define(["jquery","laydate"],function(exports) {
         othis.btnClick();
     };
 
+    //多选下拉框 注册（“确定”或“全选”按钮）点击事件
     Class.prototype.btnClick = function(){
         var othis = this;
+        //“确定”按钮
         $('#confirmBtn').bind('click',function (e) {
             var dataList = new Array();
             $("div.layui-table-select-div").find("div li").each(function (e) {
@@ -300,6 +309,7 @@ layui.define(["jquery","laydate"],function(exports) {
             }
         });
 
+        //“全选”按钮
         $('#selectAll').bind('click',function () {
             var btn = this;
             var status = $(this).attr('data-status');
@@ -363,12 +373,38 @@ layui.define(["jquery","laydate"],function(exports) {
         });
     };
 
+    //更新单元格中的显示值
     Class.prototype.update = function (options) {
         $(options.element).find("div.layui-table-cell").eq(0).text(options.value);
     };
 
+    //给下拉框注册鼠标悬停事件
+    Class.prototype.registerHover = function () {
+        var othis = this;
+        $('div.layui-table-select-div').hover(
+            function () {
+                othis.leaveStatus = false;
+            },function () {
+                othis.leaveStatus = true;
+            }
+        );
+    };
+
     //单列
     var singleInstance = new Class();
+
+    //监听鼠标中间键滚轮滚动事件
+    var scrollFunc=function(e){
+        if(singleInstance.leaveStatus){
+            singleInstance.deleteAll();
+        }
+    };
+    /*注册事件*/
+    if(document.addEventListener){
+        //兼容火狐浏览器
+        document.addEventListener('DOMMouseScroll',scrollFunc,false);
+    }
+    window.onmousewheel=document.onmousewheel=scrollFunc;//IE/Opera/Chrome
 
     var active = {
         createSelect:function (options) {
