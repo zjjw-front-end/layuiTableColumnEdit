@@ -2,8 +2,37 @@ layui.define(["jquery","laydate"],function(exports) {
     "use strict";
 
     var $ = layui.jquery,laydate = layui.laydate,
+        //构造器
         Class = function () {
+        },
+        //单列
+        singleInstance = new Class(),
+        //监听鼠标中间键滚轮滚动回调事件
+        scrollFunc=function(e){
+            if(singleInstance.leaveStatus){
+                singleInstance.deleteAll();
+            }
+        },
+        //鼠标移动的回调事件
+        mousemoveEventCall = function (e) {
+            e = e || window.event;
+            var p = singleInstance.point;
+            if(e.pageX || e.pageY) {
+                var xy = {x:e.pageX,y:e.pageY};
+                if(xy.x > p.maxX || xy.x < p.minX || xy.y > p.maxY || xy.y < p.minY){
+                    //此范围内删除所有下拉框和input
+                    singleInstance.deleteAll();
+                    //取消绑定的鼠标移动事件
+                    $(window).unbind('mousemove',mousemoveEventCall);
+                }
+            }
         };
+    /*注册事件*/
+    if(document.addEventListener){
+        //兼容火狐浏览器
+        document.addEventListener('DOMMouseScroll',scrollFunc,false);
+    }
+    window.onmousewheel=document.onmousewheel=scrollFunc;//IE/Opera/Chrome
 
     //日期选择框
     Class.prototype.date = function(options){
@@ -108,7 +137,6 @@ layui.define(["jquery","laydate"],function(exports) {
                 othis.ddClick(that);
             }
             //重新注册鼠标移动事件
-            $(window).unbind('mousemove'); //解绑注册事件
             othis.registerMousemove(that,tdInfo.type); //注册事件
         });
         icon.bind('click',function () {
@@ -358,19 +386,16 @@ layui.define(["jquery","laydate"],function(exports) {
             minY = thisY-divHeight;
             minX = thisX;
         }
+        othis.point = {
+            maxX:maxX
+            ,maxY:maxY
+            ,minX:minX
+            ,minY:minY
+        };
+        //先解绑鼠标移动事件
+        $(window).unbind('mousemove',mousemoveEventCall);
         //再次绑定鼠标移动事件
-        $(window).bind('mousemove',function (e) {
-            e = e || window.event;
-            if(e.pageX || e.pageY) {
-                var xy = {x:e.pageX,y:e.pageY};
-                if(xy.x > maxX || xy.x < minX || xy.y > maxY || xy.y < minY){
-                    //此范围内删除所有下拉框和input
-                    othis.deleteAll();
-                    //取消绑定的鼠标移动事件
-                    $(window).unbind('mousemove');
-                }
-            }
-        });
+        $(window).bind('mousemove',mousemoveEventCall);
     };
 
     //更新单元格中的显示值
@@ -389,22 +414,6 @@ layui.define(["jquery","laydate"],function(exports) {
             }
         );
     };
-
-    //单列
-    var singleInstance = new Class();
-
-    //监听鼠标中间键滚轮滚动事件
-    var scrollFunc=function(e){
-        if(singleInstance.leaveStatus){
-            singleInstance.deleteAll();
-        }
-    };
-    /*注册事件*/
-    if(document.addEventListener){
-        //兼容火狐浏览器
-        document.addEventListener('DOMMouseScroll',scrollFunc,false);
-    }
-    window.onmousewheel=document.onmousewheel=scrollFunc;//IE/Opera/Chrome
 
     var active = {
         createSelect:function (options) {
