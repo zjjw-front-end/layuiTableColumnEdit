@@ -2125,13 +2125,13 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
     othis.cacheOptions = options;
     othis.callback = options.callback;
     othis.data = options.data;
-    othis.leaveStatus = true;
     var that = options.element;
     othis.td = that;
     if ($(that).find('input').length>0) {
       return;
     }
     othis.deleteAll(that);
+    othis.leaveStatus = true;
     var input = $('<input class="layui-input layui-table-select-input" placeholder="关键字搜索">');
     var icon = $('<i class="layui-icon layui-table-select-edge" data-td-text="'+$(that).find("div.layui-table-cell").eq(0).text()+'" >&#xe625;</i>');
     $(that).append(input);
