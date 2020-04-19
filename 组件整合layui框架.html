@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>示例demo</title>
+    <link rel="stylesheet" href="layui/css/layui.css">
+</head>
+<body>
+<table class="layui-hide" id="tableId" lay-filter="tableEvent"></table>
+</body>
+<script src="layui/layui.js"></script>
+<script>
+    layui.use(['table','layer'], function () {
+        var table = layui.table;
+        var selectParams = [
+            {name:1,value:"张三1"},
+            {name:2,value:"张三2"},
+            {name:3,value:"张三3"},
+            {name:4,value:"张三4"},
+            {name:5,value:"张三5"}
+        ];
+        table.render({
+            elem: '#tableId'
+            ,id:'id'
+            ,url:'data.json'
+            ,height: 'full-90'
+            ,page: true
+            ,cols: [[
+                {type:'checkbox'}
+                ,{field:'name',title: '姓名',width:120}
+                ,{field:'danxuan', title: '单选',width:120,edit:'select',data:selectParams}
+                ,{field:'duoxuan', title: '多选',width:120,edit:'select',data:selectParams,enabled:true} //enabled（单、多选开关） true：多选，false：单选。默认为false
+                ,{field:'birthday', title: '生日',width:120,edit:'date',dateType:'date'}
+            ]]
+        });
+        table.on('edit(tableEvent)', function(obj){
+            var value = obj.value //得到修改后的值
+                ,data = obj.data //得到所在行所有键值
+                ,field = obj.field; //得到字段
+            console.log(value);
+            if(field === 'danxuan'){
+                obj.update({danxuan:value.value});
+            }
+
+            if(field === 'duoxuan'){
+                obj.update({duoxuan:'多选'});
+            }
+
+            if(field === 'birthday'){
+                obj.update({birthday:value});
+            }
+        });
+    });
+</script>
+</html>

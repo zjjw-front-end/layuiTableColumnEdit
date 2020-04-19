@@ -1637,6 +1637,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
       if(!editType){
         return;
       }
+      var thisTd = this;
       //显示编辑表单
       if(editType === 'text'){
         var input = $('<input class="layui-input '+ ELEM_EDIT +'">');
@@ -1657,10 +1658,10 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
         });
         singleInstance.select({
           data:thisData,
-          element:this,
+          element:thisTd,
           enabled:thisEnable,//true：开启多选，false：单选。默认为false
           callback:function (res) {
-            layui.event.call(this, MOD_NAME, 'edit('+ filter +')', commonMember.call(this, {
+            layui.event.call(thisTd, MOD_NAME, 'edit('+ filter +')', commonMember.call(thisTd, {
               value: res.select
               ,field: field
             }));
@@ -1680,9 +1681,9 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
         }
         singleInstance.date({
           dateType:dateType,
-          element:this,
+          element:thisTd,
           callback:function (res) {
-            layui.event.call(this, MOD_NAME, 'edit('+ filter +')', commonMember.call(this, {
+            layui.event.call(thisTd, MOD_NAME, 'edit('+ filter +')', commonMember.call(thisTd, {
               value: res.value
               ,field: field
             }));
@@ -2343,7 +2344,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
       var dataList = new Array();
       $("div.layui-table-select-div").find("div li").each(function (e) {
         var liClass = $(this).attr("class");
-        if(!liClass || liTableEdit.indexOf("li-checked") <= -1){
+        if(!liClass || liClass.indexOf("li-checked") <= -1){
           return;
         }
         var name = $(this).data("name");
