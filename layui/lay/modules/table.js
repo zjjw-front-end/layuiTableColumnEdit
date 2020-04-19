@@ -1672,7 +1672,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
         options.cols.forEach(function (e) {
           e.forEach(function (e1) {
             if(e1.field === field){
-              thisData = e1.dateType;
+              dateType = e1.dateType;
             }
           });
         });
