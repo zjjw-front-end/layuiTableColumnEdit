@@ -42,9 +42,8 @@
                 var td = $(obj.tr).find("td[data-field='age']")[0];
                 $.getJSON('selectData.json',{},function (result) {
                     layuiTableColumnEdit.createSelect({
-                        id:'#tableId',
                         data:result.data,
-                        element:td,
+                        element:this,
                         //enabled:true,//true：开启多选，false：单选。默认为false
                         callback:function (obj1) {
                             console.log(obj1.select); //下拉选项数据
@@ -62,7 +61,6 @@
                             ];
                             $(testTd).bind('click',function () {
                                 layuiTableColumnEdit.createSelect({
-                                    id: '#tableId',
                                     element: this,
                                     data: selectParams,
                                     callback: function (obj2) {

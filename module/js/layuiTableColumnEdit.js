@@ -87,15 +87,15 @@ layui.define(["jquery","laydate"],function(exports) {
     Class.prototype.register = function(options){
         var othis = this;
         othis.cacheOptions = options;
-        othis.id = options.id;
         othis.callback = options.callback;
         othis.data = options.data;
         othis.leaveStatus = true;
         var that = options.element;
         othis.td = that;
-        if(!othis.deleteAll(that)){
+        if ($(that).find('input').length>0) {
             return;
         }
+        othis.deleteAll(that);
         var input = $('<input class="layui-input layui-table-select-input" placeholder="关键字搜索">');
         var icon = $('<i class="layui-icon layui-table-select-edge" data-td-text="'+$(that).find("div.layui-table-cell").eq(0).text()+'" >&#xe625;</i>');
         $(that).append(input);
@@ -239,31 +239,20 @@ layui.define(["jquery","laydate"],function(exports) {
     Class.prototype.deleteAll = function(td){
         var othis = this;
         othis.deleteDate();
-        var divDom = $('div.layui-table-select-div');
-        if(divDom.length == 0){
-            return true;
-        }
-        divDom = divDom[0];
-        if(othis.getKey(td) === $(divDom).data('key')){
-            //同一个td元素不动态生成下拉列表
-            return false;
-        }else {
-            $('div.layui-table-body').find('td').each(function () {
-                var icon = $(this).find('i.layui-table-select-edge');
-                if(icon.length === 0){
-                    return;
-                }
-                $(this).find('input.layui-table-select-input').blur();
-                $(this).find('input.layui-table-select-input').remove();
-                icon = icon.eq(0);
-                var text = icon.attr('data-td-text');
-                $(this).find("div.layui-table-cell").eq(0).text(text);
-                icon.remove();
-            });
-            delete othis.leaveStatus;
-            $(divDom).remove();
-            return true;
-        }
+        $('div.layui-table-body').find('td').each(function () {
+            var icon = $(this).find('i.layui-table-select-edge');
+            if(icon.length === 0){
+                return;
+            }
+            $(this).find('input.layui-table-select-input').blur();
+            $(this).find('input.layui-table-select-input').remove();
+            icon = icon.eq(0);
+            var text = icon.attr('data-td-text');
+            $(this).find("div.layui-table-cell").eq(0).text(text);
+            icon.remove();
+        });
+        delete othis.leaveStatus;
+        $('div.layui-table-select-div').remove();
     };
 
     //动态生成下拉框
@@ -277,7 +266,7 @@ layui.define(["jquery","laydate"],function(exports) {
         if(othis.cacheOptions.enabled === true){
             othis.createDivli(domArr,tdInfo,width,left,type);
         }else {
-            domArr.push('<div class="layui-table-select-div div-style" data-key="'+othis.getKey(tdInfo.td)+'" style="z-index: 19910908;'+type+' width:'+width+'px;position: absolute; left: '+left+'px;">');
+            domArr.push('<div class="layui-table-select-div div-style" style="z-index: 19910908;'+type+' width:'+width+'px;position: absolute; left: '+left+'px;">');
                 domArr.push('<dl>');
                     if(data){
                         othis.createHtml(data,domArr);
@@ -294,7 +283,7 @@ layui.define(["jquery","laydate"],function(exports) {
     //生成多选下拉框
     Class.prototype.createDivli = function(domArr,tdInfo,width,left,type){
         var othis = this;
-        domArr.push('<div class="layui-table-select-div" data-key="'+othis.getKey(tdInfo.td)+'" style="z-index: 19910908;'+type+' width:'+width+'px;position: absolute; left: '+left+'px;">');
+        domArr.push('<div class="layui-table-select-div" style="z-index: 19910908;'+type+' width:'+width+'px;position: absolute; left: '+left+'px;">');
             domArr.push('<div><spn style="text-align: left"><button type="button" id="selectAll" class="layui-btn layui-btn-sm layui-btn-primary">全选</button></spn><span style="float: right"><button id="confirmBtn" type="button" class="layui-btn layui-btn-sm layui-btn-primary">确定</button></span></div>');
                 domArr.push('<div style="margin:0;background-color: #93f3ff;border: 1px solid #d2d2d2;max-height: 290px;overflow-y: auto;font: 14px Helvetica Neue,Helvetica,PingFang SC,Tahoma,Arial,sans-serif;">');
                 domArr.push('<ul class="ul-edit-data" >');
@@ -354,12 +343,6 @@ layui.define(["jquery","laydate"],function(exports) {
                 }
             });
         });
-    };
-
-    //生成key -> 表id+行索引+列索引，中间以“-”相连，用于识别是否是点击同一个单元格。
-    Class.prototype.getKey = function (that) {
-        var othis = this;
-        return othis.id+'-'+$(that).parent().data('index')+$(that).data('key');
     };
 
     //注册鼠标移动事件
@@ -426,6 +409,6 @@ layui.define(["jquery","laydate"],function(exports) {
             singleInstance.date(options);
         }
     };
-    layui.link(layui.cache.base + 'css/layuiTableColumnEdit.css');
+    //layui.link(layui.cache.base + 'css/layuiTableColumnEdit.css');
     exports('layuiTableColumnEdit', active);
 });

@@ -48,12 +48,10 @@
 
         table.on('tool(tableEvent)', function(obj){
             if(obj.event === 'state'){
-                var td = $(obj.tr).find("td[data-field='state']")[0];
                 $.getJSON('selectData.json',{},function (result) {
                     layuiTableColumnEdit.createSelect({
-                        id:'#tableId',
                         data:result.data,
-                        element:td,
+                        element:this,
                         enabled:true,//true：开启多选，false：单选。默认为false
                         callback:function (obj1) {
                             console.log(obj1.select); //下拉选项数据
@@ -65,10 +63,9 @@
                     });
                 });
             }else if(obj.event === 'test'){
-                var testTd = $(obj.tr).find("td[data-field='test']")[0];
+                var othis = this;
                 layuiTableColumnEdit.createSelect({
-                    id: '#tableId',
-                    element: this,
+                    element: othis,
                     data: selectParams,
                     enabled:true,//true：开启多选，false：单选。默认为false
                     callback: function (obj2) {
@@ -77,7 +74,7 @@
                         //把选择的数据更新到行数据中
                         obj.update({test: parseInt(obj2.select.name)});
                         //把选择的显示数据更新到单元格中显示
-                        layuiTableColumnEdit.update({element:testTd,value:obj2.select.value});
+                        layuiTableColumnEdit.update({element:othis,value:obj2.select.value});
                     }
                 });
             }
