@@ -2231,7 +2231,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
       layui.stope(e);
       var icon = $(this).find("i");
       var liClass = $(this).attr("class");
-      if(liClass && liTableEdit.indexOf("li-checked") > -1){
+      if(liClass && liClass.indexOf("li-checked") > -1){
         icon.css("background-color","#fff");
         $(this).removeClass("li-checked");
       }else {
