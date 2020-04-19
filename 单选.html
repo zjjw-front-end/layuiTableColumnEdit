@@ -47,7 +47,6 @@
                 var td = $(obj.tr).find("td[data-field='state']")[0];
                 $.getJSON('selectData.json',{},function (result) {
                     layuiTableColumnEdit.createSelect({
-                        id:'#tableId',
                         data:result.data,
                         element:td,
                         //enabled:true,//true：开启多选，false：单选。默认为false
@@ -63,7 +62,6 @@
             }else if(obj.event === 'test'){
                 var testTd = $(obj.tr).find("td[data-field='test']")[0];
                 layuiTableColumnEdit.createSelect({
-                    id: '#tableId',
                     element: this,
                     data: selectParams,
                     callback: function (obj2) {

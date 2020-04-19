@@ -35,7 +35,57 @@ layui.config({
 });
 ```
 
-### 2.在layui table单元格中渲染下拉列表
+### 2.整合layui使用
+
+注意：整合layui使用时，必须下载本项目的layui包，否则不能使用！
+
+```html
+<table class="layui-hide" id="tableId" lay-filter="tableEvent"></table>
+<script>
+       layui.use(['table','layer'], function () {
+           var table = layui.table;
+           var selectParams = [
+               {name:1,value:"张三1"},
+               {name:2,value:"张三2"},
+               {name:3,value:"张三3"},
+               {name:4,value:"张三4"},
+               {name:5,value:"张三5"}
+           ];
+           table.render({
+               elem: '#tableId'
+               ,id:'id'
+               ,url:'data.json'
+               ,height: 'full-90'
+               ,page: true
+               ,cols: [[
+                   {type:'checkbox'}
+                   ,{field:'name',title: '姓名',width:120}
+                   ,{field:'danxuan', title: '单选',width:120,edit:'select',data:selectParams}
+                   ,{field:'duoxuan', title: '多选',width:120,edit:'select',data:selectParams,enabled:true} //enabled（单、多选开关） true：多选，false：单选。默认为false
+                   ,{field:'birthday', title: '生日',width:120,edit:'date',dateType:'date'}
+               ]]
+           });
+           table.on('edit(tableEvent)', function(obj){
+               var value = obj.value //得到修改后的值
+                   ,data = obj.data //得到所在行所有键值
+                   ,field = obj.field; //得到字段
+               console.log(value);
+               if(field === 'danxuan'){
+                   obj.update({danxuan:value.value});
+               }
+   
+               if(field === 'duoxuan'){
+                   obj.update({duoxuan:'多选'});
+               }
+   
+               if(field === 'birthday'){
+                   obj.update({birthday:value});
+               }
+           });
+       });
+</script>
+```
+### 3.单独使用
 
 ```html
 <table class="layui-hide" id="tableId" lay-filter="tableEvent"></table>
@@ -77,7 +127,6 @@ layui.config({
                   var td = $(obj.tr).find("td[data-field='state']")[0];
                   $.getJSON('selectData.json',{},function (result) {
                       layuiTableColumnEdit.createSelect({
-                          id:'#tableId',
                           data:result.data,
                           element:td,
                           //enabled:true,//true：开启多选，false：单选。默认为false
@@ -97,7 +146,6 @@ layui.config({
 </script>
 ```
 
-
 ### 3.方法说明
 方法名 | 描述 |
 ---          | ----
@@ -109,7 +157,6 @@ update       | 更新单元格显示数据 注意：只更新显示的值，不�
 #### createSelect
 参数 | 类型 | 是否必填 | 描述 |
 --- | --- | --- | ----
-id        | string | 是 | table表格的id值。
 data      | array | 是 | 下拉数据。格式见（data格式）说明。
 element   | DOM元素 | 是 | 单元格（td）元素，该参数必须为原生的DOM元素对象，不能为<br/>jquery元素对象。
 callback  | function | 是 | 事件发生后的回调函数。
