@@ -5,21 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>示例demo</title>
     <link rel="stylesheet" href="layui/css/layui.css">
-    <link rel="stylesheet" href="layui/css/modules/tableedit/tableedit.css">
 </head>
 <body>
 <table class="layui-hide" id="tableId" lay-filter="tableEvent"></table>
 </body>
 <script src="layui/layui.js"></script>
 <script>
-    /*layui.config({
+    layui.config({
         base: 'module/'
     }).extend({
         layuiTableColumnEdit:'js/layuiTableColumnEdit'
-    })*/layui.use(['table','layer'], function () {
+    }).use(['table','layuiTableColumnEdit','layer'], function () {
         var table = layui.table,layer = layui.layer;
-        //var layuiTableColumnEdit = layui.layuiTableColumnEdit;
-        //var $ = layui.$;
+        var layuiTableColumnEdit = layui.layuiTableColumnEdit;
+        var $ = layui.$;
         var selectParams = [
             {name:1,value:"张三1"},
             {name:2,value:"张三2"},
@@ -36,23 +35,21 @@
             ,cols: [[
                 {type:'checkbox'}
                 ,{field:'name',title: 'table输入框',width:120}
-                ,{field:'age', title: 'table点击事件',width:120,edit:'select',data:selectParams,sort:'true'}
-                ,{field:'state', title: 'ajax传参',width:120,edit:'date',dateType:'datetime'}
+                ,{field:'age', title: 'table点击事件',width:120,sort:'true'}
+                ,{field:'state', title: 'ajax传参',width:120,event:'state'}
                 ,{field:'test', title: '数组传参',width:120,event:'test',sort:'true'}
             ]],
             done:function (res, curr, count) {
             }
         });
-        table.on('edit(tableEvent)', function(obj){
-            console.log(obj);
-        });
-        /*table.on('tool(tableEvent)', function(obj){
-            var othis = this;
+        table.on('tool(tableEvent)', function(obj){
             if(obj.event === 'state'){
+                var td = $(obj.tr).find("td[data-field='state']")[0];
                 $.getJSON('selectData.json',{},function (result) {
                     layuiTableColumnEdit.createSelect({
+                        id:'#tableId',
                         data:result.data,
-                        element:othis,
+                        element:td,
                         //enabled:true,//true：开启多选，false：单选。默认为false
                         callback:function (obj1) {
                             console.log(obj1.select); //下拉选项数据
@@ -64,8 +61,10 @@
                     });
                 });
             }else if(obj.event === 'test'){
+                var testTd = $(obj.tr).find("td[data-field='test']")[0];
                 layuiTableColumnEdit.createSelect({
-                    element: othis,
+                    id: '#tableId',
+                    element: this,
                     data: selectParams,
                     callback: function (obj2) {
                         console.log(obj2.select); //下拉选项数据
@@ -77,7 +76,7 @@
                     }
                 });
             }
-        });*/
+        });
     });
 </script>
 </html>
