@@ -37,7 +37,7 @@ layui.config({
 
 ### 2.整合layui使用
 
-注意：整合layui使用时，必须下载本项目的layui包，否则不能使用！
+注意：整合layui使用时，必须使用本项目的table.js和layui.css，否则不能使用！
 
 ```html
 <table class="layui-hide" id="tableId" lay-filter="tableEvent"></table>
