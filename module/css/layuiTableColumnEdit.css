@@ -40,6 +40,11 @@
     border-color: transparent;
 }
 
+.layui-edge-transform{
+    transform:rotate(180deg);
+    transition: all .3s;
+}
+
 .layui-table-select-input{
     position: absolute;
     left: 0;

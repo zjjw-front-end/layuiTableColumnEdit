@@ -12,20 +12,6 @@ layui.define(["jquery","laydate"],function(exports) {
             if(singleInstance.leaveStatus){
                 singleInstance.deleteAll();
             }
-        },
-        //鼠标移动的回调事件
-        mousemoveEventCall = function (e) {
-            e = e || window.event;
-            var p = singleInstance.point;
-            if(e.pageX || e.pageY) {
-                var xy = {x:e.pageX,y:e.pageY};
-                if(xy.x > p.maxX || xy.x < p.minX || xy.y > p.maxY || xy.y < p.minY){
-                    //此范围内删除所有下拉框和input
-                    singleInstance.deleteAll();
-                    //取消绑定的鼠标移动事件
-                    $(window).unbind('mousemove',mousemoveEventCall);
-                }
-            }
         };
     /*注册事件*/
     if(document.addEventListener){
@@ -33,6 +19,12 @@ layui.define(["jquery","laydate"],function(exports) {
         document.addEventListener('DOMMouseScroll',scrollFunc,false);
     }
     window.onmousewheel=document.onmousewheel=scrollFunc;//IE/Opera/Chrome
+
+    document.onclick = function () {
+        if(singleInstance.leaveStat){
+            singleInstance.deleteAll();
+        }
+    };
 
     //日期选择框
     Class.prototype.date = function(options){
@@ -45,10 +37,11 @@ layui.define(["jquery","laydate"],function(exports) {
         if ($(that).find('input').length>0) {
             return;
         }
-        othis.deleteDate();
+        othis.deleteAll();
+        othis.leaveStat = false;
         var input = $('<input class="layui-input layui-table-select-input" type="text" id="thisDate">');
         $(that).append(input);
-        var icon = $('<i class="layui-icon layui-table-select-edge">&#x1006;</i>');
+        var icon = $('<i class="layui-icon layui-table-select-edge">&#x1007;</i>');
         $(that).append(icon);
         icon.bind('click',function () {
             layui.stope();
@@ -65,6 +58,22 @@ layui.define(["jquery","laydate"],function(exports) {
                 }
             }
         });
+
+        $('div.layui-laydate').hover(
+            function () {
+                othis.leaveStat = false;
+            },function () {
+                othis.leaveStat = true;
+            }
+        );
+
+        $(othis.td).hover(
+            function () {
+                othis.leaveStat = false;
+            },function () {
+                othis.leaveStat = true;
+            }
+        );
     };
 
     //判断是否为空函数
@@ -81,6 +90,7 @@ layui.define(["jquery","laydate"],function(exports) {
         $("#thisDate").next().remove();
         $("#thisDate").remove();
         $("div.layui-laydate").remove();
+        delete this.leaveStat;
     };
 
     //生成下拉框函数入口
@@ -91,11 +101,13 @@ layui.define(["jquery","laydate"],function(exports) {
         othis.data = options.data;
         var that = options.element;
         othis.td = that;
+        delete othis.leaveStat;
         if ($(that).find('input').length>0) {
             return;
         }
         othis.deleteAll(that);
         othis.leaveStatus = true;
+        othis.leaveStat = false;
         var input = $('<input class="layui-input layui-table-select-input" placeholder="关键字搜索">');
         var icon = $('<i class="layui-icon layui-table-select-edge" data-td-text="'+$(that).find("div.layui-table-cell").eq(0).text()+'" >&#xe625;</i>');
         $(that).append(input);
@@ -136,8 +148,6 @@ layui.define(["jquery","laydate"],function(exports) {
                 dl.prepend(searchDDs.join(" "));
                 othis.ddClick(that);
             }
-            //重新注册鼠标移动事件
-            othis.registerMousemove(that,tdInfo.type); //注册事件
         });
         icon.bind('click',function () {
             layui.stope();
@@ -161,12 +171,12 @@ layui.define(["jquery","laydate"],function(exports) {
         if(thisY+tdHeight > 0.55*winHeight){
             //往上延伸
             tdInfo.type = 'up';
+            $(icon).addClass("layui-edge-transform");
         }else {
             //往下延伸
             tdInfo.type = 'down';
         }
         othis.dynamicGenerationSelect(othis.data,tdInfo);
-        othis.registerMousemove(that,tdInfo.type);
         othis.registerHover();
     };
 
@@ -252,6 +262,7 @@ layui.define(["jquery","laydate"],function(exports) {
             icon.remove();
         });
         delete othis.leaveStatus;
+        delete othis.leaveStat;
         $('div.layui-table-select-div').remove();
     };
 
@@ -345,42 +356,6 @@ layui.define(["jquery","laydate"],function(exports) {
         });
     };
 
-    //注册鼠标移动事件
-    Class.prototype.registerMousemove = function (that,type) {
-        var othis = this;
-        var divDom = $('div.layui-table-select-div')[0];
-        var divHeight = divDom.offsetHeight;
-        var thisY = that.getBoundingClientRect().top; //y坐标
-        var thisX = that.getBoundingClientRect().left; //x坐标
-        var tdHeight = that.offsetHeight;
-        var tdWidth = that.offsetWidth;
-        var maxY,maxX,minY,minX;
-        //计算出最大y坐标、最小y坐标、最大x坐标，最小x坐标。
-        if('down' === type){
-            //往下延伸
-            maxY = thisY+tdHeight+divHeight;
-            maxX = thisX + tdWidth;
-            minY = thisY;
-            minX = thisX;
-        }else {
-            //往上延伸
-            maxY = thisY+tdHeight;
-            maxX = thisX + tdWidth;
-            minY = thisY-divHeight;
-            minX = thisX;
-        }
-        othis.point = {
-            maxX:maxX
-            ,maxY:maxY
-            ,minX:minX
-            ,minY:minY
-        };
-        //先解绑鼠标移动事件
-        $(window).unbind('mousemove',mousemoveEventCall);
-        //再次绑定鼠标移动事件
-        $(window).bind('mousemove',mousemoveEventCall);
-    };
-
     //更新单元格中的显示值
     Class.prototype.update = function (options) {
         $(options.element).find("div.layui-table-cell").eq(0).text(options.value);
@@ -392,8 +367,18 @@ layui.define(["jquery","laydate"],function(exports) {
         $('div.layui-table-select-div').hover(
             function () {
                 othis.leaveStatus = false;
+                othis.leaveStat = false;
             },function () {
                 othis.leaveStatus = true;
+                othis.leaveStat = true;
+            }
+        );
+
+        $(othis.td).hover(
+            function () {
+                othis.leaveStat = false;
+            },function () {
+                othis.leaveStat = true;
             }
         );
     };

@@ -2048,20 +2048,6 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
         if(singleInstance.leaveStatus){
           singleInstance.deleteAll();
         }
-      },
-      //鼠标移动的回调事件
-      mousemoveEventCall = function (e) {
-        e = e || window.event;
-        var p = singleInstance.point;
-        if(e.pageX || e.pageY) {
-          var xy = {x:e.pageX,y:e.pageY};
-          if(xy.x > p.maxX || xy.x < p.minX || xy.y > p.maxY || xy.y < p.minY){
-            //此范围内删除所有下拉框和input
-            singleInstance.deleteAll();
-            //取消绑定的鼠标移动事件
-            $(window).unbind('mousemove',mousemoveEventCall);
-          }
-        }
       };
   /*注册事件*/
   if(document.addEventListener){
@@ -2069,6 +2055,12 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
     document.addEventListener('DOMMouseScroll',scrollFunc,false);
   }
   window.onmousewheel=document.onmousewheel=scrollFunc;//IE/Opera/Chrome
+
+  document.onclick = function () {
+    if(singleInstance.leaveStat){
+      singleInstance.deleteAll();
+    }
+  };
 
   //日期选择框
   TableEdit.prototype.date = function(options){
@@ -2081,26 +2073,43 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
     if ($(that).find('input').length>0) {
       return;
     }
-    othis.deleteDate();
+    othis.deleteAll();
+    othis.leaveStat = false;
     var input = $('<input class="layui-input layui-table-select-input" type="text" id="thisDate">');
     $(that).append(input);
-    var icon = $('<i class="layui-icon layui-table-select-edge">&#x1006;</i>');
+    var icon = $('<i class="layui-icon layui-table-select-edge">&#x1007;</i>');
     $(that).append(icon);
     icon.bind('click',function () {
       layui.stope();
-      othis.deleteDate();
+      othis.deleteAll();
     });
     //日期时间选择器
     laydate.render({
       elem: '#thisDate'
       ,type: othis.cacheOptions.dateType
       ,done:function (value, date) {
-        othis.deleteDate();
+        othis.deleteAll();
         if(othis.callback){
           othis.callback({value:value,td:that});
         }
       }
     });
+
+    $('div.layui-laydate').hover(
+        function () {
+          othis.leaveStat = false;
+        },function () {
+          othis.leaveStat = true;
+        }
+    );
+
+    $(othis.td).hover(
+        function () {
+          othis.leaveStat = false;
+        },function () {
+          othis.leaveStat = true;
+        }
+    );
   };
 
   //判断是否为空函数
@@ -2132,6 +2141,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
     }
     othis.deleteAll(that);
     othis.leaveStatus = true;
+    othis.leaveStat = false;
     var input = $('<input class="layui-input layui-table-select-input" placeholder="关键字搜索">');
     var icon = $('<i class="layui-icon layui-table-select-edge" data-td-text="'+$(that).find("div.layui-table-cell").eq(0).text()+'" >&#xe625;</i>');
     $(that).append(input);
@@ -2172,8 +2182,6 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
         dl.prepend(searchDDs.join(" "));
         othis.ddClick(that);
       }
-      //重新注册鼠标移动事件
-      othis.registerMousemove(that,tdInfo.type); //注册事件
     });
     icon.bind('click',function () {
       layui.stope();
@@ -2197,12 +2205,12 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
     if(thisY+tdHeight > 0.55*winHeight){
       //往上延伸
       tdInfo.type = 'up';
+      $(icon).addClass("layui-edge-transform");
     }else {
       //往下延伸
       tdInfo.type = 'down';
     }
     othis.dynamicGenerationSelect(othis.data,tdInfo);
-    othis.registerMousemove(that,tdInfo.type);
     othis.registerHover();
   };
 
@@ -2288,6 +2296,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
       icon.remove();
     });
     delete othis.leaveStatus;
+    delete othis.leaveStat;
     $('div.layui-table-select-div').remove();
   };
 
@@ -2381,42 +2390,6 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
     });
   };
 
-  //注册鼠标移动事件
-  TableEdit.prototype.registerMousemove = function (that,type) {
-    var othis = this;
-    var divDom = $('div.layui-table-select-div')[0];
-    var divHeight = divDom.offsetHeight;
-    var thisY = that.getBoundingClientRect().top; //y坐标
-    var thisX = that.getBoundingClientRect().left; //x坐标
-    var tdHeight = that.offsetHeight;
-    var tdWidth = that.offsetWidth;
-    var maxY,maxX,minY,minX;
-    //计算出最大y坐标、最小y坐标、最大x坐标，最小x坐标。
-    if('down' === type){
-      //往下延伸
-      maxY = thisY+tdHeight+divHeight;
-      maxX = thisX + tdWidth;
-      minY = thisY;
-      minX = thisX;
-    }else {
-      //往上延伸
-      maxY = thisY+tdHeight;
-      maxX = thisX + tdWidth;
-      minY = thisY-divHeight;
-      minX = thisX;
-    }
-    othis.point = {
-      maxX:maxX
-      ,maxY:maxY
-      ,minX:minX
-      ,minY:minY
-    };
-    //先解绑鼠标移动事件
-    $(window).unbind('mousemove',mousemoveEventCall);
-    //再次绑定鼠标移动事件
-    $(window).bind('mousemove',mousemoveEventCall);
-  };
-
   //更新单元格中的显示值
   TableEdit.prototype.update = function (options) {
     $(options.element).find("div.layui-table-cell").eq(0).text(options.value);
@@ -2428,8 +2401,18 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
     $('div.layui-table-select-div').hover(
         function () {
           othis.leaveStatus = false;
+          othis.leaveStat = false;
         },function () {
           othis.leaveStatus = true;
+          othis.leaveStat = true;
+        }
+    );
+
+    $(othis.td).hover(
+        function () {
+          othis.leaveStat = false;
+        },function () {
+          othis.leaveStat = true;
         }
     );
   };
