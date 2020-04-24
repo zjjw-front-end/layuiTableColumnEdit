@@ -45,14 +45,14 @@ layui.define(["jquery","laydate"],function(exports) {
         $(that).append(icon);
         icon.bind('click',function () {
             layui.stope();
-            othis.deleteDate();
+            othis.deleteAll();
         });
         //日期时间选择器
         laydate.render({
             elem: '#thisDate'
             ,type: othis.cacheOptions.dateType
             ,done:function (value, date) {
-                othis.deleteDate();
+                othis.deleteAll();
                 if(othis.callback){
                     othis.callback({value:value,td:that});
                 }
