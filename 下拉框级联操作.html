@@ -43,7 +43,7 @@
                 $.getJSON('selectData.json',{},function (result) {
                     layuiTableColumnEdit.createSelect({
                         data:result.data,
-                        element:this,
+                        element:td,
                         //enabled:true,//true：开启多选，false：单选。默认为false
                         callback:function (obj1) {
                             console.log(obj1.select); //下拉选项数据

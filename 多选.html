@@ -47,11 +47,12 @@
         });
 
         table.on('tool(tableEvent)', function(obj){
+            var othis = this;
             if(obj.event === 'state'){
                 $.getJSON('selectData.json',{},function (result) {
                     layuiTableColumnEdit.createSelect({
                         data:result.data,
-                        element:this,
+                        element:othis,
                         enabled:true,//true：开启多选，false：单选。默认为false
                         callback:function (obj1) {
                             console.log(obj1.select); //下拉选项数据
@@ -63,7 +64,6 @@
                     });
                 });
             }else if(obj.event === 'test'){
-                var othis = this;
                 layuiTableColumnEdit.createSelect({
                     element: othis,
                     data: selectParams,

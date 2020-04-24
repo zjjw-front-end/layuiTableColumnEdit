@@ -1,7 +1,7 @@
-layui.define(["jquery","laydate"],function(exports) {
+layui.define(["jquery","laydate","laytpl"],function(exports) {
     "use strict";
 
-    var $ = layui.jquery,laydate = layui.laydate,
+    var $ = layui.jquery,laydate = layui.laydate,laytpl = layui.laytpl,
         //构造器
         Class = function () {
         },
@@ -101,7 +101,6 @@ layui.define(["jquery","laydate"],function(exports) {
         othis.data = options.data;
         var that = options.element;
         othis.td = that;
-        delete othis.leaveStat;
         if ($(that).find('input').length>0) {
             return;
         }
@@ -130,22 +129,48 @@ layui.define(["jquery","laydate"],function(exports) {
                         if(classText.indexOf("li-checked") > -1){
                             backgroundColor = "background-color: #60b979";
                         }
-                        searchDDs.push('<li class="'+$(this).attr("class")+'" data-name="'+$(this).data('name')+'" data-value="'+thisValue+'"><div class="define-edit-checkbox" lay-skin="primary"><span>'+thisValue+'</span><i style="'+backgroundColor+'" class="layui-icon layui-icon-ok"></i></div></li>');
+                        var searchHtml = [
+                            '<li class="'+$(this).attr("class")+'" data-name="'+$(this).data('name')+'" data-value="'+thisValue+'">'
+                               ,'<div class="define-edit-checkbox" lay-skin="primary">'
+                                  ,'<span>'+thisValue+'</span>'
+                                  ,'<i style="'+backgroundColor+'" class="layui-icon layui-icon-ok"></i>'
+                               ,'</div>'
+                            ,'</li>'].join('');
+                        searchDDs.push(searchHtml);
                         $(this).remove();
                     }
                 });
-                ul.prepend(searchDDs.join(" "));
+                ul.prepend(searchDDs.join(""));
                 othis.liClick(that);
             }else {
                 var dl = $('div.layui-table-select-div').find('dl').eq(0);
-                var searchDDs = [];
+                var html;
                 if(val === null || val === '' || val.length === 0){
-                    searchDDs = othis.createHtml(othis.data);
+                    html = [
+                        '{{# if(d.data){ }}'
+                           ,'{{# layui.each(d.data, function(index,item){ }}'
+                               ,'<dd lay-value="{{ item.name }}" class="layui-table-select-dd">{{ item.value }}</dd>',
+                           ,'{{# }); }}'
+                        ,'{{# } else { }}'
+                               ,'<dd lay-value="" class="">无数据</dd>'
+                        ,'{{# } }}'].join('');
                 }else {
-                    searchDDs = othis.searchHtml(othis.data,val);
+                    html = [
+                        '{{# if(d.data){ }}'
+                           ,'{{# layui.each(d.data, function(index,item){ }}'
+                               ,'{{# if((item.value+\'\').indexOf(d.search)>-1){ }}'
+                                   ,'<dd lay-value="{{ item.name }}" class="layui-table-select-dd">{{ item.value }}</dd>',
+                               ,'{{# } }}'
+                           ,'{{# }); }}'
+                        ,'{{# } else { }}'
+                            ,'<dd lay-value="" class="">无数据</dd>'
+                        ,'{{# } }}'].join('');
                 }
                 dl.html("");
-                dl.prepend(searchDDs.join(" "));
+                dl.prepend(laytpl(html).render({
+                    data: othis.data
+                    ,search: val //索引
+                }));
                 othis.ddClick(that);
             }
         });
@@ -215,36 +240,6 @@ layui.define(["jquery","laydate"],function(exports) {
         });
     };
 
-
-    //生成下拉选择框的html代码(单选)
-    Class.prototype.createHtml = function(selectData,data){
-        if(!data)data = [];
-        selectData.forEach(function (e) {
-            data.push('<dd lay-value="'+e.name+'" class="layui-table-select-dd">'+e.value+'</dd>');
-        });
-        return data;
-    };
-    //生成根据关键字搜索的下拉选择框(单选)
-    Class.prototype.searchHtml = function(selectData,search,data){
-        if(!data)data = [];
-        selectData.forEach(function (e) {
-            if((e.value+'').indexOf(search)>-1){
-                data.push('<dd lay-value="'+e.name+'" class="layui-table-select-dd">'+e.value+'</dd>');
-            }
-        });
-        return data;
-    };
-
-
-    //生成下拉选择框的html代码(多选)
-    Class.prototype.createHtmlLi = function(selectData,data){
-        if(!data)data = [];
-        selectData.forEach(function (e) {
-            data.push('<li class="define-edit-checkbox" data-name="'+e.name+'" data-value="'+e.value+'"><div class="define-edit-checkbox" lay-skin="primary"><span>'+e.value+'</span><i class="layui-icon layui-icon-ok"></i></div></li>');
-        });
-        return data;
-    };
-
     //删除所有删除下拉框和input和div
     Class.prototype.deleteAll = function(td){
         var othis = this;
@@ -269,44 +264,62 @@ layui.define(["jquery","laydate"],function(exports) {
     //动态生成下拉框
     Class.prototype.dynamicGenerationSelect = function(data,tdInfo){
         var othis = this;
-        var domArr = [];
+        var html;
         var winHeight = $(window).height()+window.scrollY;//加上滚动条滚动高度
         var type = tdInfo.type === 'up'?'top:auto;bottom: '+(winHeight-tdInfo.y)+'px;':'bottom:auto;top:'+(tdInfo.y+tdInfo.height)+'px;';
         var width = tdInfo.width;
         var left = tdInfo.x;
         if(othis.cacheOptions.enabled === true){
-            othis.createDivli(domArr,tdInfo,width,left,type);
+            html = [
+                '<div class="layui-table-select-div" style="z-index: 19910908;{{d.style.type}} width: {{d.style.width}}px;position: absolute; left: {{d.style.left}}px;">'
+                   ,'<div>'
+                       ,'<span style="text-align: left">'
+                          ,'<button type="button" id="selectAll" class="layui-btn layui-btn-sm layui-btn-primary">全选</button>'
+                       ,'</span>'
+                       ,'<span style="float: right">'
+                          ,'<button id="confirmBtn" type="button" class="layui-btn layui-btn-sm layui-btn-primary">确定</button>'
+                       ,'</span>'
+                   ,'</div>'
+                   ,'<div style="margin:0;background-color: #93f3ff;border: 1px solid #d2d2d2;max-height: 290px;overflow-y: auto;font: 14px Helvetica Neue,Helvetica,PingFang SC,Tahoma,Arial,sans-serif;">'
+                       ,'<ul class="ul-edit-data" >'
+                          ,'{{# if(d.data){ }}'
+                              ,'{{# layui.each(d.data, function(index,item){ }}'
+                                 ,'<li class="define-edit-checkbox" data-name="{{ item.name }}" data-value="{{ item.value }}">'
+                                    ,'<div class="define-edit-checkbox" lay-skin="primary">'
+                                       ,'<span>{{ item.value }}</span>'
+                                       ,'<i class="layui-icon layui-icon-ok"></i>'
+                                    ,'</div>'
+                                 ,'</li>'
+                              ,'{{# }); }}'
+                          ,'{{# } else { }}'
+                                 ,'<li>无数据</li>'
+                          ,'{{# } }}'
+                       ,'</ul>'
+                   ,'</div>'
+                ,'</div>'].join('');
         }else {
-            domArr.push('<div class="layui-table-select-div div-style" style="z-index: 19910908;'+type+' width:'+width+'px;position: absolute; left: '+left+'px;">');
-                domArr.push('<dl>');
-                    if(data){
-                        othis.createHtml(data,domArr);
-                    }else {
-                        domArr.push('<dd lay-value="" class="">无数据</dd>');
-                    }
-                domArr.push('</dl>');
-            domArr.push('</div>');
-            $('body').append(domArr.join(" "));
-            othis.ddClick();
+            html = [
+             '<div class="layui-table-select-div div-style" style="z-index: 19910908;{{d.style.type}} width: {{d.style.width}}px;position: absolute; left: {{d.style.left}}px;">'
+               ,'<dl>'
+                 ,'{{# if(d.data){ }}'
+                    ,'{{# layui.each(d.data, function(index,item){ }}'
+                        ,'<dd lay-value="{{ item.name }}" class="layui-table-select-dd">{{ item.value }}</dd>',
+                    ,'{{# }); }}'
+                 ,'{{# } else { }}'
+                    ,'<dd lay-value="" class="">无数据</dd>'
+                 ,'{{# } }}'
+               ,'</dl>'
+             ,'</div>'].join('');
         }
-    };
-
-    //生成多选下拉框
-    Class.prototype.createDivli = function(domArr,tdInfo,width,left,type){
-        var othis = this;
-        domArr.push('<div class="layui-table-select-div" style="z-index: 19910908;'+type+' width:'+width+'px;position: absolute; left: '+left+'px;">');
-            domArr.push('<div><spn style="text-align: left"><button type="button" id="selectAll" class="layui-btn layui-btn-sm layui-btn-primary">全选</button></spn><span style="float: right"><button id="confirmBtn" type="button" class="layui-btn layui-btn-sm layui-btn-primary">确定</button></span></div>');
-                domArr.push('<div style="margin:0;background-color: #93f3ff;border: 1px solid #d2d2d2;max-height: 290px;overflow-y: auto;font: 14px Helvetica Neue,Helvetica,PingFang SC,Tahoma,Arial,sans-serif;">');
-                domArr.push('<ul class="ul-edit-data" >');
-                    if(othis.data){
-                        othis.createHtmlLi(othis.data,domArr);
-                    }else {
-                        domArr.push('<li>无数据</li>');
-                    }
-                domArr.push('</ul>');
-            domArr.push('</div>');
-        domArr.push('</div>');
-        $('body').append(domArr.join(" "));
+        $('body').append(laytpl(html).render({
+            data: data
+            ,style: {
+                type: type
+                ,width: width
+                ,left: left
+            }
+        }));
+        othis.ddClick();
         othis.liClick();
         othis.btnClick();
     };
