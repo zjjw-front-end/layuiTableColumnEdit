@@ -2304,7 +2304,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
     var othis = this,html
         ,clientHeight = document.documentElement['clientHeight']
         ,scrollTop = document.documentElement['scrollTop'];//滚动条滚动高度
-    var type = tdInfo.type === 'up'?'top:auto;bottom: '+(clientHeight-scrollTop-tdInfo.y)+'px;':'bottom:auto;top:'+(tdInfo.y+tdInfo.height+scrollTop)+'px;';
+    var type = tdInfo.type === 'up'?'top:auto;bottom: '+(clientHeight-scrollTop-tdInfo.y+3)+'px;':'bottom:auto;top:'+(tdInfo.y+tdInfo.height+scrollTop+3)+'px;';
     var width = tdInfo.width;
     var left = tdInfo.x;
     if(othis.cacheOptions.enabled === true){
