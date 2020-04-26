@@ -2301,10 +2301,10 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
 
   //动态生成下拉框
   TableEdit.prototype.dynamicGenerationSelect = function(data,tdInfo){
-    var othis = this;
-    var html;
-    var winHeight = $(window).height()+window.scrollY;//加上滚动条滚动高度
-    var type = tdInfo.type === 'up'?'top:auto;bottom: '+(winHeight-tdInfo.y)+'px;':'bottom:auto;top:'+(tdInfo.y+tdInfo.height)+'px;';
+    var othis = this,html
+        ,clientHeight = document.documentElement['clientHeight']
+        ,scrollTop = document.documentElement['scrollTop'];//滚动条滚动高度
+    var type = tdInfo.type === 'up'?'top:auto;bottom: '+(clientHeight-scrollTop-tdInfo.y)+'px;':'bottom:auto;top:'+(tdInfo.y+tdInfo.height+scrollTop)+'px;';
     var width = tdInfo.width;
     var left = tdInfo.x;
     if(othis.cacheOptions.enabled === true){
