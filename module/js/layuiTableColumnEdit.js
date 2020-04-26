@@ -1,8 +1,7 @@
 layui.define(["jquery","laydate","laytpl"],function(exports) {
     "use strict";
     var $ = layui.jquery,laydate = layui.laydate,
-        laytpl = layui.laytpl,ddTpl =
-        [
+        laytpl = layui.laytpl,ddTpl = [
             '{{# if(d.data){ }}'
                ,'{{# layui.each(d.data, function(index,item){ }}'
                    ,'<dd lay-value="{{ item.name }}" class="layui-table-select-dd">{{ item.value }}</dd>',
@@ -10,61 +9,50 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
             ,'{{# } else { }}'
                 ,'<dd lay-value="" class="">无数据</dd>'
             ,'{{# } }}'
-        ].join(''),htmlTpl =
-        {
-            //单选下拉框模板
-            selectTpl:
-            [
-                '<div class="layui-table-select-div div-style" style="z-index: 19910908;{{d.style.type}}px; width: {{d.style.width}}px;position: absolute; left: {{d.style.left}}px;">'
-                  , '<dl>'
-                      ,ddTpl
-                  , '</dl>'
-                , '</div>'
-            ].join(''),
-            //多选下拉框模板
-            selectMoreTpl:
-            [
-                '<div class="layui-table-select-div" style="z-index: 19910908;{{d.style.type}}px; width: {{d.style.width}}px;position: absolute; left: {{d.style.left}}px;">'
-                  ,'<div>'
-                     ,'<span style="text-align: left">'
-                        ,'<button type="button" id="selectAll" class="layui-btn layui-btn-sm layui-btn-primary">全选</button>'
-                     ,'</span>'
-                     ,'<span style="float: right">'
-                        ,'<button id="confirmBtn" type="button" class="layui-btn layui-btn-sm layui-btn-primary">确定</button>'
-                     ,'</span>'
-                  ,'</div>'
-                  ,'<div style="margin:0;background-color: #93f3ff;border: 1px solid #d2d2d2;max-height: 290px;overflow-y: auto;font: 14px Helvetica Neue,Helvetica,PingFang SC,Tahoma,Arial,sans-serif;">'
-                     ,'<ul class="ul-edit-data" >'
-                        ,'{{# if(d.data){ }}'
-                            ,'{{# layui.each(d.data, function(index,item){ }}'
-                                ,'<li class="define-edit-checkbox" data-name="{{ item.name }}" data-value="{{ item.value }}">'
-                                   ,'<div class="define-edit-checkbox" lay-skin="primary">'
-                                      ,'<span>{{ item.value }}</span>'
-                                      ,'<i class="layui-icon layui-icon-ok"></i>'
-                                   ,'</div>'
-                                ,'</li>'
-                            ,'{{# }); }}'
-                        ,'{{# } else { }}'
-                            ,'<li>无数据</li>'
-                        ,'{{# } }}'
-                     ,'</ul>'
-                  ,'</div>'
-                ,'</div>'
-            ].join(''),
-            ddTpl:ddTpl,
-            ddSearchTpl:
-            [
-                '{{# if(d.data){ }}'
-                   ,'{{# layui.each(d.data, function(index,item){ }}'
-                       ,'{{# if((item.value+\'\').indexOf(d.search)>-1){ }}'
-                           ,'<dd lay-value="{{ item.name }}" class="layui-table-select-dd">{{ item.value }}</dd>',
-                       ,'{{# } }}'
-                   ,'{{# }); }}'
-                ,'{{# } else { }}'
-                    ,'<dd lay-value="" class="">无数据</dd>'
-                ,'{{# } }}'
-            ].join('')
-        };
+        ].join(''),selectTpl = [ //单选下拉框模板
+            '<div class="layui-table-select-div div-style" style="z-index: 19910908;{{d.style.type}}px; width: {{d.style.width}}px;position: absolute; left: {{d.style.left}}px;">'
+              , '<dl>'
+                  ,ddTpl
+              , '</dl>'
+            , '</div>'
+        ].join(''),selectMoreTpl = [ //多选下拉框模板
+            '<div class="layui-table-select-div" style="z-index: 19910908;{{d.style.type}}px; width: {{d.style.width}}px;position: absolute; left: {{d.style.left}}px;">'
+              ,'<div>'
+                 ,'<span style="text-align: left">'
+                    ,'<button type="button" id="selectAll" class="layui-btn layui-btn-sm layui-btn-primary">全选</button>'
+                 ,'</span>'
+                 ,'<span style="float: right">'
+                    ,'<button id="confirmBtn" type="button" class="layui-btn layui-btn-sm layui-btn-primary">确定</button>'
+                 ,'</span>'
+              ,'</div>'
+              ,'<div style="margin:0;background-color: #93f3ff;border: 1px solid #d2d2d2;max-height: 290px;overflow-y: auto;font: 14px Helvetica Neue,Helvetica,PingFang SC,Tahoma,Arial,sans-serif;">'
+                 ,'<ul class="ul-edit-data" >'
+                    ,'{{# if(d.data){ }}'
+                        ,'{{# layui.each(d.data, function(index,item){ }}'
+                            ,'<li class="define-edit-checkbox" data-name="{{ item.name }}" data-value="{{ item.value }}">'
+                               ,'<div class="define-edit-checkbox" lay-skin="primary">'
+                                  ,'<span>{{ item.value }}</span>'
+                                  ,'<i class="layui-icon layui-icon-ok"></i>'
+                               ,'</div>'
+                            ,'</li>'
+                        ,'{{# }); }}'
+                    ,'{{# } else { }}'
+                        ,'<li>无数据</li>'
+                    ,'{{# } }}'
+                 ,'</ul>'
+              ,'</div>'
+            ,'</div>'
+        ].join(''),ddSearchTpl = [
+            '{{# if(d.data){ }}'
+               ,'{{# layui.each(d.data, function(index,item){ }}'
+                   ,'{{# if((item.value+\'\').indexOf(d.search)>-1){ }}'
+                       ,'<dd lay-value="{{ item.name }}" class="layui-table-select-dd">{{ item.value }}</dd>',
+                   ,'{{# } }}'
+               ,'{{# }); }}'
+            ,'{{# } else { }}'
+                ,'<dd lay-value="" class="">无数据</dd>'
+            ,'{{# } }}'
+        ].join('');
     var Class = function () {}; //构造器
     var singleInstance = new Class(); //单列
     document.onclick = function () {if(singleInstance.leaveStat)singleInstance.deleteAll();};
@@ -133,7 +121,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         //下三角图标旋转180度成上三角图标
         thisY+thisHeight > 0.55*clientHeight ? $(icon).addClass("layui-edge-transform") : '';
         //获取下拉框div模板
-        var html = othis.enabled ? htmlTpl.selectMoreTpl : htmlTpl.selectTpl;
+        var html = othis.enabled ? selectMoreTpl : selectTpl;
         //生成下拉框
         $('body').append(laytpl(html).render({data: othis.data,style: {type: type,width: thisWidth,left: thisX}}));
         //事件注册
@@ -186,7 +174,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
                 ul.prepend(searchDDs.join("")),liFunc();
             }else {
                 var dl = $('div.layui-table-select-div').find('dl').eq(0);
-                var html = othis.isEmpty(val) ? htmlTpl.ddTpl : htmlTpl.ddSearchTpl;
+                var html = othis.isEmpty(val) ? ddTpl : ddSearchTpl;
                 dl.html("");
                 dl.prepend(laytpl(html).render({data: othis.data,search: val})),ddFunc();
             }
