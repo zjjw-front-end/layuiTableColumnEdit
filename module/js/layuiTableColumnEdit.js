@@ -55,6 +55,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         ].join('');
     var Class = function () {}; //构造器
     var singleInstance = new Class(); //单列
+    var inFunc = function () {singleInstance.leaveStat = false;},outFunc = function () {singleInstance.leaveStat = true;};
     document.onclick = function () {if(singleInstance.leaveStat)singleInstance.deleteAll();};
 
     //日期选择框
@@ -67,34 +68,17 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         othis.deleteAll(),othis.leaveStat = false;
         var input = $('<input class="layui-input layui-table-select-input" type="text" id="thisDate">');
         $(that).append(input),input.focus();
-        //日期时间选择器
-        laydate.render({
-            elem: '#thisDate'
-            ,type: othis.dateType
-            ,show: true //直接显示
-            ,done:function (value, date) {
-                othis.deleteAll();
-                if(othis.callback){
-                    othis.callback({value:value,td:that});
-                }
-            }
-        });
-
-        $('div.layui-laydate').hover(
-            function () {othis.leaveStat = false;},
-            function () {othis.leaveStat = true;}
-        );
-        $(that).hover(
-            function () {othis.leaveStat = false;},
-            function () {othis.leaveStat = true;}
-        );
+        //日期时间选择器 (show: true 表示直接显示)
+        laydate.render({elem: '#thisDate',type: othis.dateType,show: true,done:function (value, date) {
+            othis.deleteAll();
+            if(othis.callback)othis.callback({value:value,td:that});
+        }});
+        $('div.layui-laydate').hover(inFunc,outFunc),$(that).hover(inFunc,outFunc);
         layui.stope();
     };
 
     //判断是否为空函数
-    Class.prototype.isEmpty = function(dataStr){
-        return typeof dataStr === 'undefined' || dataStr === null || dataStr.length <= 0;
-    };
+    Class.prototype.isEmpty = function(dataStr){return typeof dataStr === 'undefined' || dataStr === null || dataStr.length <= 0;};
 
     //生成下拉框函数入口
     Class.prototype.register = function(options){
@@ -102,9 +86,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         othis.enabled = options.enabled,othis.callback = options.callback,othis.data = options.data,othis.element = options.element;
         var that = othis.element;
         if ($(that).find('input').length>0)return;
-        othis.deleteAll(that);
-        //鼠标离开单元格或下拉框div区域状态，默认不离开（false）
-        othis.leaveStat = false;
+        othis.deleteAll(that),othis.leaveStat = false; //鼠标离开单元格或下拉框div区域状态，默认不离开（false）
         var input = $('<input class="layui-input layui-table-select-input" placeholder="关键字搜索">');
         var icon = $('<i class="layui-icon layui-table-select-edge" data-td-text="'+$(that).find("div.layui-table-cell").eq(0).text()+'" >&#xe625;</i>');
         othis.input = input,othis.icon = icon;
@@ -129,7 +111,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
     };
 
     //删除所有删除下拉框和时间选择框
-    Class.prototype.deleteAll = function(td){
+    Class.prototype.deleteAll = function(){
         var othis = this;
         //删除下拉框
         $('div.layui-table-body').find('td').each(function () {
@@ -190,8 +172,6 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
                 if(othis.callback)othis.callback({select:{name:$(this).attr('lay-value'),value:$(this).text()},td:othis.element});
             });
         };
-        ddFunc();
-
         //给li元素注册点击事件（多选）
         var liFunc = function(){
             var liArr = $('div.layui-table-select-div').find('li');
@@ -202,19 +182,11 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
                     : (icon.css("background-color","#60b979"),$(this).addClass("li-checked"));
             });
         };
-        liFunc();
+        ddFunc(),liFunc();
 
         //给下拉框和当前单元格（td）注册鼠标悬停事件
-        $('div.layui-table-select-div').hover(
-            function () {othis.leaveStat = false;},
-            function () {othis.leaveStat = true;}
-        );
-        $(othis.element).hover(
-            function () {othis.leaveStat = false;},
-            function () {othis.leaveStat = true;}
-        );
+        $('div.layui-table-select-div').hover(inFunc,outFunc),$(othis.element).hover(inFunc,outFunc);
 
-        //给“确定”按钮和“全选”按钮注册点击事件
         //“确定”按钮
         $('#confirmBtn').bind('click',function (e) {
             var dataList = new Array();
@@ -239,19 +211,11 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         });
     };
 
-    //更新单元格中的显示值
-    Class.prototype.update = function (options) {$(options.element).find("div.layui-table-cell").eq(0).text(options.value);};
-
     var active = {
-        createSelect:function (options) {
-            singleInstance.register(options);
-        },
-        update:function (options) {
-            singleInstance.update(options);
-        },
-        createDate:function (options) {
-            singleInstance.date(options);
-        }
+        createSelect:function (options) {singleInstance.register(options);},
+        update:function (options) {$(options.element).find("div.layui-table-cell").eq(0).text(options.value);},
+        createDate:function (options) {singleInstance.date(options);}
     };
-    layui.link(layui.cache.base + 'css/layuiTableColumnEdit.css'),exports('layuiTableColumnEdit', active);
+    layui.link(layui.cache.base + 'css/layuiTableColumnEdit.css');
+    exports('layuiTableColumnEdit', active);
 });
