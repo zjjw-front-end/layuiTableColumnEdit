@@ -2232,10 +2232,8 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
     othis.input.bind('input propertychange', function(){
       var val = this.value;
       if(othis.cacheOptions.enabled === true){
+        if(othis.isEmpty(val)) return;
         var ul = $('div.layui-table-select-div').find('ul.ul-edit-data').eq(0);
-        if(val === null || val === '' || val.length === 0){
-          return;
-        }
         var searchDDs = [];
         $(ul).find('li').each(function () {
           var thisValue = $(this).data('value');
