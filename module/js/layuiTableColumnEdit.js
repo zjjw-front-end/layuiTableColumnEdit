@@ -47,10 +47,12 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
             layui.stope();
             othis.deleteAll();
         });
+        input.focus();
         //日期时间选择器
         laydate.render({
-            elem: '#thisDate'
+            elem: document.getElementById('thisDate')
             ,type: othis.cacheOptions.dateType
+            ,show: true //直接显示
             ,done:function (value, date) {
                 othis.deleteAll();
                 if(othis.callback){
@@ -58,7 +60,6 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
                 }
             }
         });
-
         $('div.layui-laydate').hover(
             function () {
                 othis.leaveStat = false;
@@ -74,6 +75,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
                 othis.leaveStat = true;
             }
         );
+        layui.stope();
     };
 
     //判断是否为空函数

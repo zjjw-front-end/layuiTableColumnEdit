@@ -1689,6 +1689,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
             }));
           }
         });
+        layui.stope(e);
       }
     }).on('mouseenter', 'td', function(){
       gridExpand.call(this)
@@ -2083,10 +2084,12 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
       layui.stope();
       othis.deleteAll();
     });
+    input.focus();
     //日期时间选择器
     laydate.render({
       elem: '#thisDate'
       ,type: othis.cacheOptions.dateType
+      ,show: true //直接显示
       ,done:function (value, date) {
         othis.deleteAll();
         if(othis.callback){
