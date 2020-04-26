@@ -2109,11 +2109,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
   };
   //单列
   var singleInstance = new TableEdit();
-  document.onclick = function () {
-    if(singleInstance.leaveStat){
-      singleInstance.deleteAll();
-    }
-  };
+  document.onclick = function () {if(singleInstance.leaveStat)singleInstance.deleteAll();};
   //日期选择框
   TableEdit.prototype.date = function(options){
     var othis = this;
@@ -2123,9 +2119,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
         othis.isEmpty(othis.cacheOptions.dateType) ? "datetime":othis.cacheOptions.dateType;
     var that = options.element;
     othis.td = that;
-    if ($(that).find('input').length>0) {
-      return;
-    }
+    if ($(that).find('input').length>0)return;
     othis.deleteAll();
     othis.leaveStat = false;
     var input = $('<input class="layui-input layui-table-select-input" type="text" id="thisDate">');
@@ -2167,9 +2161,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
     othis.data = options.data;
     var that = options.element;
     othis.td = that;
-    if ($(that).find('input').length>0) {
-      return;
-    }
+    if ($(that).find('input').length>0)return;
     othis.deleteAll(that);
     //鼠标离开单元格或下拉框div区域状态，默认不离开（false）
     othis.leaveStat = false;
@@ -2240,10 +2232,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
           thisValue = othis.isEmpty(thisValue)?"":thisValue;
           if(thisValue.indexOf(val) > -1){
             var classText = $(this).attr("class");
-            var backgroundColor = "";
-            if(classText.indexOf("li-checked") > -1){
-              backgroundColor = "background-color: #60b979";
-            }
+            var backgroundColor = classText.indexOf("li-checked") > -1 ? "background-color: #60b979" : '';
             var searchHtml = [
               '<li class="'+$(this).attr("class")+'" data-name="'+$(this).data('name')+'" data-value="'+thisValue+'">'
                 ,'<div class="define-edit-checkbox" lay-skin="primary">'
@@ -2259,7 +2248,7 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
         liFunc();
       }else {
         var dl = $('div.layui-table-select-div').find('dl').eq(0);
-        var html = (val === null || val === '' || val.length === 0) ? othis.htmlTpl.ddTpl : othis.htmlTpl.ddSearchTpl;
+        var html = othis.isEmpty(val) ? othis.htmlTpl.ddTpl : othis.htmlTpl.ddSearchTpl;
         dl.html("");
         dl.prepend(laytpl(html).render({data: othis.data,search: val}));
         ddFunc();
@@ -2271,80 +2260,61 @@ layui.define(['laytpl', 'laypage', 'layer', 'form', 'util','laydate'], function(
       othis.deleteAll();
     });
 
-    //给dd元素注册点击事件(单选)
-    var ddFunc = function () {
-      var ddArr = $('div.layui-table-select-div').find('dd');
-      ddArr.unbind('click');
-      ddArr.bind('click',function (e) {
-        layui.stope(e);
-        var name = $(this).attr('lay-value');
-        othis.deleteAll();
-        if(othis.callback){
-          var update = {name:name,value:$(this).text()};
-          var thisObj = {
-            select:update,
-            td:othis.td
-          };
-          othis.callback(thisObj);
-        }
+      //给dd元素注册点击事件(单选)
+      var ddFunc = function () {
+          var ddArr = $('div.layui-table-select-div').find('dd');
+          ddArr.unbind('click');
+          ddArr.bind('click',function (e) {
+              layui.stope(e);
+              othis.deleteAll();
+              if(othis.callback)othis.callback({select:{name:$(this).attr('lay-value'),value:$(this).text()},td:othis.td});
+          });
+      };
+      ddFunc();
+
+      //给li元素注册点击事件（多选）
+      var liFunc = function(){
+          var liArr = $('div.layui-table-select-div').find('li');
+          liArr.unbind('click');
+          liArr.bind('click',function (e) {
+              layui.stope(e);
+              var icon = $(this).find("i");
+              var liClass = $(this).attr("class");
+              if(liClass && liClass.indexOf("li-checked") > -1){
+                  icon.css("background-color","#fff");
+                  $(this).removeClass("li-checked");
+              }else {
+                  icon.css("background-color","#60b979");
+                  $(this).addClass("li-checked");
+              }
+          });
+      };
+      liFunc();
+
+      //给下拉框和当前单元格（td）注册鼠标悬停事件
+      $('div.layui-table-select-div').hover(
+          function () {othis.leaveStat = false;},
+          function () {othis.leaveStat = true;}
+      );
+      $(othis.td).hover(
+          function () {othis.leaveStat = false;},
+          function () {othis.leaveStat = true;}
+      );
+
+      //给“确定”按钮和“全选”按钮注册点击事件
+      //“确定”按钮
+      $('#confirmBtn').bind('click',function (e) {
+          var dataList = new Array();
+          $("div.layui-table-select-div").find("div li").each(function (e) {
+              var liClass = $(this).attr("class");
+              if(!liClass || liClass.indexOf("li-checked") <= -1)return;
+              dataList.push({name:$(this).data("name"),value:$(this).data("value")});
+          });
+          othis.deleteAll();
+          if(othis.callback)othis.callback({select:dataList,td:othis.td});
       });
-    };
-    ddFunc();
 
-    //给li元素注册点击事件（多选）
-    var liFunc = function(){
-      var liArr = $('div.layui-table-select-div').find('li');
-      liArr.unbind('click');
-      liArr.bind('click',function (e) {
-        layui.stope(e);
-        var icon = $(this).find("i");
-        var liClass = $(this).attr("class");
-        if(liClass && liClass.indexOf("li-checked") > -1){
-          icon.css("background-color","#fff");
-          $(this).removeClass("li-checked");
-        }else {
-          icon.css("background-color","#60b979");
-          $(this).addClass("li-checked");
-        }
-      });
-    };
-    liFunc();
-
-    //给下拉框和当前单元格（td）注册鼠标悬停事件
-    $('div.layui-table-select-div').hover(
-        function () {othis.leaveStat = false;},
-        function () {othis.leaveStat = true;}
-    );
-    $(othis.td).hover(
-        function () {othis.leaveStat = false;},
-        function () {othis.leaveStat = true;}
-    );
-
-    //给“确定”按钮和“全选”按钮注册点击事件
-    //“确定”按钮
-    $('#confirmBtn').bind('click',function (e) {
-      var dataList = new Array();
-      $("div.layui-table-select-div").find("div li").each(function (e) {
-        var liClass = $(this).attr("class");
-        if(!liClass || liClass.indexOf("li-checked") <= -1){
-          return;
-        }
-        var name = $(this).data("name");
-        var value = $(this).data("value");
-        var update = {name:name,value:value};
-        dataList.push(update);
-      });
-      othis.deleteAll();
-      if(othis.callback){
-        var thisObj = {
-          select:dataList,
-          td:othis.td
-        };
-        othis.callback(thisObj);
-      }
-    });
-
-    //“全选”按钮
+      //“全选”按钮
     $('#selectAll').bind('click',function () {
       var btn = this;
       var status = $(this).attr('data-status');
