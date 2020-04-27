@@ -52,6 +52,13 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
             ,'{{# } else { }}'
                 ,'<dd lay-value="" class="layui-define-tcs-dd">无数据</dd>'
             ,'{{# } }}'
+        ].join(''),liTpl = [
+            '<li class="{{ d.classText }}" data-name="{{ d.name }}" data-value="{{ d.value }}">'
+               ,'<div class="layui-define-tcs-checkbox" lay-skin="primary">'
+                   ,'<span>{{ d.value }}</span>'
+                   ,'<i style="{{ d.bkgColor }}" class="layui-icon layui-icon-ok"></i>'
+               ,'</div>'
+            ,'</li>'
         ].join('');
     var Class = function () {}; //构造器
     var singleInstance = new Class(); //单列
@@ -115,10 +122,9 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         var othis = this;
         //删除下拉框
         $('div.layui-table-body').find('td').each(function () {
-            var icon = $(this).find('i.layui-define-tcs-edge');
+            var icon = $(this).find('i.layui-define-tcs-edge'),text = icon.attr('data-td-text');
             if(icon.length === 0)return;
             $(this).find('input.layui-define-tcs-input').remove(),icon = icon.eq(0);
-            var text = icon.attr('data-td-text');
             $(this).find("div.layui-table-cell").eq(0).text(text),icon.remove();
         });
         //删除时间选择框
@@ -132,35 +138,27 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
     Class.prototype.events = function(){
         var othis = this;
         //给输入框注册值改变事件
-        othis.input.bind('input propertychange', function(){
-            var val = this.value;
-            if(othis.enabled === true){
-                if(othis.isEmpty(val)) return;
-                var ul = $('div.layui-define-tcs-div').find('ul.layui-define-tcs-ul').eq(0),searchDDs = [];
-                $(ul).find('li').each(function () {
-                    var thisValue = $(this).data('value');
-                    thisValue = othis.isEmpty(thisValue) ? "" : thisValue;
-                    if(thisValue.indexOf(val) > -1){
-                        var classText = $(this).attr("class");
-                        var backgroundColor = classText.indexOf("li-checked") > -1 ? "background-color: #60b979" : '';
-                        var searchHtml = [
-                            '<li class="'+$(this).attr("class")+'" data-name="'+$(this).data('name')+'" data-value="'+thisValue+'">'
-                               ,'<div class="layui-define-tcs-checkbox" lay-skin="primary">'
-                                  ,'<span>'+thisValue+'</span>'
-                                  ,'<i style="'+backgroundColor+'" class="layui-icon layui-icon-ok"></i>'
-                               ,'</div>'
-                            ,'</li>'].join('');
-                        searchDDs.push(searchHtml),$(this).remove();
-                    }
-                });
-                ul.prepend(searchDDs.join("")),liFunc();
-            }else {
-                var dl = $('div.layui-define-tcs-div').find('dl').eq(0);
-                var html = othis.isEmpty(val) ? ddTpl : ddSearchTpl;
-                dl.html("");
-                dl.prepend(laytpl(html).render({data: othis.data,search: val})),ddFunc();
-            }
-        });
+        othis.input.bind('input propertychange', function(){othis.enabled ? selectFunc(this.value) : selectMoreFunc(this.value);});
+        var selectFunc = function(val){
+            if(othis.isEmpty(val)) return;
+            var ul = $('div.layui-define-tcs-div').find('ul.layui-define-tcs-ul').eq(0),liArr = [];
+            $(ul).find('li').each(function () {
+                var thisValue = $(this).data('value');
+                thisValue = othis.isEmpty(thisValue) ? "" : thisValue;
+                if(thisValue.indexOf(val) > -1){
+                    var classText = $(this).attr("class");
+                    var backgroundColor = classText.indexOf("li-checked") > -1 ? "background-color: #60b979" : '';
+                    var html = laytpl(liTpl).render({classText:classText,name:$(this).data('name'),value:thisValue,bkgColor:backgroundColor});
+                    liArr.push(html),$(this).remove();
+                }
+            });
+            ul.prepend(liArr.join("")),liFunc();
+        };
+        var selectMoreFunc = function(val){
+            var dl = $('div.layui-define-tcs-div').find('dl').eq(0);
+            var html = othis.isEmpty(val) ? ddTpl : ddSearchTpl;
+            dl.html(""),dl.prepend(laytpl(html).render({data: othis.data,search: val})),ddFunc();
+        };
         //注册点击事件
         othis.icon.bind('click',function () {layui.stope(),othis.deleteAll();});
 
