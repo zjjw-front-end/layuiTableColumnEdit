@@ -95,7 +95,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         var thisX = that.getBoundingClientRect().left; //单元格x坐标
         var thisHeight = that.offsetHeight,thisWidth = that.offsetWidth //单元格宽度和高度
             ,clientHeight = document.documentElement['clientHeight'] //窗口高度
-            ,scrollTop = document.documentElement['scrollTop'];//滚动条滚动高度
+            ,scrollTop = document.body['scrollTop'] | document.documentElement['scrollTop'];//滚动条滚动高度
         var bottom = clientHeight-scrollTop-thisY+3; //div底部距离窗口底部长度
         var top = thisY+thisHeight+scrollTop+3; //div元素y坐标
         //当前y坐标大于窗口0.55倍的高度则往上延伸，否则往下延伸。
