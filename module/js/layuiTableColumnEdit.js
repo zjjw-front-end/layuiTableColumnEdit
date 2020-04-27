@@ -138,8 +138,8 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
     Class.prototype.events = function(){
         var othis = this;
         //给输入框注册值改变事件
-        othis.input.bind('input propertychange', function(){othis.enabled ? selectFunc(this.value) : selectMoreFunc(this.value);});
-        var selectFunc = function(val){
+        othis.input.bind('input propertychange', function(){othis.enabled ? lsFunc(this.value) : dsFunc(this.value);});
+        var lsFunc = function(val){
             if(othis.isEmpty(val)) return;
             var ul = $('div.layui-define-tcs-div').find('ul.layui-define-tcs-ul').eq(0),liArr = [];
             $(ul).find('li').each(function () {
@@ -154,7 +154,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
             });
             ul.prepend(liArr.join("")),liFunc();
         };
-        var selectMoreFunc = function(val){
+        var dsFunc = function(val){
             var dl = $('div.layui-define-tcs-div').find('dl').eq(0);
             var html = othis.isEmpty(val) ? ddTpl : ddSearchTpl;
             dl.html(""),dl.prepend(laytpl(html).render({data: othis.data,search: val})),ddFunc();
