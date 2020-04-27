@@ -4,19 +4,19 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         laytpl = layui.laytpl,ddTpl = [
             '{{# if(d.data){ }}'
                ,'{{# layui.each(d.data, function(index,item){ }}'
-                   ,'<dd lay-value="{{ item.name }}" class="layui-table-select-dd">{{ item.value }}</dd>',
+                   ,'<dd lay-value="{{ item.name }}" class="layui-define-tcs-dd">{{ item.value }}</dd>',
                ,'{{# }); }}'
             ,'{{# } else { }}'
-                ,'<dd lay-value="" class="">无数据</dd>'
+                ,'<dd lay-value="" class="layui-define-tcs-dd">无数据</dd>'
             ,'{{# } }}'
         ].join(''),selectTpl = [ //单选下拉框模板
-            '<div class="layui-table-select-div div-style" style="z-index: 19910908;{{d.style.type}}px; width: {{d.style.width}}px;position: absolute; left: {{d.style.left}}px;">'
+            '<div class="layui-define-tcs-div layui-define-tcs-div-one" style="{{d.style.type}}px; width: {{d.style.width}}px; left: {{d.style.left}}px;">'
               , '<dl>'
                   ,ddTpl
               , '</dl>'
             , '</div>'
         ].join(''),selectMoreTpl = [ //多选下拉框模板
-            '<div class="layui-table-select-div" style="z-index: 19910908;{{d.style.type}}px; width: {{d.style.width}}px;position: absolute; left: {{d.style.left}}px;">'
+            '<div class="layui-define-tcs-div" style="{{d.style.type}}px; width: {{d.style.width}}px; left: {{d.style.left}}px;">'
               ,'<div>'
                  ,'<span style="text-align: left">'
                     ,'<button type="button" id="selectAll" class="layui-btn layui-btn-sm layui-btn-primary">全选</button>'
@@ -25,12 +25,12 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
                     ,'<button id="confirmBtn" type="button" class="layui-btn layui-btn-sm layui-btn-primary">确定</button>'
                  ,'</span>'
               ,'</div>'
-              ,'<div style="margin:0;background-color: #93f3ff;border: 1px solid #d2d2d2;max-height: 290px;overflow-y: auto;font: 14px Helvetica Neue,Helvetica,PingFang SC,Tahoma,Arial,sans-serif;">'
-                 ,'<ul class="ul-edit-data" >'
+              ,'<div class="layui-define-tcs-div-more">'
+                 ,'<ul class="layui-define-tcs-ul" >'
                     ,'{{# if(d.data){ }}'
-                        ,'{{# layui.each(d.data, function(index,item){ }}'
-                            ,'<li class="define-edit-checkbox" data-name="{{ item.name }}" data-value="{{ item.value }}">'
-                               ,'<div class="define-edit-checkbox" lay-skin="primary">'
+                        ,'{{# d.data.forEach(function(item){ }}'
+                            ,'<li class="layui-define-tcs-checkbox" data-name="{{ item.name }}" data-value="{{ item.value }}">'
+                               ,'<div class="layui-define-tcs-checkbox" lay-skin="primary">'
                                   ,'<span>{{ item.value }}</span>'
                                   ,'<i class="layui-icon layui-icon-ok"></i>'
                                ,'</div>'
@@ -44,13 +44,13 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
             ,'</div>'
         ].join(''),ddSearchTpl = [
             '{{# if(d.data){ }}'
-               ,'{{# layui.each(d.data, function(index,item){ }}'
+               ,'{{# d.data.forEach(function(item){ }}'
                    ,'{{# if((item.value+\'\').indexOf(d.search)>-1){ }}'
-                       ,'<dd lay-value="{{ item.name }}" class="layui-table-select-dd">{{ item.value }}</dd>',
+                       ,'<dd lay-value="{{ item.name }}" class="layui-define-tcs-dd">{{ item.value }}</dd>',
                    ,'{{# } }}'
                ,'{{# }); }}'
             ,'{{# } else { }}'
-                ,'<dd lay-value="" class="">无数据</dd>'
+                ,'<dd lay-value="" class="layui-define-tcs-dd">无数据</dd>'
             ,'{{# } }}'
         ].join('');
     var Class = function () {}; //构造器
@@ -66,7 +66,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         var that = options.element;
         if ($(that).find('input').length>0)return;
         othis.deleteAll(),othis.leaveStat = false;
-        var input = $('<input class="layui-input layui-table-select-input" type="text" id="thisDate">');
+        var input = $('<input class="layui-input layui-define-tcs-input" type="text" id="thisDate">');
         $(that).append(input),input.focus();
         //日期时间选择器 (show: true 表示直接显示)
         laydate.render({elem: '#thisDate',type: othis.dateType,show: true,done:function (value, date) {
@@ -87,8 +87,8 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         var that = othis.element;
         if ($(that).find('input').length>0)return;
         othis.deleteAll(that),othis.leaveStat = false; //鼠标离开单元格或下拉框div区域状态，默认不离开（false）
-        var input = $('<input class="layui-input layui-table-select-input" placeholder="关键字搜索">');
-        var icon = $('<i class="layui-icon layui-table-select-edge" data-td-text="'+$(that).find("div.layui-table-cell").eq(0).text()+'" >&#xe625;</i>');
+        var input = $('<input class="layui-input layui-define-tcs-input" placeholder="关键字搜索">');
+        var icon = $('<i class="layui-icon layui-define-tcs-edge" data-td-text="'+$(that).find("div.layui-table-cell").eq(0).text()+'" >&#xe625;</i>');
         othis.input = input,othis.icon = icon;
         $(that).append(input),$(that).append(icon),input.focus();
         var thisY = that.getBoundingClientRect().top; //单元格y坐标
@@ -101,7 +101,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         //当前y坐标大于窗口0.55倍的高度则往上延伸，否则往下延伸。
         var type = thisY+thisHeight > 0.55*clientHeight ?  'top:auto;bottom: '+bottom : 'bottom:auto;top:'+top;
         //下三角图标旋转180度成上三角图标
-        thisY+thisHeight > 0.55*clientHeight ? $(icon).addClass("layui-edge-transform") : '';
+        thisY+thisHeight > 0.55*clientHeight ? $(icon).addClass("layui-define-tcs-edgeTransform") : '';
         //获取下拉框div模板
         var html = othis.enabled ? selectMoreTpl : selectTpl;
         //生成下拉框
@@ -115,15 +115,15 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         var othis = this;
         //删除下拉框
         $('div.layui-table-body').find('td').each(function () {
-            var icon = $(this).find('i.layui-table-select-edge');
+            var icon = $(this).find('i.layui-define-tcs-edge');
             if(icon.length === 0)return;
-            $(this).find('input.layui-table-select-input').remove(),icon = icon.eq(0);
+            $(this).find('input.layui-define-tcs-input').remove(),icon = icon.eq(0);
             var text = icon.attr('data-td-text');
             $(this).find("div.layui-table-cell").eq(0).text(text),icon.remove();
         });
         //删除时间选择框
         $("#thisDate").next().remove(),$("#thisDate").remove();
-        $("div.layui-laydate").remove(),$('div.layui-table-select-div').remove();
+        $("div.layui-laydate").remove(),$('div.layui-define-tcs-div').remove();
         //清除leaveStat（离开状态属性）
         delete othis.leaveStat;
     };
@@ -136,7 +136,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
             var val = this.value;
             if(othis.enabled === true){
                 if(othis.isEmpty(val)) return;
-                var ul = $('div.layui-table-select-div').find('ul.ul-edit-data').eq(0),searchDDs = [];
+                var ul = $('div.layui-define-tcs-div').find('ul.layui-define-tcs-ul').eq(0),searchDDs = [];
                 $(ul).find('li').each(function () {
                     var thisValue = $(this).data('value');
                     thisValue = othis.isEmpty(thisValue) ? "" : thisValue;
@@ -145,7 +145,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
                         var backgroundColor = classText.indexOf("li-checked") > -1 ? "background-color: #60b979" : '';
                         var searchHtml = [
                             '<li class="'+$(this).attr("class")+'" data-name="'+$(this).data('name')+'" data-value="'+thisValue+'">'
-                               ,'<div class="define-edit-checkbox" lay-skin="primary">'
+                               ,'<div class="layui-define-tcs-checkbox" lay-skin="primary">'
                                   ,'<span>'+thisValue+'</span>'
                                   ,'<i style="'+backgroundColor+'" class="layui-icon layui-icon-ok"></i>'
                                ,'</div>'
@@ -155,7 +155,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
                 });
                 ul.prepend(searchDDs.join("")),liFunc();
             }else {
-                var dl = $('div.layui-table-select-div').find('dl').eq(0);
+                var dl = $('div.layui-define-tcs-div').find('dl').eq(0);
                 var html = othis.isEmpty(val) ? ddTpl : ddSearchTpl;
                 dl.html("");
                 dl.prepend(laytpl(html).render({data: othis.data,search: val})),ddFunc();
@@ -166,7 +166,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
 
         //给dd元素注册点击事件(单选)
         var ddFunc = function () {
-            var ddArr = $('div.layui-table-select-div').find('dd');
+            var ddArr = $('div.layui-define-tcs-div').find('dd');
             ddArr.unbind('click'),ddArr.bind('click',function (e) {
                 layui.stope(e),othis.deleteAll();
                 if(othis.callback)othis.callback({select:{name:$(this).attr('lay-value'),value:$(this).text()},td:othis.element});
@@ -174,7 +174,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         };
         //给li元素注册点击事件（多选）
         var liFunc = function(){
-            var liArr = $('div.layui-table-select-div').find('li');
+            var liArr = $('div.layui-define-tcs-div').find('li');
             liArr.unbind('click'),liArr.bind('click',function (e) {
                 layui.stope(e);
                 var icon = $(this).find("i"),liClass = $(this).attr("class");
@@ -185,12 +185,12 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         ddFunc(),liFunc();
 
         //给下拉框和当前单元格（td）注册鼠标悬停事件
-        $('div.layui-table-select-div').hover(inFunc,outFunc),$(othis.element).hover(inFunc,outFunc);
+        $('div.layui-define-tcs-div').hover(inFunc,outFunc),$(othis.element).hover(inFunc,outFunc);
 
         //“确定”按钮
         $('#confirmBtn').bind('click',function (e) {
             var dataList = new Array();
-            $("div.layui-table-select-div").find("div li").each(function (e) {
+            $("div.layui-define-tcs-div").find("div li").each(function (e) {
                 var liClass = $(this).attr("class");
                 if(!liClass || liClass.indexOf("li-checked") <= -1)return;
                 dataList.push({name:$(this).data("name"),value:$(this).data("value")});
@@ -202,7 +202,7 @@ layui.define(["jquery","laydate","laytpl"],function(exports) {
         //“全选”按钮
         $('#selectAll').bind('click',function () {
             var btn = this,status = $(btn).attr('data-status');
-            $('ul.ul-edit-data').find('li').each(function (e) {
+            $('ul.layui-define-tcs-ul').find('li').each(function (e) {
                 var icon = $(this).find("i");
                 othis.isEmpty(status) || status === 'false'
                     ? (icon.css("background-color","#60b979"),$(this).addClass("li-checked"),$(btn).attr("data-status","true"))
