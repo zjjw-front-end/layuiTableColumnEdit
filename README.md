@@ -91,9 +91,9 @@ cols      | array     | 是       | 单元格列信息(如下所示)
 
 ```json
  [[
-   {"field":"danxuan", "title": "单选","width":120,"event":"danxuan","eventType":"select","data":selectParams}
-   ,{"field":"duoxuan", "title": "多选","width":120,"event":"duoxuan","eventType":"select","data":selectParams,"enabled":true}
-   ,{"field":"birthday", "title": "生日","width":120,"event":"birthday","eventType":"date","dateType":"date"}
+   {"field":"danxuan", "title": "单选","width":120,"event":"danxuan","select":{"data":params}}
+   ,{"field":"duoxuan", "title": "多选","width":120,"event":"duoxuan","select":{"data":params,"enabled":true}}
+   ,{"field":"birthday", "title": "生日","width":120,"event":"birthday","date":{"dateType":"date"}}
  ]]
 ```
 
