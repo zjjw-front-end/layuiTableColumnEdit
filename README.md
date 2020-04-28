@@ -37,52 +37,62 @@ layui.config({
 
 ### 2.整合layui使用
 
-注意：整合layui使用时，必须使用本项目的table.js和layui.css，否则不能使用！
-
 ```html
 <table class="layui-hide" id="tableId" lay-filter="tableEvent"></table>
 <script>
-       layui.use(['table','layer'], function () {
-           var table = layui.table;
-           var selectParams = [
-               {name:1,value:"张三1"},
-               {name:2,value:"张三2"},
-               {name:3,value:"张三3"},
-               {name:4,value:"张三4"},
-               {name:5,value:"张三5"}
-           ];
-           table.render({
-               elem: '#tableId'
-               ,id:'id'
-               ,url:'data.json'
-               ,height: 'full-90'
-               ,page: true
-               ,cols: [[
-                   {type:'checkbox'}
-                   ,{field:'name',title: '姓名',width:120}
-                   ,{field:'danxuan', title: '单选',width:120,edit:'select',data:selectParams}
-                   ,{field:'duoxuan', title: '多选',width:120,edit:'select',data:selectParams,enabled:true} //enabled（单、多选开关） true：多选，false：单选。默认为false
-                   ,{field:'birthday', title: '生日',width:120,edit:'date',dateType:'date'}
-               ]]
+           layui.config({
+               base: 'module/'
+           }).extend({
+               layuiTableColumnEdit:'js/layuiTableColumnEdit'
+           }).use(['table','layuiTableColumnEdit','layer'], function () {
+               var table = layui.table,layuiTableColumnEdit = layui.layuiTableColumnEdit,$ = layui.$;
+               var selectParams = [
+                   {name:1,value:"张三1"},
+                   {name:2,value:"张三2"},
+                   {name:3,value:"张三3"},
+                   {name:4,value:"张三4"},
+                   {name:5,value:"张三5"}
+               ];
+               var cols = table.render({
+                   elem: '#tableId'
+                   ,id:'id'
+                   ,url:'data.json'
+                   ,height: 'full-90'
+                   ,page: true
+                   ,cols: [[
+                       {type:'checkbox'}
+                       ,{field:'name',title: '姓名',width:120,event:'name'}
+                       ,{field:'danxuan', title: '单选',width:120,event:'danxuan',eventType:'select',data:selectParams}
+                       ,{field:'duoxuan', title: '多选',width:120,event:'duoxuan',eventType:'select',data:selectParams,enabled:true} //enabled（单、多选开关） true：多选，false：单选。默认为false
+                       ,{field:'birthday', title: '生日',width:120,event:'birthday',eventType:'date',dateType:'date'}
+                   ]]
+               }).config.cols;
+               //cols为列信息
+               layuiTableColumnEdit.on('tool(tableEvent)',cols,function (obj) {
+                   var field = $(this).data('field');
+                   if(field === 'danxuan'){
+                       obj.update({danxuan:obj.value.value});
+                   }
+                   if(field === 'duoxuan'){
+                       obj.update({duoxuan:obj.value[0].value});
+                   }
+                   if(field === 'birthday'){
+                       obj.update({birthday:obj.value});
+                   }
+               });
+       
+               /*
+               * 注意：
+               *
+               * 1、 layuiTableColumnEdit.on('tool(xxx)',cols,function (obj) {})
+               * 2、 table.on('tool(yyy)',cols,function (obj) {})
+               *
+               * 如果1中的xxx与2中的yyy字符串相同时，不能同时用，用了会造成后调用者覆盖前调用者。
+               * 应该直接用1来代替2，因为1中包含了2中的事件。
+               *
+               * 如果不相同，则可以同时使用。
+               * */
            });
-           table.on('edit(tableEvent)', function(obj){
-               var value = obj.value //得到修改后的值
-                   ,data = obj.data //得到所在行所有键值
-                   ,field = obj.field; //得到字段
-               console.log(value);
-               if(field === 'danxuan'){
-                   obj.update({danxuan:value.value});
-               }
-   
-               if(field === 'duoxuan'){
-                   obj.update({duoxuan:'多选'});
-               }
-   
-               if(field === 'birthday'){
-                   obj.update({birthday:value});
-               }
-           });
-       });
 </script>
 ```
 ### 3.单独使用
@@ -146,14 +156,15 @@ layui.config({
 </script>
 ```
 
-### 3.方法说明
+### 4.方法说明
 方法名 | 描述 |
 ---          | ----
 createSelect | 动态生成下拉框
 createDate   | 动态生成时间日期选择框
 update       | 更新单元格显示数据 注意：只更新显示的值，不更新所对应的行的值。
+on           | 整合layui框架时，使用此方法注册下拉框和时间选择框
 
-### 4.参数说明
+### 5.参数说明
 #### createSelect
 参数 | 类型 | 是否必填 | 描述 |
 --- | --- | --- | ----
@@ -187,7 +198,24 @@ dateType  | string | 否 | 日期时间选择器的类型：datetime（日期时
 element   | DOM元素 | 是 | 单元格（td）元素，该参数必须为原生的DOM元素对象，不能为<br/>jquery元素对象。
 value  | string | 是 | 单元格（td）的显示值。
 
-### 5.效果图
+#### on
+参数      | 类型   | 是否必填 | 描述 |
+---       | ---    | ---      | ----
+event     | string | 是       | 单元格点击事件名称 示例：tool(tableId)
+cols      | array  | 是       | 单元格列信息(如下所示)
+callback  | array  | 是       | 单元格列信息(如下所示)
+
+&emsp;**cols格式**
+
+```json
+ [[
+   {"field":"danxuan", "title": "单选","width":120,"event":"danxuan","eventType":"select","data":selectParams}
+   ,{"field":"duoxuan", "title": "多选","width":120,"event":"duoxuan","eventType":"select","data":selectParams,"enabled":true}
+   ,{"field":"birthday", "title": "生日","width":120,"event":"birthday","eventType":"date","dateType":"date"}
+ ]]
+```
+
+### 6.效果图
 &emsp;&emsp;输入框效果图：<br/>
 &emsp;&emsp;数组形式传参：<br/>
 ![数组图1](https://images.gitee.com/uploads/images/2019/1201/005920_6bd870bd_1588195.png "2.png")

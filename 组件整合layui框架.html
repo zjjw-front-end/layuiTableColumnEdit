@@ -11,8 +11,12 @@
 </body>
 <script src="layui/layui.js"></script>
 <script>
-    layui.use(['table','layer'], function () {
-        var table = layui.table;
+    layui.config({
+        base: 'module/'
+    }).extend({
+        layuiTableColumnEdit:'js/layuiTableColumnEdit'
+    }).use(['table','layuiTableColumnEdit','layer'], function () {
+        var table = layui.table,layuiTableColumnEdit = layui.layuiTableColumnEdit,$ = layui.$;
         var selectParams = [
             {name:1,value:"张三1"},
             {name:2,value:"张三2"},
@@ -20,7 +24,7 @@
             {name:4,value:"张三4"},
             {name:5,value:"张三5"}
         ];
-        table.render({
+        var cols = table.render({
             elem: '#tableId'
             ,id:'id'
             ,url:'data.json'
@@ -28,29 +32,37 @@
             ,page: true
             ,cols: [[
                 {type:'checkbox'}
-                ,{field:'name',title: '姓名',width:120}
-                ,{field:'danxuan', title: '单选',width:120,edit:'select',data:selectParams}
-                ,{field:'duoxuan', title: '多选',width:120,edit:'select',data:selectParams,enabled:true} //enabled（单、多选开关） true：多选，false：单选。默认为false
-                ,{field:'birthday', title: '生日',width:120,edit:'date',dateType:'date'}
+                ,{field:'name',title: '姓名',width:120,event:'name'}
+                ,{field:'danxuan', title: '单选',width:120,event:'danxuan',eventType:'select',data:selectParams}
+                ,{field:'duoxuan', title: '多选',width:120,event:'duoxuan',eventType:'select',data:selectParams,enabled:true} //enabled（单、多选开关） true：多选，false：单选。默认为false
+                ,{field:'birthday', title: '生日',width:120,event:'birthday',eventType:'date',dateType:'date'}
             ]]
-        });
-        table.on('edit(tableEvent)', function(obj){
-            var value = obj.value //得到修改后的值
-                ,data = obj.data //得到所在行所有键值
-                ,field = obj.field; //得到字段
-            console.log(value);
+        }).config.cols;
+        //cols为列信息
+        layuiTableColumnEdit.on('tool(tableEvent)',cols,function (obj) {
+            var field = $(this).data('field');
             if(field === 'danxuan'){
-                obj.update({danxuan:value.value});
+                obj.update({danxuan:obj.value.value});
             }
-
             if(field === 'duoxuan'){
-                obj.update({duoxuan:'多选'});
+                obj.update({duoxuan:obj.value[0].value});
             }
-
             if(field === 'birthday'){
-                obj.update({birthday:value});
+                obj.update({birthday:obj.value});
             }
         });
+
+        /*
+        * 注意：
+        *
+        * 1、 layuiTableColumnEdit.on('tool(xxx)',cols,function (obj) {})
+        * 2、 table.on('tool(yyy)',cols,function (obj) {})
+        *
+        * 如果1中的xxx与2中的yyy字符串相同时，不能同时用，用了会造成后调用者覆盖前调用者。
+        * 应该直接用1来代替2，因为1中包含了2中的事件。
+        *
+        * 如果不相同，则可以同时使用。
+        * */
     });
 </script>
 </html>

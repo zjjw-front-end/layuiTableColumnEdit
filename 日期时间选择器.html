@@ -54,7 +54,6 @@
             }else if(obj.event === 'age'){
                 var ageTd = $(obj.tr).find("td[data-field='age']")[0];
                 layuiTableColumnEdit.createDate({
-                    type:'date',
                     dateType:'datetime',
                     element:ageTd,
                     callback:function (obj1) {
