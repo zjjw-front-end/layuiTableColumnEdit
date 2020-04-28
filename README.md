@@ -199,11 +199,11 @@ element   | DOM元素 | 是 | 单元格（td）元素，该参数必须为原生
 value  | string | 是 | 单元格（td）的显示值。
 
 #### on
-参数      | 类型   | 是否必填 | 描述 |
----       | ---    | ---      | ----
-event     | string | 是       | 单元格点击事件名称 示例：tool(tableId)
-cols      | array  | 是       | 单元格列信息(如下所示)
-callback  | array  | 是       | 单元格列信息(如下所示)
+参数      | 类型      | 是否必填 | 描述 |
+---       | ---       | ---      | ----
+event     | string    | 是       | 单元格点击事件名称 示例：tool(tableId)
+cols      | array     | 是       | 单元格列信息(如下所示)
+callback  | function  | 是       | 回调函数
 
 &emsp;**cols格式**
 
