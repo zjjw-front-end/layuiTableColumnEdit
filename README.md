@@ -7,18 +7,12 @@
 &emsp;&emsp;此项目是为了解决layui table表格单元格（column）点击事件中无下拉列表（select）及日期时间选择器功能的问题。
 <br/>
 &emsp;&emsp;a.可异步ajax请求后台数据。
-<br/>
 &emsp;&emsp;b.可直接以数组形式传参
-<br/>
 &emsp;&emsp;c.可输入关键字搜索下拉框数据
 <br/>
 &emsp;&emsp;d.可加入日期时间选择器
-<br/>
 &emsp;&emsp;e.下拉框支持多选
-<br/>
 &emsp;&emsp;f.下拉框支持单选或多选级联操作
-<br/>
-&emsp;&emsp;不会使用请加qq：374506838
 
 ## 二、使用说明
 
