@@ -94,7 +94,7 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
         if ($(that).find('input').length>0)return;
         othis.deleteAll(that),othis.leaveStat = false; //鼠标离开单元格或下拉框div区域状态，默认不离开（false）
         var input = $('<input class="layui-input layui-define-tcs-input" placeholder="关键字搜索">');
-        var icon = $('<i class="layui-icon layui-define-tcs-edge" data-td-text="'+$(that).find("div.layui-table-cell").eq(0).text()+'" >&#xe625;</i>');
+        var icon = $('<i class="layui-icon layui-define-tcs-edge">&#xe625;</i>');
         $(that).append(input),$(that).append(icon),input.focus();
         var thisY = that.getBoundingClientRect().top; //单元格y坐标
         var thisX = that.getBoundingClientRect().left; //单元格x坐标
