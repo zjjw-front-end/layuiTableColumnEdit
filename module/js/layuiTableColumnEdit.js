@@ -184,9 +184,9 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
         $('div.layui-define-tcs-div').hover(inFunc,outFunc),$(othis.element).hover(inFunc,outFunc);
     };
 
-    var AopEvent = function(event,cols,callback){this.config = {event:event,cols:cols,callback:callback};};//aop构造器
-    AopEvent.prototype.on = function(){
-        var othis = this;
+    var AopEvent = function(cols){this.config = {cols:cols};};//aop构造器
+    AopEvent.prototype.on = function(event,callback){
+        var othis = this;othis.config.event = event,othis.config.callback = callback;
         table.on(othis.config.event,function (obj) {
             var zthis = this,field = $(zthis).data('field'),eventType,thisData,thisEnabled,dateType;
             othis.config.cols.forEach(function (ite) {
@@ -222,7 +222,7 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
         });
     };
     var active = {
-        on:function(event,cols,callback){new AopEvent(event,cols,callback).on();},
+        aopObj:function(cols){return new AopEvent(cols);},
         createSelect:function (options) {singleInstance.register(options);},
         update:function (options) {$(options.element).find("div.layui-table-cell").eq(0).text(options.value);},
         createDate:function (options) {singleInstance.date(options);}

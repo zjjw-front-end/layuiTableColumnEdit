@@ -46,7 +46,7 @@ layui.config({
 createSelect | 动态生成下拉框
 createDate   | 动态生成时间日期选择框
 update       | 更新单元格显示数据 注意：只更新显示的值，不更新所对应的行的值。
-on           | 整合layui框架时，使用此方法注册下拉框和时间选择框
+aopObj       | 整合layui框架时，使用此方法获取table的aop代理对象
 
 ### 5.参数说明
 #### createSelect
@@ -82,12 +82,10 @@ dateType  | string | 否 | 日期时间选择器的类型：datetime（日期时
 element   | DOM元素 | 是 | 单元格（td）元素，该参数必须为原生的DOM元素对象，不能为<br/>jquery元素对象。
 value  | string | 是 | 单元格（td）的显示值。
 
-#### on
+#### aopObj
 参数      | 类型      | 是否必填 | 描述 |
 ---       | ---       | ---      | ----
-event     | string    | 是       | 单元格点击事件名称 示例：tool(tableId)
 cols      | array     | 是       | 单元格列信息(如下所示)
-callback  | function  | 是       | 回调函数
 
 &emsp;**cols格式**
 
