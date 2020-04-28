@@ -61,7 +61,7 @@
         * 注意：
         *
         * 1、 aopTable.on('tool(xxx)',function (obj) {})
-        * 2、 table.on('tool(yyy)',cols,function (obj) {})
+        * 2、 table.on('tool(yyy)',function (obj) {})
         *
         * 如果1中的xxx与2中的yyy字符串相同时，不能同时用，用了会造成后调用者覆盖前调用者。
         * 应该直接用1来代替2，因为1中包含了2中的事件。
