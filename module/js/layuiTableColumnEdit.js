@@ -127,8 +127,8 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
         var othis = this;
         var liSearchFunc = function(val){ //多选关键字搜索
             if(othis.isEmpty(val)) return;
-            var ul = $('div.layui-define-tcs-div').find('ul.layui-define-tcs-ul').eq(0),liArr = [];
-            $(ul).find('li').each(function () {
+            var ul = $('ul.layui-define-tcs-ul'),liArr = [];
+            ul.find('li').each(function () {
                 var thisValue = $(this).data('value');
                 thisValue = othis.isEmpty(thisValue) ? "" : thisValue;
                 if(thisValue.indexOf(val) > -1){
