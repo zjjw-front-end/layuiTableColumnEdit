@@ -191,9 +191,8 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
             var zthis = this,field = $(zthis).data('field'),eventType,thisData,thisEnabled,dateType;
             othis.config.cols.forEach(function (ite) {
                 ite.forEach(function (item) {
-                    if(field === item.field){
-                        eventType = item.eventType,thisData = item.data,thisEnabled = item.enabled,dateType = item.dateType;
-                    }
+                    if(field !== item.field || (!item.select && !item.date))return;
+                    item.select ? (eventType = 'select',thisData = item.select.data,thisEnabled = item.select.enabled) : (eventType = 'date',dateType = item.date.dateType);
                 });
             });
             if('select' === eventType){

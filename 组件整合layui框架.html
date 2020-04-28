@@ -17,7 +17,7 @@
         layuiTableColumnEdit:'js/layuiTableColumnEdit'
     }).use(['table','layuiTableColumnEdit','layer'], function () {
         var table = layui.table,layuiTableColumnEdit = layui.layuiTableColumnEdit,$ = layui.$;
-        var selectParams = [
+        var params = [
             {name:1,value:"张三1"},
             {name:2,value:"张三2"},
             {name:3,value:"张三3"},
@@ -33,18 +33,19 @@
             ,cols: [[
                 {type:'checkbox'}
                 ,{field:'name',title: '姓名',width:120,event:'name'}
-                //eventType => select（下拉框）date（时间选择框）
-                ,{field:'danxuan', title: '单选',width:120,event:'danxuan',eventType:'select',data:selectParams}
-                //data 为下拉框数据  enabled（单、多选开关） true：多选，false：单选。默认为false
-                ,{field:'duoxuan', title: '多选',width:120,event:'duoxuan',eventType:'select',data:selectParams,enabled:true}
+                //select（下拉框）date（时间选择框）
+                ,{field:'danxuan', title: '单选',width:120,event:'danxuan',select:{data:params}}
+                //data 为下拉框数据  enabled => true：多选，false：单选。默认为false
+                ,{field:'duoxuan', title: '多选',width:120,event:'duoxuan',select:{data:params,enabled:true}}
                 //dateType表示日期时间格式，date为“yyyy-MM-dd”，datetime为“yyyy-MM-dd HH:ss:mm”
-                ,{field:'birthday', title: '生日',width:120,event:'birthday',eventType:'date',dateType:'date'}
+                ,{field:'birthday', title: '生日',width:120,event:'birthday',date:{dateType:'date'}}
             ]]
         }).config.cols;
         //参数cols是table.render({})中的cols属性值
         var aopTable = layuiTableColumnEdit.aopObj(cols); //获取一个aop对象
         aopTable.on('tool(tableEvent)',function (obj) {
             var field = $(this).data('field');
+            console.log(obj);
             if(field === 'danxuan'){
                 obj.update({danxuan:obj.value.value});
             }
