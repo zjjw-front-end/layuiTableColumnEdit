@@ -60,8 +60,11 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
                ,'</div>'
             ,'</li>'
         ].join('');
-    var Class = function () {}; //构造器
-    var singleInstance = new Class(); //单列
+    var Class = function () { //单列模式  也就是只能new一个对象。
+        if(Class.instance)return Class.instance;
+        Class.instance = this;return this;
+    }; //构造器
+    var singleInstance = new Class();
     var inFunc = function () {singleInstance.leaveStat = false;},outFunc = function () {singleInstance.leaveStat = true;};
     document.onclick = function () {if(singleInstance.leaveStat)singleInstance.deleteAll();};
     //日期选择框
