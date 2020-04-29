@@ -1,18 +1,17 @@
 layui.define(["jquery","laydate","laytpl","table"],function(exports) {
     "use strict";
     var $ = layui.jquery,laydate = layui.laydate,table = layui.table,
-        laytpl = layui.laytpl,ddTpl = [
-            '{{# if(d.data){ }}'
-               ,'{{# d.data.forEach(function(item){ }}'
-                   ,'<dd lay-value="{{ item.name }}" class="layui-define-tcs-dd">{{ item.value }}</dd>',
-               ,'{{# }); }}'
-            ,'{{# } else { }}'
-                ,'<dd lay-value="" class="layui-define-tcs-dd">无数据</dd>'
-            ,'{{# } }}'
-        ].join(''),selectTpl = [ //单选下拉框模板
+        laytpl = layui.laytpl,
+        selectTpl = [ //单选下拉框模板
             '<div class="layui-define-tcs-div layui-define-tcs-div-one" style="{{d.style.type}}px; width: {{d.style.width}}px; left: {{d.style.left}}px;">'
               , '<dl>'
-                  ,ddTpl
+                  ,'{{# if(d.data){ }}'
+                      ,'{{# d.data.forEach(function(item){ }}'
+                          ,'<dd lay-value="{{ item.name }}" class="layui-define-tcs-dd">{{ item.value }}</dd>'
+                      ,'{{# }); }}'
+                  ,'{{# } else { }}'
+                      ,'<dd lay-value="" class="layui-define-tcs-dd">无数据</dd>'
+                  ,'{{# } }}'
               , '</dl>'
             , '</div>'
         ].join(''),selectMoreTpl = [ //多选下拉框模板
@@ -42,23 +41,6 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
                  ,'</ul>'
               ,'</div>'
             ,'</div>'
-        ].join(''),ddSearchTpl = [
-            '{{# if(d.data){ }}'
-               ,'{{# d.data.forEach(function(item){ }}'
-                   ,'{{# if((item.value+\'\').indexOf(d.search)>-1){ }}'
-                       ,'<dd lay-value="{{ item.name }}" class="layui-define-tcs-dd">{{ item.value }}</dd>',
-                   ,'{{# } }}'
-               ,'{{# }); }}'
-            ,'{{# } else { }}'
-                ,'<dd lay-value="" class="layui-define-tcs-dd">无数据</dd>'
-            ,'{{# } }}'
-        ].join(''),liTpl = [
-            '<li class="{{ d.classText }}" data-name="{{ d.name }}" data-value="{{ d.value }}">'
-               ,'<div class="layui-define-tcs-checkbox" lay-skin="primary">'
-                   ,'<span>{{ d.value }}</span>'
-                   ,'<i style="{{ d.bkgColor }}" class="layui-icon layui-icon-ok"></i>'
-               ,'</div>'
-            ,'</li>'
         ].join('');
     var Class = function () { //单列模式  也就是只能new一个对象。
         var instance;
@@ -135,22 +117,13 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
     Class.prototype.events = function(){
         var othis = this;
         var liSearchFunc = function(val){ //多选关键字搜索
-            if(othis.isEmpty(val)) return;
-            var ul = $('ul.layui-define-tcs-ul'),liArr = [];
-            ul.find('li').each(function () {
-                var thisValue = $(this).data('value');
-                thisValue = othis.isEmpty(thisValue) ? "" : thisValue;
-                if(thisValue.indexOf(val) > -1){
-                    var classText = $(this).attr("class");
-                    var backgroundColor = classText.indexOf("li-checked") > -1 ? "background-color: #60b979" : '';
-                    var html = laytpl(liTpl).render({classText:classText,name:$(this).data('name'),value:thisValue,bkgColor:backgroundColor});
-                    liArr.push(html),$(this).remove();
-                }
+            $('ul.layui-define-tcs-ul li').each(function () {
+                othis.isEmpty(val) || $(this).data('value').indexOf(val) > -1 ? $(this).show() : $(this).hide();
             });
-            ul.prepend(liArr.join("")),liClickFunc();
         },ddSearchFunc = function(val){ //单选关键字搜索
-            var dl = $('div.layui-define-tcs-div').find('dl').eq(0);dl.html("");
-            dl.prepend(laytpl(othis.isEmpty(val) ? ddTpl : ddSearchTpl).render({data: othis.data,search: val})),ddClickFunc();
+            $('div.layui-define-tcs-div dd').each(function () {
+                othis.isEmpty(val) || $(this).text().indexOf(val) > -1 ? $(this).show() : $(this).hide();
+            });
         },ddClickFunc = function () { //给dd元素注册点击事件(单选)
             var ddArr = $('div.layui-define-tcs-div').find('dd');
             ddArr.unbind('click'),ddArr.bind('click',function (e) {
