@@ -16,7 +16,7 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
               , '</dl>'
             , '</div>'
         ].join(''),selectMoreTpl = [ //多选下拉框模板
-            '<div class="layui-define-tcs-div" style="{{d.style.type}}px; width: {{d.style.width}}px; left: {{d.style.left}}px;">'
+            '<div class="layui-define-tcs-div layui-define-tcs-div-more" style="{{d.style.type}}px; width: {{d.style.width}}px; left: {{d.style.left}}px;">'
               ,'<div>'
                  ,'<span style="text-align: left">'
                     ,'<button type="button" event-type="select" class="layui-btn layui-btn-sm layui-btn-primary">全选</button>'
@@ -25,7 +25,7 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
                     ,'<button event-type="confirm" type="button" class="layui-btn layui-btn-sm layui-btn-primary">确定</button>'
                  ,'</span>'
               ,'</div>'
-              ,'<div class="layui-define-tcs-div-more">'
+              ,'<div class="layui-define-tcs-div-tpl">'
                  ,'<ul class="layui-define-tcs-ul" >'
                     ,'{{# if(d.data){ }}'
                         ,'{{# d.data.forEach(function(item){ }}'
