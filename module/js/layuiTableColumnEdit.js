@@ -61,8 +61,14 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
             ,'</li>'
         ].join('');
     var Class = function () { //单列模式  也就是只能new一个对象。
-        if(Class.instance)return Class.instance;
-        Class.instance = this;return this;
+        var instance;
+        Class = function Class() {
+            return instance;
+        };
+        Class.prototype = this; //保留原型属性
+        instance = new Class();
+        instance.constructor = Class; //重置构造函数指针
+        return instance
     }; //构造器
     var singleInstance = new Class();
     var inFunc = function () {singleInstance.leaveStat = false;},outFunc = function () {singleInstance.leaveStat = true;};
