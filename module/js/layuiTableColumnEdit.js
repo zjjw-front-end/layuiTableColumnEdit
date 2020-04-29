@@ -153,7 +153,7 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
             liArr.unbind('click'),liArr.bind('click',function (e) {
                 layui.stope(e);
                 var icon = $(this).find("i"),liClass = $(this).attr("class");
-                (liClass && liClass.indexOf("li-checked")) > -1 ? (icon.css("background-color","#fff"),$(this).removeClass("li-checked"))
+                (liClass && liClass.indexOf("li-checked") > -1) ? (icon.css("background-color","#fff"),$(this).removeClass("li-checked"))
                     : (icon.css("background-color","#60b979"),$(this).addClass("li-checked"));
             });
         },btnClickFunc = function (){ //给button按钮注册点击事件
