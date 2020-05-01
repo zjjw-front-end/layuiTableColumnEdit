@@ -135,6 +135,7 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
                 var icon = $(this).find("i"),liClass = $(this).attr("class");
                 (liClass && liClass.indexOf("li-checked") > -1) ? (icon.css("background-color","#fff"),$(this).removeClass("li-checked"))
                     : (icon.css("background-color","#60b979"),$(this).addClass("li-checked"));
+                $(othis.element).find('input.layui-define-tcs-input').val(''),liSearchFunc();
             });
         },btnClickFunc = function (){ //给button按钮注册点击事件
             $("div.layui-define-tcs-div button").bind('click',function () {
