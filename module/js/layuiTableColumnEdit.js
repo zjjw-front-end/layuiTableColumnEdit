@@ -67,9 +67,9 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
         $(that).append(input),input.focus();
         //日期时间选择器 (show: true 表示直接显示)
         laydate.render({elem: input[0],type: othis.dateType,show: true,done:function (value, date) {
-                othis.deleteAll();
-                if(othis.callback)othis.callback({value:value,td:that});
-            }});
+            othis.deleteAll();
+            if(othis.callback)othis.callback.call(that,value);
+        }});
         $('div.layui-laydate').hover(inFunc,outFunc),$(that).hover(inFunc,outFunc);
         layui.stope();
     };
@@ -91,7 +91,8 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
         var thisX = that.getBoundingClientRect().left; //单元格x坐标
         var thisHeight = that.offsetHeight,thisWidth = that.offsetWidth //单元格宽度和高度
             ,clientHeight = document.documentElement['clientHeight'] //窗口高度
-            ,scrollTop = document.body['scrollTop'] | document.documentElement['scrollTop'];//滚动条滚动高度
+            ,scrollTop = document.body['scrollTop'] | document.documentElement['scrollTop']//滚动条滚动高度
+            ,scrollLeft = document.body['scrollLeft'] | document.documentElement['scrollLeft'];//滚动条滚动宽度
         var bottom = clientHeight-scrollTop-thisY+3; //div底部距离窗口底部长度
         var top = thisY+thisHeight+scrollTop+3; //div元素y坐标
         //当前y坐标大于窗口0.55倍的高度则往上延伸，否则往下延伸。
@@ -99,18 +100,15 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
         //下三角图标旋转180度成上三角图标
         thisY+thisHeight > 0.55*clientHeight ? $(icon).addClass("layui-define-tcs-edgeTransform") : '';
         //生成下拉框
-        $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: {type: type,width: thisWidth,left: thisX}}));
+        $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: {type: type,width: thisWidth,left: thisX+scrollLeft}}));
         //事件注册
         othis.events();
     };
 
-    //删除所有删除下拉框和时间选择框
+    //删除所有下拉框和时间选择框
     Class.prototype.deleteAll = function(){
-        var othis = this;$('div.layui-define-tcs-div').remove();
-        //删除下拉框
-        $('div.layui-table-body td input.layui-define-tcs-input,i.layui-define-tcs-edge').remove();
-        //删除时间选择框                 清除leaveStat（离开状态属性）
-        $("div.layui-laydate").remove(); delete othis.leaveStat;
+        $('div.layui-define-tcs-div,div.layui-laydate,input.layui-define-tcs-input,i.layui-define-tcs-edge').remove();
+        delete this.leaveStat; //清除leaveStat（离开状态属性）
     };
 
     //注册事件
@@ -128,7 +126,7 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
             var ddArr = $('div.layui-define-tcs-div').find('dd');
             ddArr.unbind('click'),ddArr.bind('click',function (e) {
                 layui.stope(e),othis.deleteAll();
-                if(othis.callback)othis.callback({select:{name:$(this).attr('lay-value'),value:$(this).text()},td:othis.element});
+                if(othis.callback)othis.callback.call(othis.element,{name:$(this).attr('lay-value'),value:$(this).text()});
             });
         },liClickFunc = function(){ //给li元素注册点击事件（多选）
             var liArr = $('div.layui-define-tcs-div').find('li');
@@ -155,7 +153,7 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
                         dataList.push({name:$(this).data("name"),value:$(this).data("value")});
                     });
                     othis.deleteAll();
-                    if(othis.callback)othis.callback({select:dataList,td:othis.element});
+                    if(othis.callback)othis.callback.call(othis.element,dataList);
                 }();
             });
         };
@@ -177,26 +175,14 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
                     item.select ? (eventType = 'select',thisData = item.select.data,thisEnabled = item.select.enabled) : (eventType = 'date',dateType = item.date.dateType);
                 });
             });
+            var classCallback = function (res) {
+                obj.value = Array.isArray(res) ? (res.length>0 ? res : [{name:'',value:''}]) : res;
+                othis.config.callback.call(zthis,obj);
+            };
             if('select' === eventType){
-                singleInstance.register({
-                    data:thisData,
-                    element:zthis,
-                    enabled:thisEnabled,//true：开启多选，false：单选。默认为false
-                    callback:function (res) {
-                        var data = res.select;
-                        obj.value = Array.isArray(data) ? (data.length>0 ? data : [{name:'',value:''}]) : data;
-                        othis.config.callback.call(zthis,obj);
-                    }
-                });
+                singleInstance.register({data:thisData,element:zthis,enabled:thisEnabled,callback:classCallback});
             }else if('date' === eventType){
-                singleInstance.date({
-                    dateType:dateType,
-                    element:zthis,
-                    callback:function (res) {
-                        obj.value = res.value;
-                        othis.config.callback.call(zthis,obj);
-                    }
-                });
+                singleInstance.date({dateType:dateType,element:zthis,callback:classCallback});
             }else{
                 othis.config.callback.call(zthis,obj);
             }
@@ -208,6 +194,6 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
         update:function (options) {$(options.element).find("div.layui-table-cell").eq(0).text(options.value);},
         createDate:function (options) {singleInstance.date(options);}
     };
-    layui.link(layui.cache.base + 'css/layuiTableColumnEdit.css');
+
     exports('layuiTableColumnEdit', active);
 });

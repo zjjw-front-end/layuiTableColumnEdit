@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>示例demo</title>
     <link rel="stylesheet" href="layui/css/layui.css">
+    <link rel="stylesheet" href="module/css/layuiTableColumnEdit.css">
 </head>
 <body>
 <table class="layui-hide" id="tableId" lay-filter="tableEvent"></table>
@@ -44,11 +45,9 @@
                 layuiTableColumnEdit.createDate({
                     dateType:'datetime',
                     element:nameTd,
-                    callback:function (obj1) {
-                        console.log(obj1.value); //时间值
-                        console.log(obj1.td); //当前单元格（td）DOM元素
+                    callback:function (res) {
                         //把时间更新到行数据中
-                        obj.update({name:obj1.value});
+                        obj.update({name:res});
                     }
                 });
             }else if(obj.event === 'age'){
@@ -56,11 +55,9 @@
                 layuiTableColumnEdit.createDate({
                     dateType:'datetime',
                     element:ageTd,
-                    callback:function (obj1) {
-                        console.log(obj1.value); //时间值
-                        console.log(obj1.td); //当前单元格（td）DOM元素
+                    callback:function (res) {
                         //把时间更新到行数据中
-                        obj.update({age:obj1.value});
+                        obj.update({age:res});
                     }
                 });
             }
