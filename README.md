@@ -17,11 +17,7 @@
 ## 二、使用说明
 
 ### 1.使用方法
-&emsp;下载module整个文件夹，放在你的项目里面，然后使用模块加载的方式使用：
-
-```html
-<link rel="stylesheet" href="module/css/layuiTableColumnEdit.css">
-```
+&emsp; 把layuiTableColumnEdit.js放在你的项目里面，然后使用模块加载的方式使用：
 
 ```javascript
 layui.config({
