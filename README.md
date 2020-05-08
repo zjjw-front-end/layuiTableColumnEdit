@@ -108,3 +108,6 @@ callback  | function| 是       | 事件回调方法
 ---       | ---     | ---      | ----
 event     | string  | 是       | 事件名称
 params    | obj     | 否       | 事件回调方法的参数
+
+### 6.效果图
+![效果图](https://images.gitee.com/uploads/images/2020/0508/123901_092d3f62_1588195.gif "tableEdit.gif")
