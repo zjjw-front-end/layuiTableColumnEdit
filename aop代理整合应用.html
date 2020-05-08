@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>示例demo</title>
+    <link rel="stylesheet" href="layui/css/layui.css">
+</head>
+<body style="width: 200%;height: 2000px">
+<table class="layui-hide" id="tableId" lay-filter="tableEvent"></table>
+</body>
+<script src="layui/layui.js"></script>
+<script>
+    layui.config({
+        base: 'module/'
+    }).extend({
+        tableEdit:'js/tableEdit'
+    }).use(['table','tableEdit','layer'], function () {
+        var table = layui.table,tableEdit = layui.tableEdit,$ = layui.$;
+        var params = [
+            {name:1,value:"张三1"},
+            {name:2,value:"张三2"},
+            {name:3,value:"张三3"},
+            {name:4,value:"张三4"},
+            {name:5,value:"张三5"}
+        ];
+        var cols = table.render({
+            elem: '#tableId'
+            ,id:'id'
+            ,url:'data.json'
+            ,height: 'full-90'
+            ,page: true
+            ,cols: [[
+                {type:'checkbox'}
+                ,{field:'name',title: '姓名',width:120,event:'name'}
+                //select（下拉框）date（时间选择框）
+                ,{field:'danxuan', title: '单选',width:120,event:'danxuan',select:{data:params}}
+                //data 为下拉框数据  enabled => true：多选，false：单选。默认为false
+                ,{field:'duoxuan', title: '多选',width:120,event:'duoxuan',select:{data:params,enabled:true}}
+                //dateType表示日期时间格式，date为“yyyy-MM-dd”，datetime为“yyyy-MM-dd HH:ss:mm”
+                ,{field:'birthday', title: '生日',width:120,event:'birthday',date:{dateType:'date'}}
+                //cascadeSelectField字段为级联开关字段(存在该字段则级联，否则不级联)
+                ,{field:'xlkjl', title: '下拉框级联',width:120,event:'xlkjl',select:{data:params,cascadeSelectField:'name'}}
+                ,{field:'rqjl', title: '日期级联下拉框',width:180,event:'rqjl',date:{dateType:'date',cascadeSelectField:'name'}}
+            ]]
+        }).config.cols;
+
+        /**
+         * 参数cols是table.render({})中的cols属性值
+         * aop代理是基于event点击事件进行操作的，因此cols中务必开启event点击事件！
+         **/
+        var aopTable = tableEdit.aopObj(cols); //获取一个aop对象
+        /**
+         * 注意：
+         * 1、 aopTable.on('tool(xxx)',function (obj) {})
+         * 2、 table.on('tool(yyy)',function (obj) {})
+         * 如果1中的xxx与2中的yyy字符串相同时，不能同时用，用了会造成后调用者覆盖前调用者。
+         * 应该直接用1来代替2，因为1中包含了2中的事件。
+         * 如果不相同，则可以同时使用。
+         **/
+        aopTable.on('tool(tableEvent)',function (obj) {
+            var field = $(this).data('field');
+            console.log(obj);
+            var thisValue = obj.value;
+            if(thisValue){ //判断是否存在级联选择
+                thisValue = Array.isArray(thisValue) ? thisValue[0] : thisValue;
+            }
+            if(field === 'danxuan'){
+                obj.update({danxuan:thisValue.value});
+            }
+            if(field === 'duoxuan'){
+                obj.update({duoxuan:thisValue.value});
+            }
+            if(field === 'birthday'){
+                obj.update({birthday:thisValue});
+            }
+            if(field === 'name'){
+                if(thisValue){ //判断是否存在级联选择
+                    obj.update({name:thisValue.value});
+                }
+            }
+            if(field === 'xlkjl'){
+                obj.update({xlkjl:thisValue.value});
+            }
+            if(field === 'rqjl'){
+                obj.update({rqjl:thisValue});
+            }
+        });
+
+
+        /** 级联下拉框 => 点击事件生成下拉框之前的回调函数
+         * 主要用于 => 动态获取单元格下拉数据
+         * 如示例代码所示
+         */
+        tableEdit.on('clickBefore',function () {
+            var cascadeSelectData = $(this).attr("cascadeSelect-data"); //级联数据
+            var cascadeSelectField = $(this).attr("cascadeSelect-field"); //级联字段
+            cascadeSelectData = JSON.parse(cascadeSelectData);
+            if(Array.isArray(cascadeSelectData)){
+                cascadeSelectData = cascadeSelectData[0];
+            }
+            if(cascadeSelectData.name+'' === '1'){
+                aopTable.cascadeSelectConfig = {
+                    data:[{name:1,value:'贵州'},{name:2,value:'云南'}], //下拉数据 只可ajax同步请求后台
+                    enabled:false //单选
+                };
+            }else {
+                aopTable.cascadeSelectConfig = {
+                    data:[{name:1,value:'苏州'},{name:2,value:'杭州'}],//下拉数据 只可ajax同步请求后台
+                    enabled:true //多选
+                };
+            }
+        });
+    });
+</script>
+</html>

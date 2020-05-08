@@ -1,7 +1,7 @@
 layui.define(["jquery","laydate","laytpl","table"],function(exports) {
     "use strict";
     var $ = layui.jquery,laydate = layui.laydate,table = layui.table,
-        laytpl = layui.laytpl,
+        laytpl = layui.laytpl,moduleName = 'tableEdit',_layui = self === top ? layui : top.layui,
         selectTpl = [ //单选下拉框模板
             '<div class="layui-define-tcs-div layui-define-tcs-div-one" style="{{d.style.type}}px; width: {{d.style.width}}px; left: {{d.style.left}}px;">'
               , '<dl>'
@@ -174,32 +174,50 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
     AopEvent.prototype.on = function(event,callback){
         var othis = this;othis.config.event = event,othis.config.callback = callback;
         table.on(othis.config.event,function (obj) {
-            var zthis = this,field = $(zthis).data('field'),eventType,thisData,thisEnabled,dateType;
+            var zthis = this,field = $(zthis).data('field'),eventType,thisData,thisEnabled,dateType,cascadeSelectField;
             othis.config.cols.forEach(function (ite) {
                 ite.forEach(function (item) {
                     if(field !== item.field || (!item.select && !item.date))return;
-                    item.select ? (eventType = 'select',thisData = item.select.data,thisEnabled = item.select.enabled) : (eventType = 'date',dateType = item.date.dateType);
+                    item.select ? (eventType = 'select',thisData = item.select.data,thisEnabled = item.select.enabled,cascadeSelectField=item.select.cascadeSelectField)
+                        : (eventType = 'date',dateType = item.date.dateType,cascadeSelectField=item.date.cascadeSelectField);
                 });
             });
             var classCallback = function (res) {
                 obj.value = Array.isArray(res) ? (res.length>0 ? res : [{name:'',value:''}]) : res;
                 othis.config.callback.call(zthis,obj);
+                if(!singleInstance.isEmpty(cascadeSelectField)){
+                    var thisCascadeSelectElement = $(this.parentNode).find("td[data-field='"+cascadeSelectField+"']");
+                    $(thisCascadeSelectElement).attr("cascadeSelect-data",JSON.stringify(res)).attr("cascadeSelect-field",field);
+                }
             };
-            if('select' === eventType){
-                singleInstance.register({data:thisData,element:zthis,enabled:thisEnabled,callback:classCallback});
-            }else if('date' === eventType){
-                singleInstance.date({dateType:dateType,element:zthis,callback:classCallback});
-            }else{
-                othis.config.callback.call(zthis,obj);
-            }
+            var elementCascadeSelectField = $(this).attr("cascadeSelect-field");//级联字段
+            singleInstance.isEmpty(elementCascadeSelectField) ?
+            function () { //非级联事件
+                if('select' === eventType){
+                    singleInstance.register({data:thisData,element:zthis,enabled:thisEnabled,callback:classCallback});
+                }else if('date' === eventType){
+                    singleInstance.date({dateType:dateType,element:zthis,callback:classCallback});
+                }else{
+                    othis.config.callback.call(zthis,obj);
+                }
+            }() : function () {//级联事件
+                if('date' === eventType) return;
+                delete othis.cascadeSelectConfig; //清除上一次缓存的级联配置数据
+                active.onCallback.call(zthis,'clickBefore');
+                if(!othis.cascadeSelectConfig) return;
+                singleInstance.register({data:othis.cascadeSelectConfig.data,element:zthis,enabled:othis.cascadeSelectConfig.enabled,callback:classCallback});
+            }();
+
         });
     };
     var active = {
         aopObj:function(cols){return new AopEvent(cols);},
         createSelect:function (options) {singleInstance.register(options);},
         update:function (options) {$(options.element).find("div.layui-table-cell").eq(0).text(options.value);},
-        createDate:function (options) {singleInstance.date(options);}
+        createDate:function (options) {singleInstance.date(options);},
+        on:function (event,callback) {_layui.onevent.call(this,moduleName,event,callback);},
+        onCallback:function (event,params) {_layui.event.call(this,moduleName,event,params)}
     };
 
-    exports('layuiTableColumnEdit', active);
+    exports(moduleName, active);
 });
