@@ -3,20 +3,20 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
     var $ = layui.jquery,laydate = layui.laydate,table = layui.table,
         laytpl = layui.laytpl,moduleName = 'tableEdit',_layui = self === top ? layui : top.layui,
         selectTpl = [ //单选下拉框模板
-            '<div class="layui-define-tcs-div layui-define-tcs-div-one" style="{{d.style.type}}px; width: {{d.style.width}}px; left: {{d.style.left}}px;">'
+            '<div class="layui-tableEdit-div" style="{{d.style}}">'
               , '<dl>'
                   ,'{{# if(d.data){ }}'
                       ,'{{# d.data.forEach(function(item){ }}'
-                          ,'<dd lay-value="{{ item.name }}" class="layui-define-tcs-dd">{{ item.value }}</dd>'
+                          ,'<dd lay-value="{{ item.name }}" class="layui-tableEdit-dd">{{ item.value }}</dd>'
                       ,'{{# }); }}'
                   ,'{{# } else { }}'
-                      ,'<dd lay-value="" class="layui-define-tcs-dd">无数据</dd>'
+                      ,'<dd lay-value="" class="layui-tableEdit-dd">无数据</dd>'
                   ,'{{# } }}'
               , '</dl>'
             , '</div>'
         ].join(''),selectMoreTpl = [ //多选下拉框模板
-            '<div class="layui-define-tcs-div layui-define-tcs-div-more" style="{{d.style.type}}px; width: {{d.style.width}}px; left: {{d.style.left}}px;">'
-              ,'<div>'
+            '<div class="layui-tableEdit-div" style="{{d.style}}">'
+              ,'<div style="line-height: 36px;">'
                  ,'<span style="text-align: left">'
                     ,'<button type="button" event-type="select" class="layui-btn layui-btn-sm layui-btn-primary">全选</button>'
                  ,'</span>'
@@ -24,15 +24,12 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
                     ,'<button event-type="confirm" type="button" class="layui-btn layui-btn-sm layui-btn-primary">确定</button>'
                  ,'</span>'
               ,'</div>'
-              ,'<div class="layui-define-tcs-div-tpl">'
-                 ,'<ul class="layui-define-tcs-ul" >'
+              ,'<div class="layui-tableEdit-tpl">'
+                 ,'<ul>'
                     ,'{{# if(d.data){ }}'
                         ,'{{# d.data.forEach(function(item){ }}'
-                            ,'<li class="layui-define-tcs-checkbox" data-name="{{ item.name }}" data-value="{{ item.value }}">'
-                               ,'<div class="layui-define-tcs-checkbox" lay-skin="primary">'
-                                  ,'<span>{{ item.value }}</span>'
-                                  ,'<i class="layui-icon layui-icon-ok"></i>'
-                               ,'</div>'
+                            ,'<li data-name="{{ item.name }}" data-value="{{ item.value }}">'
+                               ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span><i class="layui-icon layui-icon-ok"></i></div>'
                             ,'</li>'
                         ,'{{# }); }}'
                     ,'{{# } else { }}'
@@ -42,10 +39,18 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
               ,'</div>'
             ,'</div>'
         ].join('');
-    //自动加载样式
-    var thisCss = ".layui-define-tcs-div{position: absolute;margin:0;background-color: #fff;font-size: 14px;border: 1px solid #d2d2d2;z-index: 19910908;}.layui-define-tcs-div-one{background-color: #fff;padding: 5px 0;overflow-y: auto;max-height: 288px;}.layui-define-tcs-div-more{max-height: 318px;}.layui-define-tcs-div-tpl{margin:0;background-color: #fff;border: 1px solid #d2d2d2;max-height: 288px;overflow-y: auto;}.layui-define-tcs-dd{padding: 0 10px;line-height: 36px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}.layui-define-tcs-div dd:hover {background-color: #5FB878;-webkit-transition: .5s all;transition: .5s all;}.layui-define-tcs-edge{position: absolute;right: 3px;top: 50%;margin-top: -15px;cursor: pointer;border-width: 6px;-webkit-transition: all .3s;border-style: dashed;border-color: transparent;}.layui-define-tcs-edgeTransform{transform:rotate(180deg);transition: all .3s;}.layui-define-tcs-input{position: absolute;left: 0;top: 0;width: 100%;height: 100%;padding: 0 14px 1px;border-radius: 0;box-shadow: 1px 1px 20px rgba(0,0,0,.15)}.layui-define-tcs-input:focus{border-color: #5FB878!important;}.layui-define-tcs-checkbox{position: relative;display: inline-block;vertical-align: middle;height: 36px;line-height: 36px;padding-left: 5px;cursor: pointer;font-size: 0;-webkit-transition: .1s linear;transition: .1s linear;box-sizing: border-box;min-width: 100%;}.layui-define-tcs-checkbox *{display: inline-block;vertical-align: middle;}.layui-define-tcs-checkbox span{padding: 0 10px;height: 100%;font-size: 14px;border-radius: 2px 0 0 2px;background-color: #d2d2d2;color: #fff;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;}.layui-define-tcs-checkbox:hover span{background-color: #44aedb;}.layui-define-tcs-checkbox i{position: absolute; right: 0; top: 0; width: 30px; height: 28px; border: 1px solid #d2d2d2; border-left: none; border-radius: 0 2px 2px 0; color: #fff; font-size: 20px; text-align: center;}.layui-define-tcs-checkbox:hover i{border-color: #c2c2c2; color: #c2c2c2;}.layui-define-tcs-checkbox[lay-skin=\"primary\"]{height: auto!important; line-height: normal!important; min-width: 18px; min-height: 18px; border: none!important; margin-right: 0; padding-left: 28px; padding-right: 0; background: none;}.layui-define-tcs-checkbox[lay-skin=\"primary\"] span{padding-left: 0; padding-right: 15px; line-height: 18px; background: none; color: #666;}.layui-define-tcs-checkbox[lay-skin=\"primary\"] i{right: auto; left: 0; width: 16px; height: 16px; line-height: 16px; border: 1px solid #d2d2d2; font-size: 12px; border-radius: 2px; background-color: #fff; -webkit-transition: .1s linear; transition: .1s linear;}.layui-define-tcs-checkbox[lay-skin=\"primary\"]:hover i{border-color: #5FB878; color: #fff;}.layui-define-tcs-ul{overflow: auto;}.layui-define-tcs-ul li{height: 36px; line-height: 36px;}.layui-define-tcs-ul li:hover{background-color: #5FB878; transition: .5s all;}";
+    //组件用到的css样式
+    var thisCss = [];
+    thisCss.push('.layui-tableEdit-div{position:absolute;margin:0;background-color:#fff;font-size:14px;border:1px solid #d2d2d2;z-index:19910908;}');
+    thisCss.push('.layui-tableEdit-div dd:hover{background-color:#5FB878;}');
+    thisCss.push('.layui-tableEdit-tpl{margin:0;border:1px solid #d2d2d2;max-height:288px;overflow-y:auto;}');
+    thisCss.push('.layui-tableEdit-tpl li{line-height:36px;padding-left:5px;}');
+    thisCss.push('.layui-tableEdit-tpl li:hover{background-color:#5FB878;}');
+    thisCss.push('.layui-tableEdit-dd{padding:0 10px;line-height:36px;overflow:hidden;}');
+    thisCss.push('.layui-tableEdit-edge{position:absolute;right:3px;bottom:8px;}');
+    thisCss.push('.layui-tableEdit-input{position:absolute;left:0;bottom:0;width:100%;height:38px;}');
     var thisStyle = document.createElement('style');
-    thisStyle.innerHTML = thisCss,document.getElementsByTagName('head')[0].appendChild(thisStyle);
+    thisStyle.innerHTML = thisCss.join('\n'),document.getElementsByTagName('head')[0].appendChild(thisStyle);
 
     var Class = function () { //单列模式  也就是只能new一个对象。
         var instance;
@@ -60,6 +65,7 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
     var singleInstance = new Class();
     var inFunc = function () {singleInstance.leaveStat = false;},outFunc = function () {singleInstance.leaveStat = true;};
     document.onclick = function () {if(singleInstance.leaveStat)singleInstance.deleteAll();};
+
     //日期选择框
     Class.prototype.date = function(options){
         var othis = this;
@@ -68,7 +74,7 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
         var that = options.element;
         if ($(that).find('input').length>0)return;
         othis.deleteAll(),othis.leaveStat = false;
-        var input = $('<input class="layui-input layui-define-tcs-input" type="text">');
+        var input = $('<input class="layui-input layui-tableEdit-input" type="text">');
         $(that).append(input),input.focus();
         //日期时间选择器 (show: true 表示直接显示)
         laydate.render({elem: input[0],type: othis.dateType,show: true,done:function (value, date) {
@@ -88,72 +94,69 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
         othis.enabled = options.enabled,othis.callback = options.callback,othis.data = options.data,othis.element = options.element;
         var that = othis.element;
         if ($(that).find('input').length>0)return;
-        othis.deleteAll(that),othis.leaveStat = false; //鼠标离开单元格或下拉框div区域状态，默认不离开（false）
-        var input = $('<input class="layui-input layui-define-tcs-input" placeholder="关键字搜索">');
-        var icon = $('<i class="layui-icon layui-define-tcs-edge">&#xe625;</i>');
+        othis.deleteAll(that),othis.leaveStat = false;
+        var input = $('<input class="layui-input layui-tableEdit-input" placeholder="关键字搜索">');
+        var icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>');
         $(that).append(input),$(that).append(icon),input.focus();
-        var thisY = that.getBoundingClientRect().top; //单元格y坐标
-        var thisX = that.getBoundingClientRect().left; //单元格x坐标
-        var thisHeight = that.offsetHeight,thisWidth = that.offsetWidth //单元格宽度和高度
+        var thisY = input[0].getBoundingClientRect().top //输入框y坐标
+            ,thisX = input[0].getBoundingClientRect().left //输入框x坐标
+            ,thisHeight = input[0].offsetHeight,thisWidth = input[0].offsetWidth //输入框宽度和高度
             ,clientHeight = document.documentElement['clientHeight'] //窗口高度
             ,scrollTop = document.body['scrollTop'] | document.documentElement['scrollTop']//滚动条滚动高度
-            ,scrollLeft = document.body['scrollLeft'] | document.documentElement['scrollLeft'];//滚动条滚动宽度
-        var bottom = clientHeight-scrollTop-thisY+3; //div底部距离窗口底部长度
-        var top = thisY+thisHeight+scrollTop+3; //div元素y坐标
-        //当前y坐标大于窗口0.55倍的高度则往上延伸，否则往下延伸。
-        var type = thisY+thisHeight > 0.55*clientHeight ?  'top:auto;bottom: '+bottom : 'bottom:auto;top:'+top;
-        //下三角图标旋转180度成上三角图标
-        thisY+thisHeight > 0.55*clientHeight ? $(icon).addClass("layui-define-tcs-edgeTransform") : '';
-        //生成下拉框
-        $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: {type: type,width: thisWidth,left: thisX+scrollLeft}}));
-        //事件注册
+            ,scrollLeft = document.body['scrollLeft'] | document.documentElement['scrollLeft']//滚动条滚动宽度
+            ,bottom = clientHeight-scrollTop-thisY+3 //div底部距离窗口底部长度
+            ,top = thisY+thisHeight+scrollTop+3 //div元素y坐标
+            ,type = thisY+thisHeight > 0.55*clientHeight ?  'top: auto;bottom: '+bottom+'px;' : 'bottom: auto;top: '+top+'px;';
+        thisY+thisHeight > 0.55*clientHeight ? icon.css('transform','rotate(180deg)') : null;
+        var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;'+(othis.enabled ? 'max-height: 318px;' : 'padding: 5px 0;overflow-y: auto;max-height: 288px;');
+        $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style}));
         othis.events();
     };
 
     //删除所有下拉框和时间选择框
     Class.prototype.deleteAll = function(){
-        $('div.layui-define-tcs-div,div.layui-laydate,input.layui-define-tcs-input,i.layui-define-tcs-edge').remove();
-        delete this.leaveStat; //清除leaveStat（离开状态属性）
+        $('div.layui-tableEdit-div,div.layui-laydate,input.layui-tableEdit-input,i.layui-tableEdit-edge').remove();
+        delete this.leaveStat;//清除（离开状态属性）
     };
 
     //注册事件
     Class.prototype.events = function(){
         var othis = this;
         var liSearchFunc = function(val){ //多选关键字搜索
-            $('ul.layui-define-tcs-ul li').each(function () {
+            $('div.layui-tableEdit-div li').each(function () {
                 othis.isEmpty(val) || $(this).data('value').indexOf(val) > -1 ? $(this).show() : $(this).hide();
             });
         },ddSearchFunc = function(val){ //单选关键字搜索
-            $('div.layui-define-tcs-div dd').each(function () {
+            $('div.layui-tableEdit-div dd').each(function () {
                 othis.isEmpty(val) || $(this).text().indexOf(val) > -1 ? $(this).show() : $(this).hide();
             });
         },ddClickFunc = function () { //给dd元素注册点击事件(单选)
-            var ddArr = $('div.layui-define-tcs-div').find('dd');
+            var ddArr = $('div.layui-tableEdit-div dd');
             ddArr.unbind('click'),ddArr.bind('click',function (e) {
                 layui.stope(e),othis.deleteAll();
                 if(othis.callback)othis.callback.call(othis.element,{name:$(this).attr('lay-value'),value:$(this).text()});
             });
         },liClickFunc = function(){ //给li元素注册点击事件（多选）
-            var liArr = $('div.layui-define-tcs-div').find('li');
+            var liArr = $('div.layui-tableEdit-div li');
             liArr.unbind('click'),liArr.bind('click',function (e) {
                 layui.stope(e);
                 var icon = $(this).find("i"),liClass = $(this).attr("class");
                 (liClass && liClass.indexOf("li-checked") > -1) ? (icon.css("background-color","#fff"),$(this).removeClass("li-checked"))
                     : (icon.css("background-color","#60b979"),$(this).addClass("li-checked"));
-                $(othis.element).find('input.layui-define-tcs-input').val(''),liSearchFunc();
+                $(othis.element).find('input.layui-tableEdit-input').val(''),liSearchFunc();
             });
         },btnClickFunc = function (){ //给button按钮注册点击事件
-            $("div.layui-define-tcs-div button").bind('click',function () {
+            $("div.layui-tableEdit-div button").bind('click',function () {
                 var eventType = $(this).attr("event-type"), btn = this,status = $(btn).attr('data-status'),dataList = new Array();
                 eventType === 'select' ? function () { //“全选”按钮
-                    $('ul.layui-define-tcs-ul').find('li').each(function (e) {
+                    $('div.layui-tableEdit-div li').each(function (e) {
                         var icon = $(this).find("i");
                         othis.isEmpty(status) || status === 'false'
                             ? (icon.css("background-color","#60b979"),$(this).addClass("li-checked"),$(btn).attr("data-status","true"))
                             : (icon.css("background-color","#fff"),$(this).removeClass("li-checked"),$(btn).attr("data-status","false"));
                     });
                 }() : function () { //“确定”按钮
-                    $("div.layui-define-tcs-div").find("div li").each(function (e) {
+                    $('div.layui-tableEdit-div li').each(function (e) {
                         var liClass = $(this).attr("class");
                         if(!liClass || liClass.indexOf("li-checked") <= -1)return;
                         dataList.push({name:$(this).data("name"),value:$(this).data("value")});
@@ -164,10 +167,10 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
             });
         };
         //事件注册
-        $(othis.element).find('input.layui-define-tcs-input').bind('input propertychange', function(){othis.enabled ? liSearchFunc(this.value) : ddSearchFunc(this.value);});
-        $(othis.element).find('i.layui-define-tcs-edge').bind('click',function () {layui.stope(),othis.deleteAll();});
+        $(othis.element).find('input.layui-tableEdit-input').bind('input propertychange', function(){othis.enabled ? liSearchFunc(this.value) : ddSearchFunc(this.value);});
+        $(othis.element).find('i.layui-tableEdit-edge').bind('click',function () {layui.stope(),othis.deleteAll();});
         othis.enabled ? (liClickFunc(),btnClickFunc()) : ddClickFunc();
-        $('div.layui-define-tcs-div').hover(inFunc,outFunc),$(othis.element).hover(inFunc,outFunc);
+        $('div.layui-tableEdit-div').hover(inFunc,outFunc),$(othis.element).hover(inFunc,outFunc);
     };
 
     var AopEvent = function(cols){this.config = {cols:cols};};//aop构造器
