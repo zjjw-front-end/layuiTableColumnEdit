@@ -1,8 +1,8 @@
 layui.define(["laydate","laytpl","table"],function(exports) {
     "use strict";
-    var moduleName = 'tableEdit',_layui = self === top ? layui : top.layui,laytpl = _layui.laytpl,
-        $ = _layui.$,laydate = _layui.laydate,table = _layui.table,
-        selectTpl = [ //单选下拉框模板
+    var moduleName = 'tableEdit',_layui = self === top ? layui : top.layui,laytpl = _layui.laytpl
+        ,$ = _layui.$,laydate = _layui.laydate,table = _layui.table
+        ,selectTpl = [ //单选下拉框模板
             '<div class="layui-tableEdit-div" style="{{d.style}}">'
               , '<dl>'
                   ,'{{# if(d.data){ }}'
@@ -14,7 +14,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                   ,'{{# } }}'
               , '</dl>'
             , '</div>'
-        ].join(''),selectMoreTpl = [ //多选下拉框模板
+        ].join('')
+        ,selectMoreTpl = [ //多选下拉框模板
             '<div class="layui-tableEdit-div" style="{{d.style}}">'
               ,'<div style="line-height: 36px;">'
                  ,'<span style="text-align: left">'
@@ -95,8 +96,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         var that = othis.element;
         if ($(that).find('input').length>0)return;
         othis.deleteAll(that),othis.leaveStat = false;
-        var input = $('<input class="layui-input layui-tableEdit-input" placeholder="关键字搜索">');
-        var icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>');
+        var input = $('<input class="layui-input layui-tableEdit-input" placeholder="关键字搜索">')
+            ,icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>');
         $(that).append(input),$(that).append(icon),input.focus();
         var thisY = input[0].getBoundingClientRect().top //输入框y坐标
             ,thisX = input[0].getBoundingClientRect().left //输入框x坐标
@@ -108,7 +109,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             ,top = thisY+thisHeight+scrollTop+3 //div元素y坐标
             ,type = thisY+thisHeight > 0.55*clientHeight ?  'top: auto;bottom: '+bottom+'px;' : 'bottom: auto;top: '+top+'px;';
         thisY+thisHeight > 0.55*clientHeight ? icon.css('transform','rotate(180deg)') : null;
-        var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;'+(othis.enabled ? 'max-height: 318px;' : 'padding: 5px 0;overflow-y: auto;max-height: 288px;');
+        var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;'
+            +(othis.enabled ? 'max-height: 318px;' : 'padding: 5px 0;overflow-y: auto;max-height: 288px;');
         $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style}));
         othis.events();
     };
