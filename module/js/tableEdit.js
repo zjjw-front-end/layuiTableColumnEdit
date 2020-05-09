@@ -1,7 +1,7 @@
-layui.define(["jquery","laydate","laytpl","table"],function(exports) {
+layui.define(["laydate","laytpl","table"],function(exports) {
     "use strict";
-    var $ = layui.jquery,laydate = layui.laydate,table = layui.table,
-        laytpl = layui.laytpl,moduleName = 'tableEdit',_layui = self === top ? layui : top.layui,
+    var moduleName = 'tableEdit',_layui = self === top ? layui : top.layui,laytpl = _layui.laytpl,
+        $ = _layui.$,laydate = _layui.laydate,table = _layui.table,
         selectTpl = [ //单选下拉框模板
             '<div class="layui-tableEdit-div" style="{{d.style}}">'
               , '<dl>'
@@ -82,7 +82,7 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
             if(othis.callback)othis.callback.call(that,value);
         }});
         $('div.layui-laydate').hover(inFunc,outFunc),$(that).hover(inFunc,outFunc);
-        layui.stope();
+        _layui.stope();
     };
 
     //判断是否为空函数
@@ -133,13 +133,13 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
         },ddClickFunc = function () { //给dd元素注册点击事件(单选)
             var ddArr = $('div.layui-tableEdit-div dd');
             ddArr.unbind('click'),ddArr.bind('click',function (e) {
-                layui.stope(e),othis.deleteAll();
+                _layui.stope(e),othis.deleteAll();
                 if(othis.callback)othis.callback.call(othis.element,{name:$(this).attr('lay-value'),value:$(this).text()});
             });
         },liClickFunc = function(){ //给li元素注册点击事件（多选）
             var liArr = $('div.layui-tableEdit-div li');
             liArr.unbind('click'),liArr.bind('click',function (e) {
-                layui.stope(e);
+                _layui.stope(e);
                 var icon = $(this).find("i"),liClass = $(this).attr("class");
                 (liClass && liClass.indexOf("li-checked") > -1) ? (icon.css("background-color","#fff"),$(this).removeClass("li-checked"))
                     : (icon.css("background-color","#60b979"),$(this).addClass("li-checked"));
@@ -168,7 +168,7 @@ layui.define(["jquery","laydate","laytpl","table"],function(exports) {
         };
         //事件注册
         $(othis.element).find('input.layui-tableEdit-input').bind('input propertychange', function(){othis.enabled ? liSearchFunc(this.value) : ddSearchFunc(this.value);});
-        $(othis.element).find('i.layui-tableEdit-edge').bind('click',function () {layui.stope(),othis.deleteAll();});
+        $(othis.element).find('i.layui-tableEdit-edge').bind('click',function () {_layui.stope(),othis.deleteAll();});
         othis.enabled ? (liClickFunc(),btnClickFunc()) : ddClickFunc();
         $('div.layui-tableEdit-div').hover(inFunc,outFunc),$(othis.element).hover(inFunc,outFunc);
     };
