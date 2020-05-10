@@ -4,13 +4,15 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         ,$ = _layui.$,laydate = _layui.laydate,table = _layui.table
         ,selectTpl = [ //单选下拉框模板
             '<div class="layui-tableEdit-div" style="{{d.style}}">'
-              , '<dl>'
+              , '<ul class="layui-tableEdit-ul">'
                   ,'{{# if(d.data){ }}'
                       ,'{{# d.data.forEach(function(item){ }}'
-                          ,'<dd lay-value="{{ item.name }}" class="layui-tableEdit-dd">{{ item.value }}</dd>'
+                          ,'<li data-name="{{ item.name }}" data-value="{{ item.value }}">'
+                              ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span></div>'
+                          ,'</li>'
                       ,'{{# }); }}'
                   ,'{{# } else { }}'
-                      ,'<dd lay-value="" class="layui-tableEdit-dd">无数据</dd>'
+                      ,'<li>无数据</li>'
                   ,'{{# } }}'
               , '</dl>'
             , '</div>'
@@ -42,12 +44,12 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         ].join('');
     //组件用到的css样式
     var thisCss = [];
-    thisCss.push('.layui-tableEdit-div{position:absolute;margin:0;background-color:#fff;font-size:14px;border:1px solid #d2d2d2;z-index:19910908445;}');
+    thisCss.push('.layui-tableEdit-div{position:absolute;background-color:#fff;font-size:14px;border:1px solid #d2d2d2;z-index:19910908445;max-height: 288px;}');
     thisCss.push('.layui-tableEdit-div dd:hover{background-color:#5FB878;}');
     thisCss.push('.layui-tableEdit-tpl{margin:0;max-height:252px;overflow-y:auto;}');
-    thisCss.push('.layui-tableEdit-tpl li{line-height:36px;padding-left:5px;}');
-    thisCss.push('.layui-tableEdit-tpl li:hover{background-color:#5FB878;}');
-    thisCss.push('.layui-tableEdit-dd{padding:0 10px;line-height:36px;overflow:hidden;}');
+    thisCss.push('.layui-tableEdit-div li{line-height:36px;padding-left:5px;}');
+    thisCss.push('.layui-tableEdit-div li:hover{background-color:#5FB878;}');
+    thisCss.push('.layui-tableEdit-ul div{padding-left:0px!important;}');
     thisCss.push('.layui-tableEdit-edge{position:absolute;right:3px;bottom:8px;z-index:199109084;}');
     thisCss.push('.layui-tableEdit-input{position:absolute;left:0;bottom:0;width:100%;height:38px;z-index:19910908;}');
     var thisStyle = document.createElement('style');
@@ -109,8 +111,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             ,top = thisY+thisHeight+scrollTop+3 //div元素y坐标
             ,type = thisY+thisHeight > 0.55*clientHeight ?  'top: auto;bottom: '+bottom+'px;' : 'bottom: auto;top: '+top+'px;';
         thisY+thisHeight > 0.55*clientHeight ? icon.css('transform','rotate(180deg)') : null;
-        var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;'
-            +(othis.enabled ? 'max-height: 288px;' : 'padding: 5px 0;overflow-y: auto;max-height: 288px;');
+        var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;';
+            style += othis.enabled ? '' : 'overflow-y: auto;';
         $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style}));
         othis.events();
     };
@@ -124,27 +126,23 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     //注册事件
     Class.prototype.events = function(){
         var othis = this;
-        var liSearchFunc = function(val){ //多选关键字搜索
+        var searchFunc = function(val){ //多选关键字搜索
             $('div.layui-tableEdit-div li').each(function () {
                 othis.isEmpty(val) || $(this).data('value').indexOf(val) > -1 ? $(this).show() : $(this).hide();
             });
-        },ddSearchFunc = function(val){ //单选关键字搜索
-            $('div.layui-tableEdit-div dd').each(function () {
-                othis.isEmpty(val) || $(this).text().indexOf(val) > -1 ? $(this).show() : $(this).hide();
-            });
-        },ddClickFunc = function () { //给dd元素注册点击事件(单选)
-            var ddArr = $('div.layui-tableEdit-div dd');
-            ddArr.unbind('click'),ddArr.bind('click',function (e) {
-                _layui.stope(e),othis.deleteAll();
-                if(othis.callback)othis.callback.call(othis.element,{name:$(this).attr('lay-value'),value:$(this).text()});
-            });
-        },liClickFunc = function(){ //给li元素注册点击事件（多选）
+        },liClickFunc = function(){ //给li元素注册点击事件
             var liArr = $('div.layui-tableEdit-div li');
             liArr.unbind('click'),liArr.bind('click',function (e) {
                 _layui.stope(e);
-                var icon = $(this).find("i"),liClass = $(this).attr("class");
-                (liClass && liClass.indexOf("li-checked") > -1) ? (icon.css("background-color","#fff"),$(this).removeClass("li-checked"))
-                    : (icon.css("background-color","#60b979"),$(this).addClass("li-checked"));
+                var zthis = this;
+                othis.enabled ? function () {
+                    var icon = $(zthis).find("i"),liClass = $(zthis).attr("class");
+                    (liClass && liClass.indexOf("li-checked") > -1) ? (icon.css("background-color","#fff"),$(zthis).removeClass("li-checked"))
+                        : (icon.css("background-color","#60b979"),$(zthis).addClass("li-checked"));
+                }() : function () {
+                    othis.deleteAll();
+                    if(othis.callback)othis.callback.call(othis.element,{name:$(zthis).data("name"),value:$(zthis).data("value")});
+                }();
             });
         },btnClickFunc = function (){ //给button按钮注册点击事件
             $("div.layui-tableEdit-div button").bind('click',function () {
@@ -168,9 +166,9 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             });
         };
         //事件注册
-        $(othis.element).find('input.layui-tableEdit-input').bind('input propertychange', function(){othis.enabled ? liSearchFunc(this.value) : ddSearchFunc(this.value);});
+        $(othis.element).find('input.layui-tableEdit-input').bind('input propertychange', function(){searchFunc(this.value)});
         $(othis.element).find('i.layui-tableEdit-edge').bind('click',function () {_layui.stope(),othis.deleteAll();});
-        othis.enabled ? (liClickFunc(),btnClickFunc()) : ddClickFunc();
+        othis.enabled ? (liClickFunc(),btnClickFunc()) : liClickFunc();
         $('div.layui-tableEdit-div').hover(inFunc,outFunc),$(othis.element).hover(inFunc,outFunc);
     };
 
