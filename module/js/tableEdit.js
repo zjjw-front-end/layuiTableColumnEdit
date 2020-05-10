@@ -4,7 +4,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         ,$ = _layui.$,laydate = _layui.laydate,table = _layui.table
         ,selectTpl = [ //单选下拉框模板
             '<div class="layui-tableEdit-div" style="{{d.style}}">'
-              , '<ul class="layui-tableEdit-ul">'
+              ,'<ul class="layui-tableEdit-ul">'
                   ,'{{# if(d.data){ }}'
                       ,'{{# d.data.forEach(function(item){ }}'
                           ,'<li data-name="{{ item.name }}" data-value="{{ item.value }}">'
@@ -14,7 +14,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                   ,'{{# } else { }}'
                       ,'<li>无数据</li>'
                   ,'{{# } }}'
-              , '</dl>'
+              ,'</ul>'
             , '</div>'
         ].join('')
         ,selectMoreTpl = [ //多选下拉框模板
