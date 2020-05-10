@@ -1,7 +1,7 @@
 layui.define(["laydate","laytpl","table"],function(exports) {
     "use strict";
     var moduleName = 'tableEdit',_layui = self === top ? layui : top.layui,laytpl = _layui.laytpl
-        ,$ = _layui.$,laydate = _layui.laydate,table = _layui.table
+        ,$ = _layui.$,laydate = _layui.laydate,table = _layui.table,removeFields = new Set()
         ,selectTpl = [ //单选下拉框模板
             '<div class="layui-tableEdit-div" style="{{d.style}}">'
               , '<dl>'
@@ -94,8 +94,11 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         var othis = this
             ,tableEdit$ = $(options.element).find('div.layui-tableEdit-div');
         if(tableEdit$[0])return;
-        $(this.element).find('i.layui-tableEdit-edge').css('transform','');
-        othis.enabled = options.enabled,othis.callback = options.callback,othis.data = options.data,othis.element = options.element;
+        $(this.element).find('i.layui-tableEdit-edge').css('transform',''); //转回下三角图标
+        othis.enabled = options.enabled;  //注意：这里不能用$.extend({},{})
+        othis.callback = options.callback;
+        othis.data = options.data;
+        othis.element = options.element;
         var that = othis.element;
         othis.deleteAll(),othis.leaveStat = false;
         var input = $(that).find('input.layui-tableEdit-input')
@@ -123,20 +126,25 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             ,elemHeight = that.offsetHeight
             ,type = elemY-divY > 0.8*clientHeight ? 'top: auto;bottom: '+(elemHeight)+'px;' : 'bottom: auto;top: '+(elemHeight)+'px;';
         icon.css('transform','rotate(180deg)');
-        if(elemY<divY)div$[0].scrollTop = that.offsetTop;
+        if(elemY<divY)div$[0].scrollTop = that.offsetTop; //调整滚动条位置
         var style = type+'width: '+thisWidth+'px;left: 0px;'
             +(othis.enabled ? 'max-height: 252px;' : 'overflow-y: auto;max-height: 252px;');
         $div.append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style}));
         tableEdit$ = $('div.layui-tableEdit-div');
-        if($divY+tableEdit$.height() > pageY) div$[0].scrollTop = that.offsetTop+tableEdit$.height();
+        if($divY+tableEdit$.height() > pageY) div$[0].scrollTop = that.offsetTop+tableEdit$.height(); //调整滚动条位置
         othis.events();
     };
 
     //删除所有下拉框和时间选择框
     Class.prototype.deleteAll = function(){
-        $('div.layui-tableEdit-div,div.layui-laydate,input.layui-tableEdit-date').remove();
-        $(this.element).find('i.layui-tableEdit-edge').css('transform','');
-        delete this.leaveStat;//清除（离开状态属性）
+        var othis = this;
+        $('div.layui-laydate,input.layui-tableEdit-date').remove();
+        if(removeFields.size > 0) removeFields.forEach(function (field) { //删除整个下拉框，包括input
+            $(othis.element).parents('div.layui-table-body').find('td[data-field="'+field+'"] div.layui-tableEdit').remove();
+        });
+        $('div.layui-tableEdit-div').remove(); //只删除下拉框div
+        $(othis.element).find('i.layui-tableEdit-edge').css('transform','');
+        delete othis.leaveStat;//清除（离开状态属性）
     };
 
     //注册事件
@@ -186,7 +194,9 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             });
         };
         //事件注册
-        $(othis.element).find('input.layui-tableEdit-input').bind('input propertychange', function(){othis.enabled ? liSearchFunc(this.value) : ddSearchFunc(this.value);});
+        $(othis.element).find('input.layui-tableEdit-input').bind('input propertychange', function(){
+            othis.enabled ? liSearchFunc(this.value) : ddSearchFunc(this.value);
+        });
         $(othis.element).find('i.layui-tableEdit-edge').bind('click',function () {_layui.stope(),othis.deleteAll();});
         othis.enabled ? (liClickFunc(),btnClickFunc()) : ddClickFunc();
         $(othis.element).hover(inFunc,outFunc);
@@ -195,13 +205,20 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     var AopEvent = function(cols){this.config = {cols:cols};};//aop构造器
     AopEvent.prototype.on = function(event,callback){
         var othis = this;othis.config.event = event,othis.config.callback = callback;
+        othis.config.cols.forEach(function (ite) {
+            ite.forEach(function (item) {
+                if(item.select && item.select.isRemove) removeFields.add(item.field)
+            });
+        });
         table.on(othis.config.event,function (obj) {
             var zthis = this,field = $(zthis).data('field'),eventType,thisData,thisEnabled,dateType,cascadeSelectField;
             othis.config.cols.forEach(function (ite) {
                 ite.forEach(function (item) {
-                    if(field !== item.field || (!item.select && !item.date))return;
-                    item.select ? (eventType = 'select',thisData = item.select.data,thisEnabled = item.select.enabled,cascadeSelectField=item.select.cascadeSelectField)
-                        : (eventType = 'date',dateType = item.date.dateType,cascadeSelectField=item.date.cascadeSelectField);
+                    var $select = item.select,$date = item.date;
+                    if(field !== item.field || (!$select && !$date))return;
+                    $select ? (eventType = 'select',thisData = $select.data,thisEnabled = $select.enabled)
+                        : (eventType = 'date',dateType = $date.dateType);
+                    cascadeSelectField = $select ?  $select.cascadeSelectField : $date.cascadeSelectField;
                 });
             });
             var classCallback = function (res) {
@@ -238,7 +255,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 var filter = $(zthis).parents('div.layui-table-view').eq(0).prev().attr('lay-filter');
                 active.onCallback.call(zthis,'clickBefore('+filter+')');
                 if(!othis.cascadeSelectConfig) return;
-                singleInstance.register({data:othis.cascadeSelectConfig.data,element:zthis,enabled:othis.cascadeSelectConfig.enabled,callback:classCallback});
+                singleInstance.register({data:othis.cascadeSelectConfig.data,element:zthis
+                    ,enabled:othis.cascadeSelectConfig.enabled,callback:classCallback});
             }();
 
         });
@@ -249,18 +267,22 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         update:function (options) {$(options.element).find("div.layui-table-cell").eq(0).text(options.value);},
         createDate:function (options) {singleInstance.date(options);},
         on:function (event,callback) {_layui.onevent.call(this,moduleName,event,callback);},
-        onCallback:function (event,params) {_layui.event.call(this,moduleName,event,params)},
-        initStyle:function (options) {
-            options['fields'].forEach(function (field) {
-                $(options.element).next().find('div.layui-table-body td[data-field="'+field+'"]').each(function () {
-                    var input = $('<input class="layui-input layui-tableEdit-input" placeholder="请选择" value="'+($(this).children('div.layui-table-cell').text())+'">')
-                        ,icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>')
-                        ,div = $('<div class="layui-tableEdit"></div>');
-                    div.append(input),div.append(icon),$(this).append(div);
-                });
-            });
-
-        }
+        onCallback:function (event,params) {_layui.event.call(this,moduleName,event,params)}
     };
+    active.on('showInput',function (options) {
+        options['fields'].forEach(function (field) {
+            $(options.element).next().find('div.layui-table-body td[data-field="'+field+'"]').each(function () {
+                var input = $('<input class="layui-input layui-tableEdit-input" placeholder="请选择" value="'+($(this).children('div.layui-table-cell').text())+'">')
+                    ,icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>')
+                    ,div = $('<div class="layui-tableEdit"></div>');
+                div.append(input),div.append(icon),$(this).append(div);
+            });
+        });
+    });
+    active.on('removeFields',function (options) {
+        options.fields.forEach(function (field) {
+            removeFields.add(field);
+        });
+    });
     exports(moduleName, active);
 });
