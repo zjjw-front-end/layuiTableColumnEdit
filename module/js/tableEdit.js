@@ -42,14 +42,14 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         ].join('');
     //组件用到的css样式
     var thisCss = [];
-    thisCss.push('.layui-tableEdit-div{position:absolute;margin:0;background-color:#fff;font-size:14px;border:1px solid #d2d2d2;z-index:19910908;}');
+    thisCss.push('.layui-tableEdit-div{position:absolute;margin:0;background-color:#fff;font-size:14px;border:1px solid #d2d2d2;z-index:19910908445;}');
     thisCss.push('.layui-tableEdit-div dd:hover{background-color:#5FB878;}');
     thisCss.push('.layui-tableEdit-tpl{margin:0;max-height:288px;overflow-y:auto;}');
     thisCss.push('.layui-tableEdit-tpl li{line-height:36px;padding-left:5px;}');
     thisCss.push('.layui-tableEdit-tpl li:hover{background-color:#5FB878;}');
     thisCss.push('.layui-tableEdit-dd{padding:0 10px;line-height:36px;overflow:hidden;}');
-    thisCss.push('.layui-tableEdit-edge{position:absolute;right:3px;bottom:8px;}');
-    thisCss.push('.layui-tableEdit-input{position:absolute;left:0;bottom:0;width:100%;height:38px;}');
+    thisCss.push('.layui-tableEdit-edge{position:absolute;right:3px;bottom:8px;z-index:199109084;}');
+    thisCss.push('.layui-tableEdit-input{position:absolute;left:0;bottom:0;width:100%;height:38px;z-index:19910908;}');
     var thisStyle = document.createElement('style');
     thisStyle.innerHTML = thisCss.join('\n'),document.getElementsByTagName('head')[0].appendChild(thisStyle);
 
