@@ -45,7 +45,6 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     //组件用到的css样式
     var thisCss = [];
     thisCss.push('.layui-tableEdit-div{position:absolute;background-color:#fff;font-size:14px;border:1px solid #d2d2d2;z-index:19910908445;max-height: 288px;}');
-    thisCss.push('.layui-tableEdit-div dd:hover{background-color:#5FB878;}');
     thisCss.push('.layui-tableEdit-tpl{margin:0;max-height:252px;overflow-y:auto;}');
     thisCss.push('.layui-tableEdit-div li{line-height:36px;padding-left:5px;}');
     thisCss.push('.layui-tableEdit-div li:hover{background-color:#5FB878;}');
@@ -110,9 +109,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             ,bottom = clientHeight-scrollTop-thisY+3 //div底部距离窗口底部长度
             ,top = thisY+thisHeight+scrollTop+3 //div元素y坐标
             ,type = thisY+thisHeight > 0.55*clientHeight ?  'top: auto;bottom: '+bottom+'px;' : 'bottom: auto;top: '+top+'px;';
+        var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;'+(othis.enabled ? '':'overflow-y: auto;');
         thisY+thisHeight > 0.55*clientHeight ? icon.css('transform','rotate(180deg)') : null;
-        var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;';
-            style += othis.enabled ? '' : 'overflow-y: auto;';
         $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style}));
         othis.events();
     };
