@@ -44,7 +44,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     var thisCss = [];
     thisCss.push('.layui-tableEdit-div{position:absolute;margin:0;background-color:#fff;font-size:14px;border:1px solid #d2d2d2;z-index:19910908445;}');
     thisCss.push('.layui-tableEdit-div dd:hover{background-color:#5FB878;}');
-    thisCss.push('.layui-tableEdit-tpl{margin:0;max-height:288px;overflow-y:auto;}');
+    thisCss.push('.layui-tableEdit-tpl{margin:0;max-height:252px;overflow-y:auto;}');
     thisCss.push('.layui-tableEdit-tpl li{line-height:36px;padding-left:5px;}');
     thisCss.push('.layui-tableEdit-tpl li:hover{background-color:#5FB878;}');
     thisCss.push('.layui-tableEdit-dd{padding:0 10px;line-height:36px;overflow:hidden;}');
@@ -110,7 +110,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             ,type = thisY+thisHeight > 0.55*clientHeight ?  'top: auto;bottom: '+bottom+'px;' : 'bottom: auto;top: '+top+'px;';
         thisY+thisHeight > 0.55*clientHeight ? icon.css('transform','rotate(180deg)') : null;
         var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;'
-            +(othis.enabled ? 'max-height: 318px;' : 'padding: 5px 0;overflow-y: auto;max-height: 288px;');
+            +(othis.enabled ? 'max-height: 288px;' : 'padding: 5px 0;overflow-y: auto;max-height: 288px;');
         $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style}));
         othis.events();
     };
