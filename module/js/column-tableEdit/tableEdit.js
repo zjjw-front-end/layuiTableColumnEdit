@@ -1,7 +1,7 @@
 layui.define(["laydate","laytpl","table"],function(exports) {
     "use strict";
     var moduleName = 'tableEdit',_layui = self === top ? layui : top.layui,laytpl = _layui.laytpl
-        ,$ = _layui.$,laydate = _layui.laydate,table = _layui.table,removeFields = new Set()
+        ,$ = _layui.$,laydate = _layui.laydate,table = _layui.table
         ,selectTpl = [ //单选下拉框模板
             '<div class="layui-tableEdit-div" style="{{d.style}}">'
               , '<dl>'
@@ -138,11 +138,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     //删除所有下拉框和时间选择框
     Class.prototype.deleteAll = function(){
         var othis = this;
-        $('div.layui-laydate,input.layui-tableEdit-date').remove();
-        if(removeFields.size > 0) removeFields.forEach(function (field) { //删除整个下拉框，包括input
-            $(othis.element).parents('div.layui-table-body').find('td[data-field="'+field+'"] div.layui-tableEdit').remove();
-        });
-        $('div.layui-tableEdit-div').remove(); //只删除下拉框div
+        $('div.layui-tableEdit-div,div.layui-laydate,input.layui-tableEdit-date').remove();
         $(othis.element).find('i.layui-tableEdit-edge').css('transform','');
         delete othis.leaveStat;//清除（离开状态属性）
     };
@@ -205,11 +201,6 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     var AopEvent = function(cols){this.config = {cols:cols};};//aop构造器
     AopEvent.prototype.on = function(event,callback){
         var othis = this;othis.config.event = event,othis.config.callback = callback;
-        othis.config.cols.forEach(function (ite) {
-            ite.forEach(function (item) {
-                if(item.select && item.select.isRemove) removeFields.add(item.field)
-            });
-        });
         table.on(othis.config.event,function (obj) {
             var zthis = this,field = $(zthis).data('field'),eventType,thisData,thisEnabled,dateType,cascadeSelectField;
             othis.config.cols.forEach(function (ite) {
@@ -228,15 +219,6 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                     var thisCascadeSelectElement = $(this.parentNode).find("td[data-field='"+cascadeSelectField+"']");
                     $(thisCascadeSelectElement).attr("cascadeSelect-data",JSON.stringify(res)).attr("cascadeSelect-field",field);
                 }
-                if(typeof res === 'string') return;
-                var thisValue = Array.isArray(res) ? function () {
-                    var v  = [];
-                    res.forEach(function (e) {
-                       v.push(e.value);
-                    });
-                    return v.join(',');
-                }() : res.value;
-                $(zthis).find('input.layui-tableEdit-input').val(thisValue);
             };
             var elementCascadeSelectField = $(this).attr("cascadeSelect-field");//级联字段
             singleInstance.isEmpty(elementCascadeSelectField) ?
@@ -277,11 +259,6 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                     ,div = $('<div class="layui-tableEdit"></div>');
                 div.append(input),div.append(icon),$(this).append(div);
             });
-        });
-    });
-    active.on('removeFields',function (options) {
-        options.fields.forEach(function (field) {
-            removeFields.add(field);
         });
     });
     exports(moduleName, active);
