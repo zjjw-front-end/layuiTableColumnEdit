@@ -15,6 +15,7 @@
         base: 'module/'
     }).extend({
         tableEdit:'js/tableEdit'
+        //tableEdit:'js/column-tableEdit/tableEdit'
     }).use(['table','tableEdit','layer'], function () {
         var table = layui.table,tableEdit = layui.tableEdit,$ = layui.$;
         var params = [
@@ -42,7 +43,10 @@
                 //cascadeSelectField字段为级联开关字段(存在该字段则级联，否则不级联)
                 ,{field:'xlkjl', title: '下拉框级联',width:120,event:'xlkjl',select:{data:params,cascadeSelectField:'name'}}
                 ,{field:'rqjl', title: '日期级联下拉框',width:180,event:'rqjl',date:{dateType:'date',cascadeSelectField:'name'}}
-            ]]
+            ]],done:function () {
+                //单元格显示输入框
+                tableEdit.callback('showInput',{fields:['danxuan'],element:'#tableId'})
+            }
         }).config.cols;
 
         /**
@@ -111,6 +115,11 @@
                     enabled:true //多选
                 };
             }
+        });
+        //下拉框删除之后执行的回调
+        tableEdit.on('deleteAfter(tableEvent)',function () {
+            //删除相关列的输入框
+            tableEdit.callback('hideInput',{fields:['duoxuan','xlkjl','name'],element:'#tableId'});
         });
     });
 </script>

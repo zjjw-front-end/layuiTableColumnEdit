@@ -146,6 +146,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         $('div.layui-tableEdit-div,div.layui-laydate,input.layui-tableEdit-date').remove();
         $(othis.element).find('i.layui-tableEdit-edge').css('transform','');
         delete othis.leaveStat;//清除（离开状态属性）
+        var filter = $(othis.element).parents('div.layui-table-view').eq(0).prev().attr('lay-filter');
+        active.callback('deleteAfter('+filter+')');
     };
 
     //注册事件
@@ -247,9 +249,6 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         on:function (event,callback) {_layui.onevent.call(this,moduleName,event,callback);},
         callback:function (event,params) {_layui.event.call(this,moduleName,event,params)}
     };
-    active.on('createSelect',function (options) {singleInstance.register(options)});
-    active.on('createDate',function (options) {singleInstance.date(options)});
-    active.on('update',function (options) {$(options.element).find("div.layui-table-cell").eq(0).text(options.value);});
     active.on('showInput',function (options) {
         if(!options || !options['fields'] || !options.element) return
         options['fields'].forEach(function (field) {

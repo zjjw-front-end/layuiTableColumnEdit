@@ -79,7 +79,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         var that = options.element;
         if ($(that).find('input').length>0)return;
         othis.deleteAll(),othis.leaveStat = false;
-        var input = $('<input class="layui-input layui-tableEdit-input" type="text">');
+        var input = $('<input class="layui-input layui-tableEdit-input layui-tableEdit-date" type="text">');
         $(that).append(input),input.focus();
         //日期时间选择器 (show: true 表示直接显示)
         laydate.render({elem: input[0],type: othis.dateType,show: true,done:function (value, date) {
@@ -136,8 +136,10 @@ layui.define(["laydate","laytpl","table"],function(exports) {
 
     //删除所有下拉框和时间选择框
     Class.prototype.deleteAll = function(){
-        $('div.layui-tableEdit-div,div.layui-laydate,input.layui-tableEdit-input,div.layui-tableEdit').remove();
+        $('div.layui-tableEdit-div,div.layui-laydate,input.layui-tableEdit-date').remove();
         delete this.leaveStat;//清除（离开状态属性）
+        var filter = $(this.element).parents('div.layui-table-view').eq(0).prev().attr('lay-filter');
+        active.callback('deleteAfter('+filter+')');
     };
 
     //注册事件
@@ -237,8 +239,21 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         on:function (event,callback) {_layui.onevent.call(this,moduleName,event,callback);},
         callback:function (event,params) {_layui.event.call(this,moduleName,event,params)}
     };
-    active.on('createSelect',function (options) {singleInstance.register(options)});
-    active.on('createDate',function (options) {singleInstance.date(options)});
-    active.on('update',function (options) {$(options.element).find("div.layui-table-cell").eq(0).text(options.value);});
+    active.on('showInput',function (options) {
+        if(!options || !options['fields'] || !options.element) return
+        options['fields'].forEach(function (field) {
+            $(options.element).next().find('div.layui-table-body td[data-field="'+field+'"]').each(function () {
+                var input = $('<input class="layui-input layui-tableEdit-input" placeholder="请选择" value="'+($(this).children('div.layui-table-cell').text())+'">')
+                    ,icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>')
+                    ,div = $('<div class="layui-tableEdit"></div>');
+                div.append(input),div.append(icon),$(this).append(div);
+            });
+        });
+    });
+    active.on('hideInput',function (options) {
+        options && options.fields && options.element ? options.fields.forEach(function (field) {
+            $(options.element).next().find('div.layui-table-body td[data-field="'+field+'"] div.layui-tableEdit').remove()
+        }) : $('div.layui-tableEdit').remove();
+    });
     exports(moduleName, active);
 });
