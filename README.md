@@ -37,7 +37,6 @@ layui.config({
 ---          | ----
 aopObj       | 获取一个table的aop代理对象方法,一张表对应一个aop对象。
 on           | 事件注册
-callback     | 事件回调
 
 ### 3.参数说明
 
@@ -52,20 +51,14 @@ cols      | array     | 是       | table.render(options)中options的cols属性
 event     | string  | 是       | 事件名称
 callback  | function| 是       | 事件回调方法
 
-#### callback
-参数      | 类型    | 是否必填 | 描述 |
----       | ---     | ---      | ----
-event     | string  | 是       | 事件名称
-params    | obj     | 否       | 事件回调方法的参数
-
 
 &emsp;**cols格式**
 
 ```json
  [[
-   {"field":"danxuan", "title": "单选","width":120,"event":"danxuan","select":{"data":params,"cascadeSelectField":"name"}}
-   ,{"field":"duoxuan", "title": "多选","width":120,"event":"duoxuan","select":{"data":params,"enabled":true}}
-   ,{"field":"birthday", "title": "生日","width":120,"event":"birthday","date":{"dateType":"date"}}
+   {"field":"danxuan", "title": "单选","event":"danxuan","select":{"data":params,"cascadeSelectField":"name"}}
+   ,{"field":"duoxuan", "title": "多选","event":"duoxuan","select":{"data":params,"enabled":true}}
+   ,{"field":"birthday", "title": "生日","event":"birthday","date":{"dateType":"date"}}
  ]]
 ```
 
