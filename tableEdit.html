@@ -16,6 +16,11 @@
     }).extend({
         tableEdit:'js/tableEdit'
         //tableEdit:'js/column-tableEdit/tableEdit'
+        /**
+         * 第一个js的下拉框div在body中创建
+         * 第二个js的下拉框div在单元格中创建
+         * 两个js用法一致，具体用哪个js看个人喜好。
+         */
     }).use(['table','tableEdit','layer'], function () {
         var table = layui.table,tableEdit = layui.tableEdit,$ = layui.$;
         var params = [
@@ -44,7 +49,13 @@
                 ,{field:'xlkjl', title: '下拉框级联',width:120,event:'xlkjl',select:{data:params,cascadeSelectField:'name'}}
                 ,{field:'rqjl', title: '日期级联下拉框',width:180,event:'rqjl',date:{dateType:'date',cascadeSelectField:'name'}}
             ]],done:function () {
-                //单元格显示输入框
+                /**
+                 * 单元格显示输入框
+                 * 如果不需要显示输入框，就不要调用此方法。
+                 * 参数
+                 * fields => 需要显示输入框的列，数组类。
+                 * elemen => 表格id或者表格元素对象
+                 **/
                 tableEdit.callback('showInput',{fields:['danxuan'],element:'#tableId'})
             }
         }).config.cols;
@@ -66,33 +77,17 @@
             var field = $(this).data('field');
             console.log(obj);
             var thisValue = obj.value;
-            if(thisValue){ //判断是否存在级联选择
+            if(thisValue){
                 thisValue = Array.isArray(thisValue) ? thisValue[0] : thisValue;
             }
             if(field === 'danxuan'){
                 obj.update({danxuan:thisValue.value});
             }
-            if(field === 'duoxuan'){
-                obj.update({duoxuan:thisValue.value});
-            }
-            if(field === 'birthday'){
-                obj.update({birthday:thisValue});
-            }
-            if(field === 'name'){
-                if(thisValue){ //判断是否存在级联选择
-                    obj.update({name:thisValue.value});
-                }
-            }
-            if(field === 'xlkjl'){
-                obj.update({xlkjl:thisValue.value});
-            }
-            if(field === 'rqjl'){
-                obj.update({rqjl:thisValue});
-            }
         });
 
 
-        /** 级联下拉框 => 点击事件生成下拉框之前的回调函数
+        /**
+         * 级联下拉框 => 点击事件生成下拉框之前的回调函数
          * 主要用于 => 动态获取单元格下拉数据
          * tableEvent => table的lay-filter属性值
          * 如示例代码所示
@@ -116,9 +111,17 @@
                 };
             }
         });
-        //下拉框删除之后执行的回调
+        /**
+         * 下拉框删除之后执行的回调
+         **/
         tableEdit.on('deleteAfter(tableEvent)',function () {
-            //删除相关列的输入框
+            /**
+             * 删除单元格输入框
+             * 如果不需要删除输入框，就不要调用此方法。
+             * 参数
+             * fields => 需要显示删除的输入框的列，数组类。
+             * elemen => 表格id或者表格元素对象
+             **/
             tableEdit.callback('hideInput',{fields:['duoxuan','xlkjl','name'],element:'#tableId'});
         });
     });
