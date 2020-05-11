@@ -128,9 +128,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             ,type = thisY+thisHeight > 0.55*clientHeight ?  'top: auto;bottom: '+bottom+'px;' : 'bottom: auto;top: '+top+'px;';
         var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;'+(othis.enabled ? '':'overflow-y: auto;');
         thisY+thisHeight > 0.55*clientHeight ? icon.css('transform','rotate(180deg)') : null;
-        var thisSelected = $(that).children('div.layui-table-cell').text();
-        thisSelected = singleInstance.isEmpty(thisSelected) ? othis.selectedValue : thisSelected;
-        $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:thisSelected}));
+        $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:othis.selectedValue}));
         othis.events();
     };
 
@@ -227,7 +225,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 //获取当前单元格的table表格的lay-filter属性值
                 var filter = $(zthis).parents('div.layui-table-view').eq(0).prev().attr('lay-filter');
                 active.callback.call(zthis,'clickBefore('+filter+')');
-                if(!othis.cascadeSelectConfig) return;
+                if(!othis.cascadeSelectConfig) othis.cascadeSelectConfig = {};
                 singleInstance.register({data:othis.cascadeSelectConfig.data,element:zthis
                     ,enabled:othis.cascadeSelectConfig.enabled,selectedValue:obj.data[field],callback:classCallback});
             }();
