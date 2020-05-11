@@ -38,7 +38,7 @@
             ,page: true
             ,cols: [[
                 {type:'checkbox'}
-                ,{field:'name',title: '姓名',width:120,event:'name'}
+                ,{field:'name',title: '姓名',width:120}
                 //select（下拉框）date（时间选择框）
                 ,{field:'danxuan',align:'center', title: '单选',width:120,event:'danxuan',select:{data:params}}
                 //data 为下拉框数据  enabled => true：多选，false：单选。默认为false
@@ -46,8 +46,10 @@
                 //dateType表示日期时间格式，date为“yyyy-MM-dd”，datetime为“yyyy-MM-dd HH:ss:mm”
                 ,{field:'birthday', title: '生日',width:120,event:'birthday',date:{dateType:'date'}}
                 //cascadeSelectField字段为级联开关字段(存在该字段则级联，否则不级联)
-                ,{field:'xlkjl', title: '下拉框级联',width:120,event:'xlkjl',select:{data:params,cascadeSelectField:'name'}}
-                ,{field:'rqjl', title: '日期级联下拉框',width:180,event:'rqjl',date:{dateType:'date',cascadeSelectField:'name'}}
+                ,{field:'xlkjl', title: '下拉框联动(上级)',width:150,event:'xlkjl',select:{data:params,cascadeSelectField:'xialaxiaji'}}
+                ,{field:'xialaxiaji', title: '下拉框联动(下级)',width:150,event:'xiaji',select:{data:params}}
+                ,{field:'rqjl', title: '日期联动(上级)',width:150,event:'rqjl',date:{dateType:'date',cascadeSelectField:'rqxiaji'}}
+                ,{field:'rqxiaji', title: '日期框联动(下级)',width:150,event:'rqxiaji',select:{data:params}}
             ]],done:function () {
                 /**
                  * 单元格显示输入框
@@ -140,7 +142,7 @@
              * fields => 需要显示删除的输入框的列，数组类。
              * elemen => 表格id或者表格元素对象
              **/
-            tableEdit.callback('hideInput',{fields:['duoxuan','xlkjl','name'],element:'#tableId'});
+            tableEdit.callback('hideInput',{fields:['duoxuan','xlkjl','xialaxiaji','rqxiaji'],element:'#tableId'});
         });
     });
 </script>
