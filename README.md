@@ -92,7 +92,7 @@ cascadeSelectField | string    | 否       | 下拉框联动配置字段
 &emsp;**date说明**
 
 参数               | 类型      | 是否必填 | 描述 |
-----               | ---       | ---      | -------
+-----              | ---       | ---      | -------
 dateType           | string    | 是       | 日期选择框类型，date:yyyy-MM-dd,datetime:yyyy-MM-dd HH:ss:mm,time:HH:ss:mm
 cascadeSelectField | string    | 否       | 下拉框联动配置字段
 
