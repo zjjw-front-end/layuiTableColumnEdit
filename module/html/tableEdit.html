@@ -4,36 +4,24 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>示例demo</title>
-    <link rel="stylesheet" href="layui/css/layui.css">
+    <link rel="stylesheet" href="../../layuiAdmin.pro-v1.4.0/start/layui/css/layui.css">
 </head>
-<body style="width: 200%;">
+<body>
 <table class="layui-hide" id="tableId" lay-filter="tableEvent"></table>
 </body>
-<script src="layui/layui.js"></script>
+<script src="../../layuiAdmin.pro-v1.4.0/start/layui/layui.js"></script>
 <script>
     layui.config({
-        base: 'module/'
+        base: '../'
     }).extend({
         tableEdit:'js/tableEdit'
-        //tableEdit:'js/column-tableEdit/tableEdit'
-        /**
-         * 第一个js的下拉框div在body中创建
-         * 第二个js的下拉框div在单元格中创建
-         * 两个js用法一致，具体用哪个js看个人喜好。
-         */
     }).use(['table','tableEdit','layer'], function () {
         var table = layui.table,tableEdit = layui.tableEdit,$ = layui.$;
-        var params = [
-            {name:1,value:"张三1"},
-            {name:2,value:"张三2"},
-            {name:3,value:"张三3"},
-            {name:4,value:"张三4"},
-            {name:5,value:"张三5"}
-        ];
+        var params = [{name:1,value:"张三1"},{name:2,value:"张三2"},{name:3,value:"张三3"},{name:4,value:"张三4"},{name:5,value:"张三5"}];
         var cols = table.render({
             elem: '#tableId'
             ,id:'id'
-            ,url:'data.json'
+            ,url:'../json/data.json'
             ,height: 'full-90'
             ,page: true
             ,cols: [[
@@ -50,16 +38,7 @@
                 ,{field:'xialaxiaji', title: '下拉框联动(下级)',width:150,event:'xiaji',select:{data:params}}
                 ,{field:'rqjl', title: '日期联动(上级)',width:150,event:'rqjl',date:{dateType:'date',cascadeSelectField:'rqxiaji'}}
                 ,{field:'rqxiaji', title: '日期框联动(下级)',width:150,event:'rqxiaji',select:{data:params}}
-            ]],done:function () {
-                /**
-                 * 单元格显示输入框
-                 * 如果不需要显示输入框，就不要调用此方法。
-                 * 参数
-                 * fields => 需要显示输入框的列字段，数组类。
-                 * elemen => 表格id或者表格元素对象
-                 **/
-                tableEdit.callback('showInput',{fields:['danxuan'],element:'#tableId'})
-            }
+            ]]
         }).config.cols;
 
         /**
@@ -77,17 +56,15 @@
          **/
         aopTable.on('tool(tableEvent)',function (obj) {
             var field = $(this).data('field');
-            console.log(obj);
             var thisValue = obj.value;
             if(thisValue){
+                //这里是测试，所以如果是数组，就取第一个数组元素。
                 thisValue = Array.isArray(thisValue) ? thisValue[0] : thisValue;
             }
             var update = {};
             update[field] = thisValue && typeof thisValue === 'string' ? thisValue : thisValue.value;
             //把value更新到行中
             obj.update(update);
-            //把显示值更新到输入框中(input)
-            thisValue && typeof thisValue === 'string' ? null : $(this).find('input.layui-tableEdit-input').val(thisValue.value);
         });
 
 
@@ -130,19 +107,6 @@
                     };
                 }
             }
-        });
-        /**
-         * 下拉框删除之后执行的回调
-         **/
-        tableEdit.on('deleteAfter(tableEvent)',function () {
-            /**
-             * 删除单元格输入框
-             * 如果不需要删除输入框，就不要调用此方法。
-             * 参数
-             * fields => 需要删除的输入框的列字段，数组类。
-             * elemen => 表格id或者表格元素对象
-             **/
-            tableEdit.callback('hideInput',{fields:['duoxuan','xlkjl','xialaxiaji','rqxiaji'],element:'#tableId'});
         });
     });
 </script>

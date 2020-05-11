@@ -4,50 +4,50 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         ,$ = _layui.$,laydate = _layui.laydate,table = _layui.table
         ,selectTpl = [ //单选下拉框模板
             '<div class="layui-tableEdit-div" style="{{d.style}}">'
-              ,'<ul class="layui-tableEdit-ul">'
-                  ,'{{# if(d.data){ }}'
-                      ,'{{# d.data.forEach(function(item){ }}'
-                          ,'{{# var $class = (item.value === d.selectedValue) || (item.name+"" === d.selectedValue) ? "layui-tableEdit-selected" : "";  }}'
-                          ,'<li class="{{ $class }}" data-name="{{ item.name }}" data-value="{{ item.value }}">'
-                              ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span></div>'
-                          ,'</li>'
-                      ,'{{# }); }}'
-                  ,'{{# } else { }}'
-                      ,'<li>无数据</li>'
-                  ,'{{# } }}'
-              ,'</ul>'
-            , '</div>'
-        ].join('')
-        ,selectMoreTpl = [ //多选下拉框模板
-            '<div class="layui-tableEdit-div" style="{{d.style}}">'
-              ,'<div style="line-height: 36px;">'
-                 ,'<div style="float: left">'
-                    ,'<button type="button" event-type="select" class="layui-btn layui-btn-sm layui-btn-primary">全选</button>'
-                 ,'</div>'
-                 ,'<div style="text-align: right">'
-                    ,'<button event-type="confirm" type="button" class="layui-btn layui-btn-sm layui-btn-primary">确定</button>'
-                 ,'</div>'
-              ,'</div>'
-              ,'<div class="layui-tableEdit-tpl">'
-                 ,'<ul>'
+                ,'<ul class="layui-tableEdit-ul">'
                     ,'{{# if(d.data){ }}'
                         ,'{{# d.data.forEach(function(item){ }}'
                             ,'{{# var $class = (item.value === d.selectedValue) || (item.name+"" === d.selectedValue) ? "layui-tableEdit-selected" : "";  }}'
                             ,'<li class="{{ $class }}" data-name="{{ item.name }}" data-value="{{ item.value }}">'
-                               ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span><i class="layui-icon layui-icon-ok"></i></div>'
+                                ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span></div>'
+                            ,'</li>'
+                        ,'{{# }); }}'
+                        ,'{{# } else { }}'
+                            ,'<li>无数据</li>'
+                    ,'{{# } }}'
+                ,'</ul>'
+            , '</div>'
+        ].join('')
+        ,selectMoreTpl = [ //多选下拉框模板
+            '<div class="layui-tableEdit-div" style="{{d.style}}">'
+                ,'<div style="line-height: 36px;">'
+                    ,'<div style="float: left">'
+                        ,'<button type="button" event-type="select" class="layui-btn layui-btn-sm layui-btn-primary">全选</button>'
+                    ,'</div>'
+                    ,'<div style="text-align: right">'
+                        ,'<button event-type="confirm" type="button" class="layui-btn layui-btn-sm layui-btn-primary">确定</button>'
+                    ,'</div>'
+                ,'</div>'
+                ,'<div class="layui-tableEdit-tpl">'
+                    ,'<ul>'
+                    ,'{{# if(d.data){ }}'
+                        ,'{{# d.data.forEach(function(item){ }}'
+                            ,'{{# var $class = (item.value === d.selectedValue) || (item.name+"" === d.selectedValue) ? "layui-tableEdit-selected" : "";  }}'
+                            ,'<li class="{{ $class }}" data-name="{{ item.name }}" data-value="{{ item.value }}">'
+                                ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span><i class="layui-icon layui-icon-ok"></i></div>'
                             ,'</li>'
                         ,'{{# }); }}'
                     ,'{{# } else { }}'
                         ,'<li>无数据</li>'
                     ,'{{# } }}'
-                 ,'</ul>'
-              ,'</div>'
+                    ,'</ul>'
+                ,'</div>'
             ,'</div>'
         ].join('');
     //组件用到的css样式
     var thisCss = [];
-    thisCss.push('.layui-tableEdit-div{position:absolute;background-color:#fff;font-size:14px;border:1px solid #d2d2d2;z-index:19910908445;max-height: 288px;}');
-    thisCss.push('.layui-tableEdit-tpl{margin:0;max-height:252px;overflow-y:auto;}');
+    thisCss.push('.layui-tableEdit-div{position:absolute;background-color:#fff;font-size:14px;border:1px solid #d2d2d2;z-index:19910908445;max-height: 252px;}');
+    thisCss.push('.layui-tableEdit-tpl{margin:0;max-height:216px;overflow-y:auto;}');
     thisCss.push('.layui-tableEdit-div li{line-height:36px;padding-left:5px;}');
     thisCss.push('.layui-tableEdit-div li:hover{background-color:#f2f2f2;}');
     thisCss.push('.layui-tableEdit-selected{background-color:#5FB878;}');
@@ -70,6 +70,48 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     var singleInstance = new Class();
     var inFunc = function () {singleInstance.leaveStat = false;},outFunc = function () {singleInstance.leaveStat = true;};
     document.onclick = function () {if(singleInstance.leaveStat)singleInstance.deleteAll();};
+
+    var createSelectV1 = function (othis) {//在body中生成下拉框
+        var that = othis.element
+            ,input = $('<input class="layui-input layui-tableEdit-input" placeholder="请选择">')
+            ,icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>')
+            ,$div = $('<div class="layui-tableEdit"></div>');
+        $div.append(input),$div.append(icon),$(that).append($div),input.focus();
+        var thisY = input[0].getBoundingClientRect().top //输入框y坐标
+            ,thisX = input[0].getBoundingClientRect().left //输入框x坐标
+            ,thisHeight = input[0].offsetHeight,thisWidth = input[0].offsetWidth //输入框宽度和高度
+            ,clientHeight = document.documentElement['clientHeight'] //窗口高度
+            ,scrollTop = document.body['scrollTop'] | document.documentElement['scrollTop']//滚动条滚动高度
+            ,scrollLeft = document.body['scrollLeft'] | document.documentElement['scrollLeft']//滚动条滚动宽度
+            ,bottom = clientHeight-scrollTop-thisY+3 //div底部距离窗口底部长度
+            ,top = thisY+thisHeight+scrollTop+3 //div元素y坐标
+            ,type = thisY+thisHeight > 0.55*clientHeight ?  'top: auto;bottom: '+bottom+'px;' : 'bottom: auto;top: '+top+'px;';
+        var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;'+(othis.enabled ? '':'overflow-y: auto;');
+        thisY+thisHeight > 0.55*clientHeight ? icon.css('transform','rotate(180deg)') : null;
+        $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:othis.selectedValue}));
+    },createSelectV2 = function(othis){//在单元格中生成下拉框
+        var that = othis.element
+            ,input = $('<input class="layui-input layui-tableEdit-input" placeholder="请选择">')
+            ,icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>')
+            ,$div = $('<div class="layui-tableEdit"></div>')
+            ,div$ = $(that).parents('div.layui-table-body')
+            ,divPage = $(that).parents('div.layui-table-box').eq(0).next();
+        $div.append(input),$div.append(icon),$(that).append($div),input.focus();
+        var elemY = that.getBoundingClientRect().top //输入框y坐标
+            ,divY = div$[0].getBoundingClientRect().top
+            ,thisWidth = input[0].offsetWidth
+            ,pageY = divPage[0].getBoundingClientRect().top
+            ,$divY = $div[0].getBoundingClientRect().top
+            ,clientHeight = div$.height() //表格高度
+            ,elemHeight = that.offsetHeight
+            ,type = elemY-divY > 0.8*clientHeight ? 'top: auto;bottom: '+(elemHeight)+'px;' : 'bottom: auto;top: '+(elemHeight)+'px;';
+        elemY-divY > 0.8*clientHeight ? icon.css('transform','rotate(180deg)') : null;
+        if(elemY<divY)div$[0].scrollTop = that.offsetTop; //调整滚动条位置
+        var style = type+'width: '+thisWidth+'px;left: 0px;'+(othis.enabled ? '':'overflow-y: auto;');
+        $div.append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:othis.selectedValue}));
+        var tableEdit = $('div.layui-tableEdit-div');
+        if($divY+tableEdit.height() > pageY) div$[0].scrollTop = that.offsetTop+tableEdit.height(); //调整滚动条位置
+    };
 
     //日期选择框
     Class.prototype.date = function(options){
@@ -95,49 +137,21 @@ layui.define(["laydate","laytpl","table"],function(exports) {
 
     //生成下拉框函数入口
     Class.prototype.register = function(options){
-        var othis = this
-            ,tableEdit$ = $(options.element).find('div.layui-tableEdit-div');
-        if(tableEdit$[0])return;
+        var othis = this;
         othis.enabled = options.enabled,othis.callback = options.callback;
         othis.data = options.data,othis.element = options.element;
         othis.selectedValue = options.selectedValue;
         var that = othis.element;
-        othis.deleteAll(that),othis.leaveStat = false;
-        var input = $(that).find('input.layui-tableEdit-input')
-            ,icon = $(that).find('i.layui-tableEdit-edge')
-            ,$div = $(that).children('div.layui-tableEdit');
-        if(!$div[0]){
-            $div = $('<div class="layui-tableEdit"></div>');$(that).append($div);
-        }
-        if(!input[0]){
-            input = $('<input class="layui-input layui-tableEdit-input" placeholder="请选择">');
-            $div.append(input),input.focus();
-        }
-        if(!icon[0]){
-            icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>');
-            $div.append(icon);
-        }
-        var thisY = input[0].getBoundingClientRect().top //输入框y坐标
-            ,thisX = input[0].getBoundingClientRect().left //输入框x坐标
-            ,thisHeight = input[0].offsetHeight,thisWidth = input[0].offsetWidth //输入框宽度和高度
-            ,clientHeight = document.documentElement['clientHeight'] //窗口高度
-            ,scrollTop = document.body['scrollTop'] | document.documentElement['scrollTop']//滚动条滚动高度
-            ,scrollLeft = document.body['scrollLeft'] | document.documentElement['scrollLeft']//滚动条滚动宽度
-            ,bottom = clientHeight-scrollTop-thisY+3 //div底部距离窗口底部长度
-            ,top = thisY+thisHeight+scrollTop+3 //div元素y坐标
-            ,type = thisY+thisHeight > 0.55*clientHeight ?  'top: auto;bottom: '+bottom+'px;' : 'bottom: auto;top: '+top+'px;';
-        var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;'+(othis.enabled ? '':'overflow-y: auto;');
-        thisY+thisHeight > 0.55*clientHeight ? icon.css('transform','rotate(180deg)') : null;
-        $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:othis.selectedValue}));
+        if($(that).find('input.layui-tableEdit-input')[0]) return;
+        othis.deleteAll(),othis.leaveStat = false;
+        createSelectV1(othis);
         othis.events();
     };
 
     //删除所有下拉框和时间选择框
     Class.prototype.deleteAll = function(){
-        $('div.layui-tableEdit-div,div.layui-laydate,input.layui-tableEdit-date').remove();
+        $('div.layui-tableEdit-div,div.layui-tableEdit,div.layui-laydate,input.layui-tableEdit-date').remove();
         delete this.leaveStat;//清除（离开状态属性）
-        var filter = $(this.element).parents('div.layui-table-view').eq(0).prev().attr('lay-filter');
-        active.callback('deleteAfter('+filter+')');
     };
 
     //注册事件
@@ -237,21 +251,5 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         on:function (event,callback) {_layui.onevent.call(this,moduleName,event,callback);},
         callback:function (event,params) {_layui.event.call(this,moduleName,event,params)}
     };
-    active.on('showInput',function (options) {
-        if(!options || !options['fields'] || !options.element) return
-        options['fields'].forEach(function (field) {
-            $(options.element).next().find('div.layui-table-body td[data-field="'+field+'"]').each(function () {
-                var input = $('<input class="layui-input layui-tableEdit-input" placeholder="请选择" value="'+($(this).children('div.layui-table-cell').text())+'">')
-                    ,icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>')
-                    ,div = $('<div class="layui-tableEdit"></div>');
-                div.append(input),div.append(icon),$(this).append(div);
-            });
-        });
-    });
-    active.on('hideInput',function (options) {
-        options && options.fields && options.element ? options.fields.forEach(function (field) {
-            $(options.element).next().find('div.layui-table-body td[data-field="'+field+'"] div.layui-tableEdit').remove()
-        }) : $('div.layui-tableEdit').remove();
-    });
     exports(moduleName, active);
 });
