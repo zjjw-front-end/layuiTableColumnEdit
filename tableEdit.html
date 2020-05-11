@@ -14,8 +14,8 @@
     layui.config({
         base: 'module/'
     }).extend({
-        tableEdit:'js/tableEdit'
-        //tableEdit:'js/column-tableEdit/tableEdit'
+        //tableEdit:'js/tableEdit'
+        tableEdit:'js/column-tableEdit/tableEdit'
         /**
          * 第一个js的下拉框div在body中创建
          * 第二个js的下拉框div在单元格中创建
@@ -55,7 +55,7 @@
                  * 单元格显示输入框
                  * 如果不需要显示输入框，就不要调用此方法。
                  * 参数
-                 * fields => 需要显示输入框的列，数组类。
+                 * fields => 需要显示输入框的列字段，数组类。
                  * elemen => 表格id或者表格元素对象
                  **/
                 tableEdit.callback('showInput',{fields:['danxuan'],element:'#tableId'})
@@ -139,7 +139,7 @@
              * 删除单元格输入框
              * 如果不需要删除输入框，就不要调用此方法。
              * 参数
-             * fields => 需要显示删除的输入框的列，数组类。
+             * fields => 需要删除的输入框的列字段，数组类。
              * elemen => 表格id或者表格元素对象
              **/
             tableEdit.callback('hideInput',{fields:['duoxuan','xlkjl','xialaxiaji','rqxiaji'],element:'#tableId'});
