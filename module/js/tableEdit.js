@@ -238,7 +238,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 delete othis.cascadeSelectConfig; //清除上一次缓存的级联配置数据
                 //获取当前单元格的table表格的lay-filter属性值
                 var filter = $(zthis).parents('div.layui-table-view').eq(0).prev().attr('lay-filter');
-                _layui.event.call(zthis,'clickBefore('+filter+')');
+                _layui.event.call(zthis,moduleName,'clickBefore('+filter+')');
                 if(!othis.cascadeSelectConfig) othis.cascadeSelectConfig = {};
                 singleInstance.register({data:othis.cascadeSelectConfig.data,element:zthis
                     ,enabled:othis.cascadeSelectConfig.enabled,selectedValue:obj.data[field],callback:classCallback});
