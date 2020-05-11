@@ -1,15 +1,15 @@
 {
   "data": [
-    {"id":1,"name":"张三1","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": ""},
+    {"id":1,"name":"张三1","danxuan":"5","duoxuan":"3","birthday":"","xlkjl": "", "rqjl": ""},
     {"id":2,"name":"张三2","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": ""},
     {"id":3,"name":"张三3","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": ""},
-    {"id":4,"name":"张三4","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": ""},
+    {"id":4,"name":"张三4","danxuan":"张三5","duoxuan":"张三5","birthday":"","xlkjl": "", "rqjl": ""},
     {"id":5,"name":"张三5","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": ""},
-    {"id":6,"name":"张三6","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": ""},
+    {"id":6,"name":"张三6","danxuan":"3","duoxuan":"","birthday":"","xlkjl": "", "rqjl": ""},
     {"id":7,"name":"张三7","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": ""},
-    {"id":8,"name":"张三8","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": ""},
+    {"id":8,"name":"张三8","danxuan":"张三2","duoxuan":"张三2","birthday":"","xlkjl": "", "rqjl": ""},
     {"id":9,"name":"张三9","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": ""},
-    {"id":10,"name":"张三10","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": ""}
+    {"id":10,"name":"张三10","danxuan":"","duoxuan":"1","birthday":"","xlkjl": "", "rqjl": ""}
   ],
   "code": 0,
   "msg": "",

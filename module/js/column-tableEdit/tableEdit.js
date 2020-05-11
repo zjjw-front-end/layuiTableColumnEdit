@@ -234,7 +234,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 delete othis.cascadeSelectConfig; //清除上一次缓存的级联配置数据
                 //获取当前单元格的table表格的lay-filter属性值
                 var filter = $(zthis).parents('div.layui-table-view').eq(0).prev().attr('lay-filter');
-                active.onCallback.call(zthis,'clickBefore('+filter+')');
+                active.callback.call(zthis,'clickBefore('+filter+')');
                 if(!othis.cascadeSelectConfig) return;
                 singleInstance.register({data:othis.cascadeSelectConfig.data,element:zthis
                     ,enabled:othis.cascadeSelectConfig.enabled,selectedValue:obj.data[field],callback:classCallback});
@@ -244,13 +244,14 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     };
     var active = {
         aopObj:function(cols){return new AopEvent(cols);},
-        createSelect:function (options) {singleInstance.register(options);},
-        update:function (options) {$(options.element).find("div.layui-table-cell").eq(0).text(options.value);},
-        createDate:function (options) {singleInstance.date(options);},
         on:function (event,callback) {_layui.onevent.call(this,moduleName,event,callback);},
-        onCallback:function (event,params) {_layui.event.call(this,moduleName,event,params)}
+        callback:function (event,params) {_layui.event.call(this,moduleName,event,params)}
     };
+    active.on('createSelect',function (options) {singleInstance.register(options)});
+    active.on('createDate',function (options) {singleInstance.date(options)});
+    active.on('update',function (options) {$(options.element).find("div.layui-table-cell").eq(0).text(options.value);});
     active.on('showInput',function (options) {
+        if(!options || !options['fields'] || !options.element) return
         options['fields'].forEach(function (field) {
             $(options.element).next().find('div.layui-table-body td[data-field="'+field+'"]').each(function () {
                 var input = $('<input class="layui-input layui-tableEdit-input" placeholder="请选择" value="'+($(this).children('div.layui-table-cell').text())+'">')
@@ -259,6 +260,11 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 div.append(input),div.append(icon),$(this).append(div);
             });
         });
+    });
+    active.on('hideInput',function (options) {
+        options && options.fields && options.element ? options.fields.forEach(function (field) {
+            $(options.element).next().find('div.layui-table-body td[data-field="'+field+'"] div.layui-tableEdit').remove()
+        }) : $('div.layui-tableEdit').remove();
     });
     exports(moduleName, active);
 });

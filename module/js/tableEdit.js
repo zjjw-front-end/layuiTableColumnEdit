@@ -95,16 +95,28 @@ layui.define(["laydate","laytpl","table"],function(exports) {
 
     //生成下拉框函数入口
     Class.prototype.register = function(options){
-        var othis = this;
+        var othis = this
+            ,tableEdit$ = $(options.element).find('div.layui-tableEdit-div');
+        if(tableEdit$[0])return;
         othis.enabled = options.enabled,othis.callback = options.callback;
         othis.data = options.data,othis.element = options.element;
         othis.selectedValue = options.selectedValue;
         var that = othis.element;
-        if ($(that).find('input').length>0)return;
         othis.deleteAll(that),othis.leaveStat = false;
-        var input = $('<input class="layui-input layui-tableEdit-input" placeholder="关键字搜索">')
-            ,icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>');
-        $(that).append(input),$(that).append(icon),input.focus();
+        var input = $(that).find('input.layui-tableEdit-input')
+            ,icon = $(that).find('i.layui-tableEdit-edge')
+            ,$div = $(that).children('div.layui-tableEdit');
+        if(!$div[0]){
+            $div = $('<div class="layui-tableEdit"></div>');$(that).append($div);
+        }
+        if(!input[0]){
+            input = $('<input class="layui-input layui-tableEdit-input" placeholder="请选择">');
+            $div.append(input),input.focus();
+        }
+        if(!icon[0]){
+            icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>');
+            $div.append(icon);
+        }
         var thisY = input[0].getBoundingClientRect().top //输入框y坐标
             ,thisX = input[0].getBoundingClientRect().left //输入框x坐标
             ,thisHeight = input[0].offsetHeight,thisWidth = input[0].offsetWidth //输入框宽度和高度
@@ -124,7 +136,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
 
     //删除所有下拉框和时间选择框
     Class.prototype.deleteAll = function(){
-        $('div.layui-tableEdit-div,div.layui-laydate,input.layui-tableEdit-input,i.layui-tableEdit-edge').remove();
+        $('div.layui-tableEdit-div,div.layui-laydate,input.layui-tableEdit-input,div.layui-tableEdit').remove();
         delete this.leaveStat;//清除（离开状态属性）
     };
 
@@ -212,7 +224,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 delete othis.cascadeSelectConfig; //清除上一次缓存的级联配置数据
                 //获取当前单元格的table表格的lay-filter属性值
                 var filter = $(zthis).parents('div.layui-table-view').eq(0).prev().attr('lay-filter');
-                active.onCallback.call(zthis,'clickBefore('+filter+')');
+                active.callback.call(zthis,'clickBefore('+filter+')');
                 if(!othis.cascadeSelectConfig) return;
                 singleInstance.register({data:othis.cascadeSelectConfig.data,element:zthis
                     ,enabled:othis.cascadeSelectConfig.enabled,selectedValue:obj.data[field],callback:classCallback});
@@ -222,11 +234,11 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     };
     var active = {
         aopObj:function(cols){return new AopEvent(cols);},
-        createSelect:function (options) {singleInstance.register(options);},
-        update:function (options) {$(options.element).find("div.layui-table-cell").eq(0).text(options.value);},
-        createDate:function (options) {singleInstance.date(options);},
         on:function (event,callback) {_layui.onevent.call(this,moduleName,event,callback);},
-        onCallback:function (event,params) {_layui.event.call(this,moduleName,event,params)}
+        callback:function (event,params) {_layui.event.call(this,moduleName,event,params)}
     };
+    active.on('createSelect',function (options) {singleInstance.register(options)});
+    active.on('createDate',function (options) {singleInstance.date(options)});
+    active.on('update',function (options) {$(options.element).find("div.layui-table-cell").eq(0).text(options.value);});
     exports(moduleName, active);
 });

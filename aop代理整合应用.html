@@ -6,7 +6,7 @@
     <title>示例demo</title>
     <link rel="stylesheet" href="layui/css/layui.css">
 </head>
-<body style="width: 200%;height: 2000px">
+<body style="width: 200%;">
 <table class="layui-hide" id="tableId" lay-filter="tableEvent"></table>
 </body>
 <script src="layui/layui.js"></script>
@@ -34,9 +34,9 @@
                 {type:'checkbox'}
                 ,{field:'name',title: '姓名',width:120,event:'name'}
                 //select（下拉框）date（时间选择框）
-                ,{field:'danxuan', title: '单选',width:120,event:'danxuan',select:{data:params}}
+                ,{field:'danxuan',align:'center', title: '单选',width:120,event:'danxuan',select:{data:params}}
                 //data 为下拉框数据  enabled => true：多选，false：单选。默认为false
-                ,{field:'duoxuan', title: '多选',width:120,event:'duoxuan',select:{data:params,enabled:true}}
+                ,{field:'duoxuan',align:'center', title: '多选',width:120,event:'duoxuan',select:{data:params,enabled:true,isRemove:true}}
                 //dateType表示日期时间格式，date为“yyyy-MM-dd”，datetime为“yyyy-MM-dd HH:ss:mm”
                 ,{field:'birthday', title: '生日',width:120,event:'birthday',date:{dateType:'date'}}
                 //cascadeSelectField字段为级联开关字段(存在该字段则级联，否则不级联)
