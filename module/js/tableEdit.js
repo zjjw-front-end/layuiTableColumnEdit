@@ -7,7 +7,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
               ,'<ul class="layui-tableEdit-ul">'
                   ,'{{# if(d.data){ }}'
                       ,'{{# d.data.forEach(function(item){ }}'
-                          ,'<li data-name="{{ item.name }}" data-value="{{ item.value }}">'
+                          ,'{{# var $class = (item.value === d.selectedValue) || (item.name+"" === d.selectedValue) ? "layui-tableEdit-selected" : "";  }}'
+                          ,'<li class="{{ $class }}" data-name="{{ item.name }}" data-value="{{ item.value }}">'
                               ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span></div>'
                           ,'</li>'
                       ,'{{# }); }}'
@@ -31,7 +32,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                  ,'<ul>'
                     ,'{{# if(d.data){ }}'
                         ,'{{# d.data.forEach(function(item){ }}'
-                            ,'<li data-name="{{ item.name }}" data-value="{{ item.value }}">'
+                            ,'{{# var $class = (item.value === d.selectedValue) || (item.name+"" === d.selectedValue) ? "layui-tableEdit-selected" : "";  }}'
+                            ,'<li class="{{ $class }}" data-name="{{ item.name }}" data-value="{{ item.value }}">'
                                ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span><i class="layui-icon layui-icon-ok"></i></div>'
                             ,'</li>'
                         ,'{{# }); }}'
@@ -47,7 +49,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     thisCss.push('.layui-tableEdit-div{position:absolute;background-color:#fff;font-size:14px;border:1px solid #d2d2d2;z-index:19910908445;max-height: 288px;}');
     thisCss.push('.layui-tableEdit-tpl{margin:0;max-height:252px;overflow-y:auto;}');
     thisCss.push('.layui-tableEdit-div li{line-height:36px;padding-left:5px;}');
-    thisCss.push('.layui-tableEdit-div li:hover{background-color:#5FB878;}');
+    thisCss.push('.layui-tableEdit-div li:hover{background-color:#f2f2f2;}');
+    thisCss.push('.layui-tableEdit-selected{background-color:#5FB878;}');
     thisCss.push('.layui-tableEdit-ul div{padding-left:0px!important;}');
     thisCss.push('.layui-tableEdit-edge{position:absolute;right:3px;bottom:8px;z-index:199109084;}');
     thisCss.push('.layui-tableEdit-input{position:absolute;left:0;bottom:0;width:100%;height:38px;z-index:19910908;}');
@@ -93,7 +96,9 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     //生成下拉框函数入口
     Class.prototype.register = function(options){
         var othis = this;
-        othis.enabled = options.enabled,othis.callback = options.callback,othis.data = options.data,othis.element = options.element;
+        othis.enabled = options.enabled,othis.callback = options.callback;
+        othis.data = options.data,othis.element = options.element;
+        othis.selectedValue = options.selectedValue;
         var that = othis.element;
         if ($(that).find('input').length>0)return;
         othis.deleteAll(that),othis.leaveStat = false;
@@ -111,7 +116,9 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             ,type = thisY+thisHeight > 0.55*clientHeight ?  'top: auto;bottom: '+bottom+'px;' : 'bottom: auto;top: '+top+'px;';
         var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;'+(othis.enabled ? '':'overflow-y: auto;');
         thisY+thisHeight > 0.55*clientHeight ? icon.css('transform','rotate(180deg)') : null;
-        $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style}));
+        var thisSelected = $(that).children('div.layui-table-cell').text();
+        thisSelected = singleInstance.isEmpty(thisSelected) ? othis.selectedValue : thisSelected;
+        $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:thisSelected}));
         othis.events();
     };
 
@@ -194,7 +201,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             singleInstance.isEmpty(elementCascadeSelectField) ?
             function () { //非级联事件
                 if('select' === eventType){
-                    singleInstance.register({data:thisData,element:zthis,enabled:thisEnabled,callback:classCallback});
+                    singleInstance.register({data:thisData,element:zthis,enabled:thisEnabled,selectedValue:obj.data[field],callback:classCallback});
                 }else if('date' === eventType){
                     singleInstance.date({dateType:dateType,element:zthis,callback:classCallback});
                 }else{
@@ -207,7 +214,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 var filter = $(zthis).parents('div.layui-table-view').eq(0).prev().attr('lay-filter');
                 active.onCallback.call(zthis,'clickBefore('+filter+')');
                 if(!othis.cascadeSelectConfig) return;
-                singleInstance.register({data:othis.cascadeSelectConfig.data,element:zthis,enabled:othis.cascadeSelectConfig.enabled,callback:classCallback});
+                singleInstance.register({data:othis.cascadeSelectConfig.data,element:zthis
+                    ,enabled:othis.cascadeSelectConfig.enabled,selectedValue:obj.data[field],callback:classCallback});
             }();
 
         });

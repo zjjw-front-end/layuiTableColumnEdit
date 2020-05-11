@@ -7,7 +7,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
               , '<ul class="layui-tableEdit-ul">'
                   ,'{{# if(d.data){ }}'
                       ,'{{# d.data.forEach(function(item){ }}'
-                            ,'<li data-name="{{ item.name }}" data-value="{{ item.value }}">'
+                            ,'{{# var $class = (item.value === d.selectedValue) || (item.name+"" === d.selectedValue) ? "layui-tableEdit-selected" : "";  }}'
+                            ,'<li class="{{ $class }}" data-name="{{ item.name }}" data-value="{{ item.value }}">'
                                 ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span></div>'
                             ,'</li>'
                       ,'{{# }); }}'
@@ -31,7 +32,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                  ,'<ul>'
                     ,'{{# if(d.data){ }}'
                         ,'{{# d.data.forEach(function(item){ }}'
-                            ,'<li data-name="{{ item.name }}" data-value="{{ item.value }}">'
+                            ,'{{# var $class = (item.value === d.selectedValue) || (item.name+"" === d.selectedValue) ? "layui-tableEdit-selected" : "";  }}'
+                            ,'<li class="{{ $class }}" data-name="{{ item.name }}" data-value="{{ item.value }}">'
                                ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span><i class="layui-icon layui-icon-ok"></i></div>'
                             ,'</li>'
                         ,'{{# }); }}'
@@ -47,8 +49,9 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     thisCss.push('.layui-tableEdit-div{position:absolute;max-height: 252px;background-color:#fff;font-size:14px;border:1px solid #d2d2d2;z-index:19910908445;}');
     thisCss.push('.layui-tableEdit-tpl{margin:0;max-height:216px;overflow-y:auto;}');
     thisCss.push('.layui-tableEdit-div li{line-height:36px;padding-left:5px;}');
-    thisCss.push('.layui-tableEdit-div li:hover{background-color:#5FB878;}');
+    thisCss.push('.layui-tableEdit-div li:hover{background-color:#f2f2f2;}');
     thisCss.push('.layui-tableEdit-ul div{padding-left:0px!important;}');
+    thisCss.push('.layui-tableEdit-selected{background-color:#5FB878;}');
     thisCss.push('.layui-tableEdit-edge{position:absolute;right:3px;bottom:8px;z-index:199109084;}');
     thisCss.push('.layui-tableEdit-input{position:absolute;left:0;bottom:0;width:100%;height:38px;z-index:19910908;}');
     var thisStyle = document.createElement('style');
@@ -100,6 +103,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         othis.callback = options.callback;
         othis.data = options.data;
         othis.element = options.element;
+        othis.selectedValue = options.selectedValue;
         var that = othis.element;
         othis.deleteAll(),othis.leaveStat = false;
         var input = $(that).find('input.layui-tableEdit-input')
@@ -129,7 +133,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         icon.css('transform','rotate(180deg)');
         if(elemY<divY)div$[0].scrollTop = that.offsetTop; //调整滚动条位置
         var style = type+'width: '+thisWidth+'px;left: 0px;'+(othis.enabled ? '':'overflow-y: auto;');
-        $div.append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style}));
+        othis.selectedValue = singleInstance.isEmpty(input[0].value) ? othis.selectedValue : input[0].value;
+        $div.append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:othis.selectedValue}));
         tableEdit$ = $('div.layui-tableEdit-div');
         if($divY+tableEdit$.height() > pageY) div$[0].scrollTop = that.offsetTop+tableEdit$.height(); //调整滚动条位置
         othis.events();
@@ -218,7 +223,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             singleInstance.isEmpty(elementCascadeSelectField) ?
             function () { //非级联事件
                 if('select' === eventType){
-                    singleInstance.register({data:thisData,element:zthis,enabled:thisEnabled,callback:classCallback});
+                    singleInstance.register({data:thisData,element:zthis,enabled:thisEnabled,selectedValue:obj.data[field],callback:classCallback});
                 }else if('date' === eventType){
                     singleInstance.date({dateType:dateType,element:zthis,callback:classCallback});
                 }else{
@@ -232,7 +237,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 active.onCallback.call(zthis,'clickBefore('+filter+')');
                 if(!othis.cascadeSelectConfig) return;
                 singleInstance.register({data:othis.cascadeSelectConfig.data,element:zthis
-                    ,enabled:othis.cascadeSelectConfig.enabled,callback:classCallback});
+                    ,enabled:othis.cascadeSelectConfig.enabled,selectedValue:obj.data[field],callback:classCallback});
             }();
 
         });
