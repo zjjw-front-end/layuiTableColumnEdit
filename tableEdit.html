@@ -24,6 +24,7 @@
             ,url:'module/json/data.json'
             ,height: 'full-90'
             ,page: true
+            ,size:'lg'
             ,cols: [[
                 {type:'checkbox'}
                 ,{field:'name',title: '姓名',width:120}
@@ -80,32 +81,34 @@
             if(Array.isArray(cascadeSelectData)){
                 cascadeSelectData = cascadeSelectData[0];
             }
+            var reslut = null;
             //下拉数据 只可ajax同步请求后台
             if(cascadeSelectField === 'rqjl'){ //日期级联下拉框
                 if(cascadeSelectData === '2020-05-11'){
-                    aopTable.cascadeSelectConfig = {
+                    reslut = {
                         data:[{name:1,value:'语文'},{name:2,value:'数学'},{name:3,value:'英语'},{name:4,value:'物理'},{name:5,value:'化学'}],
                         enabled:false //单选
                     };
                 }else {
-                    aopTable.cascadeSelectConfig = {
+                    reslut = {
                         data:[{name:6,value:'政治'},{name:7,value:'地理'},{name:8,value:'历史'},{name:9,value:'生物'},{name:10,value:'音乐'}],
                         enabled:true //多选
                     };
                 }
             }else {
                 if(cascadeSelectData.name+'' === '1'){
-                    aopTable.cascadeSelectConfig = {
+                    reslut = {
                         data:[{name:11,value:'贵州'},{name:12,value:'云南'},{name:13,value:'四川'},{name:14,value:'湖南'}],
                         enabled:false //单选
                     };
                 }else {
-                    aopTable.cascadeSelectConfig = {
+                    reslut = {
                         data:[{name:15,value:'荆州'},{name:16,value:'扬州'},{name:17,value:'杭州'},{name:18,value:'苏州'}],
                         enabled:true //多选
                     };
                 }
             }
+            return reslut;
         });
     });
 </script>

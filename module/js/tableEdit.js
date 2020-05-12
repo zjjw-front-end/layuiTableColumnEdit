@@ -57,6 +57,10 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     var thisStyle = document.createElement('style');
     thisStyle.innerHTML = thisCss.join('\n'),document.getElementsByTagName('head')[0].appendChild(thisStyle);
 
+    var configs = {
+        callbacks:{}
+    };
+
     var Class = function () { //单列模式  也就是只能new一个对象。
         var instance;
         Class = function Class() {
@@ -140,7 +144,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             var style = type+'width: '+thisWidth+'px;left: 0px;'+(othis.enabled ? '':'overflow-y: auto;');
             tableEdit.append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:othis.selectedValue}));
             var $tableEdit = $('div.layui-tableEdit-div');
-            (thisY+$tableEdit.height() > pageY) && !isType && (tableBody[0].scrollTop = that.offsetTop);//调整滚动条位置
+            (thisY+$tableEdit.height()+thisHeight > pageY) && !isType && (tableBody[0].scrollTop = that.offsetTop);//调整滚动条位置
         }
         tableBody[0].scrollHeight > tableBody[0].offsetHeight || tableBody[0].scrollWidth > tableBody[0].offsetWidth ? toThisElem() : toBody();
         othis.events();
@@ -234,20 +238,22 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 }
             }() : function () {//级联事件
                 if('date' === eventType) return;
-                delete othis.cascadeSelectConfig; //清除上一次缓存的级联配置数据
                 //获取当前单元格的table表格的lay-filter属性值
                 var filter = $(zthis).parents('div.layui-table-view').eq(0).prev().attr('lay-filter');
-                _layui.event.call(zthis,moduleName,'clickBefore('+filter+')',JSON.parse(_csdata));
-                if(!othis.cascadeSelectConfig) othis.cascadeSelectConfig = {};
-                singleInstance.register({data:othis.cascadeSelectConfig.data,element:zthis
-                    ,enabled:othis.cascadeSelectConfig.enabled,selectedValue:obj.data[field],callback:classCallback});
+                var func = configs.callbacks[moduleName+'_clickBefore_'+filter];
+                var thisResult = func ? func.call(zthis,JSON.parse(_csdata)) : {};
+                singleInstance.register({data:thisResult.data,element:zthis
+                    ,enabled:thisResult.enabled,selectedValue:obj.data[field],callback:classCallback});
             }();
 
         });
     };
     var active = {
         aopObj:function(cols){return new AopEvent(cols);},
-        on:function (event,callback) {_layui.onevent.call(this,moduleName,event,callback);}
+        on:function (event,callback) {
+            var filter = event.match(/\((.*)\)$/),eventName = (filter ? event.replace(filter[0],'') : event)+'_'+(filter ? filter[1] : '');
+            configs.callbacks[moduleName+'_'+eventName]=callback;
+        }
     };
     exports(moduleName, active);
 });
