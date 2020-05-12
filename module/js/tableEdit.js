@@ -1,6 +1,6 @@
 layui.define(["laydate","laytpl","table"],function(exports) {
     "use strict";
-    var moduleName = 'tableEdit',_layui = self === top ? layui : top.layui,laytpl = _layui.laytpl
+    var moduleName = 'tableEdit',_layui = layui,laytpl = _layui.laytpl
         ,$ = _layui.$,laydate = _layui.laydate,table = _layui.table
         ,selectTpl = [ //单选下拉框模板
             '<div class="layui-tableEdit-div" style="{{d.style}}">'
@@ -20,14 +20,6 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         ].join('')
         ,selectMoreTpl = [ //多选下拉框模板
             '<div class="layui-tableEdit-div" style="{{d.style}}">'
-                ,'<div style="line-height: 36px;">'
-                    ,'<div style="float: left">'
-                        ,'<button type="button" event-type="select" class="layui-btn layui-btn-sm layui-btn-primary">全选</button>'
-                    ,'</div>'
-                    ,'<div style="text-align: right">'
-                        ,'<button event-type="confirm" type="button" class="layui-btn layui-btn-sm layui-btn-primary">确定</button>'
-                    ,'</div>'
-                ,'</div>'
                 ,'<div class="layui-tableEdit-tpl">'
                     ,'<ul>'
                     ,'{{# if(d.data){ }}'
@@ -42,13 +34,21 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                     ,'{{# } }}'
                     ,'</ul>'
                 ,'</div>'
+                ,'<div style="line-height: 36px;">'
+                    ,'<div style="float: left">'
+                        ,'<button type="button" event-type="select" class="layui-btn layui-btn-sm layui-btn-primary">全选</button>'
+                    ,'</div>'
+                    ,'<div style="text-align: right">'
+                        ,'<button event-type="confirm" type="button" class="layui-btn layui-btn-sm layui-btn-primary">确定</button>'
+                    ,'</div>'
+                ,'</div>'
             ,'</div>'
         ].join('');
     //组件用到的css样式
     var thisCss = [];
     thisCss.push('.layui-tableEdit-div{position:absolute;background-color:#fff;font-size:14px;border:1px solid #d2d2d2;z-index:19910908445;max-height: 252px;}');
     thisCss.push('.layui-tableEdit-tpl{margin:0;max-height:216px;overflow-y:auto;}');
-    thisCss.push('.layui-tableEdit-div li{line-height:36px;padding-left:5px;}');
+    thisCss.push('.layui-tableEdit-div li{line-height:36px;padding-left:5px;text-align:center;}');
     thisCss.push('.layui-tableEdit-div li:hover{background-color:#f2f2f2;}');
     thisCss.push('.layui-tableEdit-selected{background-color:#5FB878;}');
     thisCss.push('.layui-tableEdit-ul div{padding-left:0px!important;}');
@@ -71,11 +71,13 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     var inFunc = function () {singleInstance.leaveStat = false;},outFunc = function () {singleInstance.leaveStat = true;};
     document.onclick = function () {if(singleInstance.leaveStat)singleInstance.deleteAll();};
 
-    var createSelectV1 = function (othis) {//在body中生成下拉框
+    var createSelectToBody = function (othis) {//在body中生成下拉框
         var that = othis.element
             ,input = $('<input class="layui-input layui-tableEdit-input" placeholder="请选择">')
             ,icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>')
             ,$div = $('<div class="layui-tableEdit"></div>');
+        (39 - that.offsetHeight > 3) && (input.css('height','30px'),icon.css('bottom','5px'));
+        (that.offsetHeight - 39 > 3) && (input.css('height','50px'),icon.css('bottom','14px'));
         $div.append(input),$div.append(icon),$(that).append($div),input.focus();
         var thisY = input[0].getBoundingClientRect().top //输入框y坐标
             ,thisX = input[0].getBoundingClientRect().left //输入框x坐标
@@ -87,15 +89,17 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             ,top = thisY+thisHeight+scrollTop+3 //div元素y坐标
             ,type = thisY+thisHeight > 0.55*clientHeight ?  'top: auto;bottom: '+bottom+'px;' : 'bottom: auto;top: '+top+'px;';
         var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;'+(othis.enabled ? '':'overflow-y: auto;');
-        thisY+thisHeight > 0.55*clientHeight ? icon.css('transform','rotate(180deg)') : null;
+        (thisY+thisHeight > 0.55*clientHeight) && icon.css('transform','rotate(180deg)');
         $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:othis.selectedValue}));
-    },createSelectV2 = function(othis){//在单元格中生成下拉框
+    },createSelectToThisTd = function(othis){//在单元格中生成下拉框
         var that = othis.element
             ,input = $('<input class="layui-input layui-tableEdit-input" placeholder="请选择">')
             ,icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>')
             ,$div = $('<div class="layui-tableEdit"></div>')
             ,div$ = $(that).parents('div.layui-table-body')
             ,divPage = $(that).parents('div.layui-table-box').eq(0).next();
+        (39 - that.offsetHeight > 3) && (input.css('height','30px'),icon.css('bottom','5px'));
+        (that.offsetHeight - 39 > 3) && (input.css('height','50px'),icon.css('bottom','14px'));
         $div.append(input),$div.append(icon),$(that).append($div),input.focus();
         var elemY = that.getBoundingClientRect().top //输入框y坐标
             ,divY = div$[0].getBoundingClientRect().top
@@ -122,12 +126,14 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         if ($(that).find('input').length>0)return;
         othis.deleteAll(),othis.leaveStat = false;
         var input = $('<input class="layui-input layui-tableEdit-input layui-tableEdit-date" type="text">');
+        (39 - that.offsetHeight > 3) && input.css('height','30px');
+        (that.offsetHeight - 39 > 3) && input.css('height','50px');
         $(that).append(input),input.focus();
         //日期时间选择器 (show: true 表示直接显示)
         laydate.render({elem: input[0],type: othis.dateType,show: true,done:function (value, date) {
-            othis.deleteAll();
-            if(othis.callback)othis.callback.call(that,value);
-        }});
+                othis.deleteAll();
+                if(othis.callback)othis.callback.call(that,value);
+            }});
         $('div.layui-laydate').hover(inFunc,outFunc),$(that).hover(inFunc,outFunc);
         _layui.stope();
     };
@@ -144,7 +150,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         var that = othis.element;
         if($(that).find('input.layui-tableEdit-input')[0]) return;
         othis.deleteAll(),othis.leaveStat = false;
-        createSelectV1(othis);
+        var _div = $(that).parents('div.layui-table-body')[0];
+        _div.scrollHeight > _div.offsetHeight || _div.scrollWidth > _div.offsetWidth ? createSelectToThisTd(othis) : createSelectToBody(othis);
         othis.events();
     };
 
