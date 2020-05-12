@@ -74,10 +74,9 @@
          * tableEvent => table的lay-filter属性值
          * 如示例代码所示
          */
-        tableEdit.on('clickBefore(tableEvent)',function () {
-            var cascadeSelectData = $(this).attr("cascadeSelect-data"); //级联数据
-            var cascadeSelectField = $(this).attr("cascadeSelect-field"); //级联字段
-            cascadeSelectData = JSON.parse(cascadeSelectData);
+        tableEdit.on('clickBefore(tableEvent)',function (obj) {
+            var cascadeSelectData = obj.data; //级联数据
+            var cascadeSelectField = obj.field; //级联字段
             if(Array.isArray(cascadeSelectData)){
                 cascadeSelectData = cascadeSelectData[0];
             }

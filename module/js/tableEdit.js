@@ -229,11 +229,11 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 othis.config.callback.call(zthis,obj);
                 if(!singleInstance.isEmpty(cascadeSelectField)){
                     var thisCascadeSelectElement = $(this.parentNode).find("td[data-field='"+cascadeSelectField+"']");
-                    $(thisCascadeSelectElement).attr("cascadeSelect-data",JSON.stringify(res)).attr("cascadeSelect-field",field);
+                    $(thisCascadeSelectElement).attr("cascadeSelect-data",JSON.stringify({data:res,field:field}));
                 }
             };
-            var elementCascadeSelectField = $(this).attr("cascadeSelect-field");//级联字段
-            singleInstance.isEmpty(elementCascadeSelectField) ?
+            var _csdata = $(this).attr("cascadeSelect-data");//级联数据
+            singleInstance.isEmpty(_csdata) ?
             function () { //非级联事件
                 if('select' === eventType){
                     singleInstance.register({data:thisData,element:zthis,enabled:thisEnabled,selectedValue:obj.data[field],callback:classCallback});
@@ -247,7 +247,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 delete othis.cascadeSelectConfig; //清除上一次缓存的级联配置数据
                 //获取当前单元格的table表格的lay-filter属性值
                 var filter = $(zthis).parents('div.layui-table-view').eq(0).prev().attr('lay-filter');
-                _layui.event.call(zthis,moduleName,'clickBefore('+filter+')');
+                _layui.event.call(zthis,moduleName,'clickBefore('+filter+')',JSON.parse(_csdata));
                 if(!othis.cascadeSelectConfig) othis.cascadeSelectConfig = {};
                 singleInstance.register({data:othis.cascadeSelectConfig.data,element:zthis
                     ,enabled:othis.cascadeSelectConfig.enabled,selectedValue:obj.data[field],callback:classCallback});
