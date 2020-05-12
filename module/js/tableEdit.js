@@ -108,13 +108,14 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             ,$divY = $div[0].getBoundingClientRect().top
             ,clientHeight = div$.height() //表格高度
             ,elemHeight = that.offsetHeight
-            ,type = elemY-divY > 0.8*clientHeight ? 'top: auto;bottom: '+(elemHeight)+'px;' : 'bottom: auto;top: '+(elemHeight)+'px;';
-        elemY-divY > 0.8*clientHeight ? icon.css('transform','rotate(180deg)') : null;
+            ,isType = elemY-divY > 0.8*clientHeight
+            ,type = isType ? 'top: auto;bottom: '+(elemHeight)+'px;' : 'bottom: auto;top: '+(elemHeight)+'px;';
+        isType && icon.css('transform','rotate(180deg)');
         if(elemY<divY)div$[0].scrollTop = that.offsetTop; //调整滚动条位置
         var style = type+'width: '+thisWidth+'px;left: 0px;'+(othis.enabled ? '':'overflow-y: auto;');
         $div.append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:othis.selectedValue}));
         var tableEdit = $('div.layui-tableEdit-div');
-        if($divY+tableEdit.height() > pageY) div$[0].scrollTop = that.offsetTop+tableEdit.height(); //调整滚动条位置
+        ($divY+tableEdit.height() > pageY) && !isType && (div$[0].scrollTop = that.offsetTop);//调整滚动条位置
     };
 
     //日期选择框
@@ -207,7 +208,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         $(othis.element).find('input.layui-tableEdit-input').bind('input propertychange', function(){searchFunc(this.value)});
         $(othis.element).find('i.layui-tableEdit-edge').bind('click',function () {_layui.stope(),othis.deleteAll();});
         othis.enabled ? (liClickFunc(),btnClickFunc()) : liClickFunc();
-        $('div.layui-tableEdit-div').hover(inFunc,outFunc),$(othis.element).hover(inFunc,outFunc);
+        !$(othis.element).find('div.layui-tableEdit-div')[0] && $('div.layui-tableEdit-div').hover(inFunc,outFunc);
+        $(othis.element).hover(inFunc,outFunc);
     };
 
     var AopEvent = function(cols){this.config = {cols:cols};};//aop构造器
