@@ -71,53 +71,6 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     var inFunc = function () {singleInstance.leaveStat = false;},outFunc = function () {singleInstance.leaveStat = true;};
     document.onclick = function () {if(singleInstance.leaveStat)singleInstance.deleteAll();};
 
-    var createSelectToBody = function (othis) {//在body中生成下拉框
-        var that = othis.element
-            ,input = $('<input class="layui-input layui-tableEdit-input" placeholder="请选择">')
-            ,icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>')
-            ,$div = $('<div class="layui-tableEdit"></div>');
-        (39 - that.offsetHeight > 3) && (input.css('height','30px'),icon.css('bottom','5px'));
-        (that.offsetHeight - 39 > 3) && (input.css('height','50px'),icon.css('bottom','14px'));
-        $div.append(input),$div.append(icon),$(that).append($div),input.focus();
-        var thisY = input[0].getBoundingClientRect().top //输入框y坐标
-            ,thisX = input[0].getBoundingClientRect().left //输入框x坐标
-            ,thisHeight = input[0].offsetHeight,thisWidth = input[0].offsetWidth //输入框宽度和高度
-            ,clientHeight = document.documentElement['clientHeight'] //窗口高度
-            ,scrollTop = document.body['scrollTop'] | document.documentElement['scrollTop']//滚动条滚动高度
-            ,scrollLeft = document.body['scrollLeft'] | document.documentElement['scrollLeft']//滚动条滚动宽度
-            ,bottom = clientHeight-scrollTop-thisY+3 //div底部距离窗口底部长度
-            ,top = thisY+thisHeight+scrollTop+3 //div元素y坐标
-            ,type = thisY+thisHeight > 0.55*clientHeight ?  'top: auto;bottom: '+bottom+'px;' : 'bottom: auto;top: '+top+'px;';
-        var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;'+(othis.enabled ? '':'overflow-y: auto;');
-        (thisY+thisHeight > 0.55*clientHeight) && icon.css('transform','rotate(180deg)');
-        $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:othis.selectedValue}));
-    },createSelectToThisTd = function(othis){//在单元格中生成下拉框
-        var that = othis.element
-            ,input = $('<input class="layui-input layui-tableEdit-input" placeholder="请选择">')
-            ,icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>')
-            ,$div = $('<div class="layui-tableEdit"></div>')
-            ,div$ = $(that).parents('div.layui-table-body')
-            ,divPage = $(that).parents('div.layui-table-box').eq(0).next();
-        (39 - that.offsetHeight > 3) && (input.css('height','30px'),icon.css('bottom','5px'));
-        (that.offsetHeight - 39 > 3) && (input.css('height','50px'),icon.css('bottom','14px'));
-        $div.append(input),$div.append(icon),$(that).append($div),input.focus();
-        var elemY = that.getBoundingClientRect().top //输入框y坐标
-            ,divY = div$[0].getBoundingClientRect().top
-            ,thisWidth = input[0].offsetWidth
-            ,pageY = divPage[0].getBoundingClientRect().top
-            ,$divY = $div[0].getBoundingClientRect().top
-            ,clientHeight = div$.height() //表格高度
-            ,elemHeight = that.offsetHeight
-            ,isType = elemY-divY > 0.8*clientHeight
-            ,type = isType ? 'top: auto;bottom: '+(elemHeight)+'px;' : 'bottom: auto;top: '+(elemHeight)+'px;';
-        isType && icon.css('transform','rotate(180deg)');
-        if(elemY<divY)div$[0].scrollTop = that.offsetTop; //调整滚动条位置
-        var style = type+'width: '+thisWidth+'px;left: 0px;'+(othis.enabled ? '':'overflow-y: auto;');
-        $div.append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:othis.selectedValue}));
-        var tableEdit = $('div.layui-tableEdit-div');
-        ($divY+tableEdit.height() > pageY) && !isType && (div$[0].scrollTop = that.offsetTop);//调整滚动条位置
-    };
-
     //日期选择框
     Class.prototype.date = function(options){
         var othis = this;
@@ -151,8 +104,45 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         var that = othis.element;
         if($(that).find('input.layui-tableEdit-input')[0]) return;
         othis.deleteAll(),othis.leaveStat = false;
-        var _div = $(that).parents('div.layui-table-body')[0];
-        _div.scrollHeight > _div.offsetHeight || _div.scrollWidth > _div.offsetWidth ? createSelectToThisTd(othis) : createSelectToBody(othis);
+        var input = $('<input class="layui-input layui-tableEdit-input" placeholder="请选择">')
+            ,icon = $('<i class="layui-icon layui-tableEdit-edge">&#xe625;</i>')
+            ,tableEdit = $('<div class="layui-tableEdit"></div>')
+            ,tableBody = $(that).parents('div.layui-table-body')
+            ,tablePage = $(that).parents('div.layui-table-box').eq(0).next();
+        (39 - that.offsetHeight > 3) && (input.css('height','30px'),icon.css('bottom','5px'));
+        (that.offsetHeight - 39 > 3) && (input.css('height','50px'),icon.css('bottom','14px'));
+        tableEdit.append(input),tableEdit.append(icon),$(that).append(tableEdit),input.focus();
+        var thisY = input[0].getBoundingClientRect().top //输入框y坐标
+            ,thisX = input[0].getBoundingClientRect().left //输入框x坐标
+            ,thisHeight = ((39 - that.offsetHeight > 3) ? 30 : input[0].offsetHeight) //输入框高度
+            ,thisHeight = ((that.offsetHeight - 39 > 3) ? 50 :thisHeight)
+            ,thisWidth = input[0].offsetWidth; //输入框宽度
+        function toBody() {
+            var clientHeight = document.documentElement['clientHeight'] //窗口高度
+                ,scrollTop = document.body['scrollTop'] | document.documentElement['scrollTop']//滚动条滚动高度
+                ,scrollLeft = document.body['scrollLeft'] | document.documentElement['scrollLeft']//滚动条滚动宽度
+                ,bottom = clientHeight-scrollTop-thisY+3 //div底部距离窗口底部长度
+                ,top = thisY+thisHeight+scrollTop+3 //div元素y坐标
+                ,type = thisY+thisHeight > 0.55*clientHeight ?  'top: auto;bottom: '+bottom+'px;' : 'bottom: auto;top: '+top+'px;';
+            var style = type+'width: '+(thisWidth-2)+'px;left: '+(thisX+scrollLeft)+'px;'+(othis.enabled ? '':'overflow-y: auto;');
+            (thisY+thisHeight > 0.55*clientHeight) && icon.css('transform','rotate(180deg)');
+            $('body').append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:othis.selectedValue}));
+        }
+        function toThisElem(){
+            var elemY = that.getBoundingClientRect().top //输入框y坐标
+                ,tableBodyY = tableBody[0].getBoundingClientRect().top
+                ,pageY = tablePage[0].getBoundingClientRect().top
+                ,tableBodyHeight = tableBody.height() //表格高度
+                ,isType = thisY-tableBodyY > 0.8*tableBodyHeight
+                ,type = isType ? 'top: auto;bottom: '+(thisHeight+3)+'px;' : 'bottom: auto;top: '+(thisHeight+3)+'px;';
+            isType && icon.css('transform','rotate(180deg)');
+            if(elemY<tableBodyY)tableBody[0].scrollTop = that.offsetTop; //调整滚动条位置
+            var style = type+'width: '+thisWidth+'px;left: 0px;'+(othis.enabled ? '':'overflow-y: auto;');
+            tableEdit.append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:othis.selectedValue}));
+            var $tableEdit = $('div.layui-tableEdit-div');
+            (thisY+$tableEdit.height() > pageY) && !isType && (tableBody[0].scrollTop = that.offsetTop);//调整滚动条位置
+        }
+        tableBody[0].scrollHeight > tableBody[0].offsetHeight || tableBody[0].scrollWidth > tableBody[0].offsetWidth ? toThisElem() : toBody();
         othis.events();
     };
 
