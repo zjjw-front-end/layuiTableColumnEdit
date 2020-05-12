@@ -146,7 +146,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             var $tableEdit = $('div.layui-tableEdit-div');
             (thisY+$tableEdit.height()+thisHeight > pageY) && !isType && (tableBody[0].scrollTop = that.offsetTop);//调整滚动条位置
         }
-        tableBody[0].scrollHeight > tableBody[0].offsetHeight || tableBody[0].scrollWidth > tableBody[0].offsetWidth ? toThisElem() : toBody();
+        tableBody[0].offsetHeight-252 > 38 ? toThisElem() : toBody();
         othis.events();
     };
 
@@ -239,12 +239,11 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             }() : function () {//级联事件
                 if('date' === eventType) return;
                 //获取当前单元格的table表格的lay-filter属性值
-                var filter = $(zthis).parents('div.layui-table-view').eq(0).prev().attr('lay-filter');
-                var func = configs.callbacks[moduleName+'_clickBefore_'+filter];
-                var thisResult = func ? func.call(zthis,JSON.parse(_csdata)) : {};
-                thisResult = singleInstance.isEmpty(thisResult) ? {} : thisResult;
-                singleInstance.register({data:thisResult.data,element:zthis
-                    ,enabled:thisResult.enabled,selectedValue:obj.data[field],callback:classCallback});
+                var filter = $(zthis).parents('div.layui-table-view').eq(0).prev().attr('lay-filter')
+                    ,rs = active.callbackFn('clickBefore('+filter+')',JSON.parse(_csdata));
+                    rs = singleInstance.isEmpty(rs) ? {} : rs;
+                singleInstance.register({data:rs.data,element:zthis
+                    ,enabled:rs.enabled,selectedValue:obj.data[field],callback:classCallback});
             }();
 
         });
@@ -254,6 +253,12 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         on:function (event,callback) {
             var filter = event.match(/\((.*)\)$/),eventName = (filter ? event.replace(filter[0],'') : event)+'_'+(filter ? filter[1] : '');
             configs.callbacks[moduleName+'_'+eventName]=callback;
+        },
+        callbackFn:function (event,params) {
+            var filter = event.match(/\((.*)\)$/),eventName = (filter ? event.replace(filter[0],'') : event)+'_'+(filter ? filter[1] : '');
+            var key = moduleName+'_'+eventName,func = configs.callbacks[key];
+            if(!func) return;
+            return func.call(this,params);
         }
     };
     exports(moduleName, active);
