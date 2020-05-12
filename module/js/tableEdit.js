@@ -242,6 +242,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 var filter = $(zthis).parents('div.layui-table-view').eq(0).prev().attr('lay-filter');
                 var func = configs.callbacks[moduleName+'_clickBefore_'+filter];
                 var thisResult = func ? func.call(zthis,JSON.parse(_csdata)) : {};
+                thisResult = singleInstance.isEmpty(thisResult) ? {} : thisResult;
                 singleInstance.register({data:thisResult.data,element:zthis
                     ,enabled:thisResult.enabled,selectedValue:obj.data[field],callback:classCallback});
             }();
