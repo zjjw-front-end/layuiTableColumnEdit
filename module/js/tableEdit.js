@@ -58,7 +58,6 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     thisCss.push('.layui-tableEdit-div li{line-height:36px;padding-left:5px;}');
     thisCss.push('.layui-tableEdit-div li:hover{background-color:#f2f2f2;}');
     thisCss.push('.layui-tableEdit-selected{background-color:#5FB878;}');
-    thisCss.push('.layui-tableEdit-selected i{background-color:#60b979!important;}');
     thisCss.push('.layui-tableEdit-checked i{background-color:#60b979!important;}');
     thisCss.push('.layui-tableEdit-ul div{padding-left:0px!important;}');
     thisCss.push('.layui-tableEdit-input{position:absolute;left:0;bottom:0;width:100%;height:38px;z-index:19910908;}');
