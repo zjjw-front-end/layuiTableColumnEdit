@@ -59,6 +59,21 @@ layui.define(["laydate","laytpl","table"],function(exports) {
 
     var configs = {
         callbacks:{}
+        ,parseConfig:function (cols,field) {
+            var type,data,enabled,dateType,csField;
+            cols.forEach(function (ite) {
+                ite.forEach(function (item) {
+                    if(field !== item.field || !item.config)return;
+                    var config = item.config;
+                    type = config.type;
+                    data = config.data;
+                    enabled = config.enabled;
+                    dateType = config.dateType;
+                    csField = config.cascadeSelectField;
+                });
+            });
+            return {type:type,data:data,enabled:enabled,dateType:dateType,cascadeSelectField:csField};
+        }
     };
 
     var Class = function () { //单列模式  也就是只能new一个对象。
@@ -83,7 +98,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         var that = options.element;
         if ($(that).find('input').length>0)return;
         othis.deleteAll(),othis.leaveStat = false;
-        var input = $('<input class="layui-input layui-tableEdit-input layui-tableEdit-date" type="text">');
+        var input = $('<input class="layui-input layui-tableEdit-input" type="text">');
         (39 - that.offsetHeight > 3) && input.css('height','30px');
         (that.offsetHeight - 39 > 3) && input.css('height','50px');
         $(that).append(input),input.focus();
@@ -93,6 +108,27 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 if(othis.callback)othis.callback.call(that,value);
             }});
         $('div.layui-laydate').hover(inFunc,outFunc),$(that).hover(inFunc,outFunc);
+        _layui.stope();
+    };
+
+    //输入框
+    Class.prototype.input = function(options){
+        var othis = this;
+        othis.callback = options.callback,othis.element = options.element;
+        othis.oldValue = options.oldValue;
+        var that = options.element;
+        if ($(that).find('input').length>0)return;
+        othis.deleteAll(),othis.leaveStat = false;
+        var input = $('<input class="layui-input layui-tableEdit-input" value="'+othis.oldValue+'" type="text">');
+        (39 - that.offsetHeight > 3) && input.css('height','30px');
+        (that.offsetHeight - 39 > 3) && input.css('height','50px');
+        $(that).append(input),input.focus();
+        input.blur(function (e) {
+            _layui.stope(e);
+            othis.callback.call(othis.element,this.value);
+        });
+        input.bind('change', function(e){othis.callback.call(othis.element,this.value)});
+        $(that).hover(inFunc,outFunc);
         _layui.stope();
     };
 
@@ -152,7 +188,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
 
     //删除所有下拉框和时间选择框
     Class.prototype.deleteAll = function(){
-        $('div.layui-tableEdit-div,div.layui-tableEdit,div.layui-laydate,input.layui-tableEdit-date').remove();
+        $('div.layui-tableEdit-div,div.layui-tableEdit,div.layui-laydate,input.layui-tableEdit-input').remove();
         delete this.leaveStat;//清除（离开状态属性）
     };
 
@@ -200,30 +236,25 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     AopEvent.prototype.on = function(event,callback){
         var othis = this;othis.config.event = event,othis.config.callback = callback;
         table.on(othis.config.event,function (obj) {
-            var zthis = this,field = $(zthis).data('field'),eventType,data,enabled,dateType,csField;
-            othis.config.cols.forEach(function (ite) {
-                ite.forEach(function (item) {
-                    if(field !== item.field || (!item.select && !item.date))return;
-                    item.select ? (eventType = 'select',data = item.select.data,enabled = item.select.enabled,csField=item.select.cascadeSelectField)
-                        : (eventType = 'date',dateType = item.date.dateType,csField=item.date.cascadeSelectField);
-                });
-            });
+            var zthis = this,field = $(zthis).data('field'),config = configs.parseConfig(othis.config.cols,field);
+            obj.field = field;
             var callbackFn = function (res) {
                 obj.value = Array.isArray(res) ? (res.length>0 ? res : [{name:'',value:''}]) : res;
                 othis.config.callback.call(zthis,obj);
-                if(!singleInstance.isEmpty(csField)){
-                    var csElement = $(this.parentNode).find("td[data-field='"+csField+"']");
+                if(!singleInstance.isEmpty(config.cascadeSelectField)){
+                    var csElement = $(this.parentNode).find("td[data-field='"+config.cascadeSelectField+"']");
                     $(csElement).attr("cascadeSelect-data",JSON.stringify({data:res,field:field}));
                 }
             };
             var csd = $(this).attr("cascadeSelect-data");//联动数据
             if(singleInstance.isEmpty(csd)){ //非联动事件
-                eventType && eventType === 'select' &&
-                singleInstance.register({data:data,element:zthis,enabled:enabled,selectedData:obj.data[field],callback:callbackFn});
-                eventType && eventType === 'date' && singleInstance.date({dateType:dateType,element:zthis,callback:callbackFn});
-                !eventType && othis.config.callback.call(zthis,obj);
+                config.type === 'select' &&
+                singleInstance.register({data:config.data,element:zthis,enabled:config.enabled,selectedData:obj.data[field],callback:callbackFn});
+                config.type === 'date' && singleInstance.date({dateType:config.dateType,element:zthis,callback:callbackFn});
+                config.type === 'input'&& singleInstance.input({element:zthis,oldValue:obj.data[field],callback:callbackFn})
+                !config.type && othis.config.callback.call(zthis,obj);
             } else {//联动事件
-                if(eventType === 'date') return;
+                if(config.type === 'date') return;
                 //获取当前单元格的table表格的lay-filter属性值
                 var filter = $(zthis).parents('div.layui-table-view').eq(0).prev().attr('lay-filter')
                     ,rs = active.callbackFn.call(zthis,'clickBefore('+filter+')',JSON.parse(csd));

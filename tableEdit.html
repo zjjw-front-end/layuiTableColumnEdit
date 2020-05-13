@@ -26,13 +26,15 @@
             ,page: true
             ,cols: [[
                 {type:'checkbox'}
-                ,{field:'name',title: '姓名',width:120}
-                //select（下拉框）date（时间选择框）
-                ,{field:'danxuan',align:'center', title: '单选',width:120,event:'danxuan',select:{data:params},templet:function (d) {
+                //type的类型值：select（下拉框）date（时间选择框）input(输入框)
+                //input为输入框，失去焦点会触发回调，aopTable.on()中触发的回调
+                ,{field:'name',title: '输入框',width:120,event:'name',config:{type:'input'}}
+                //data 为下拉框数据
+                ,{field:'danxuan',align:'center', title: '单选',width:120,event:'danxuan',config:{type:'select',data:params},templet:function (d) {
                     return d.danxuan && d.danxuan.value ? d.danxuan.value : '';
                 }}
-                //data 为下拉框数据  enabled => true：多选，false：单选。默认为false
-                ,{field:'duoxuan', title: '多选',width:120,event:'duoxuan',select:{data:params,enabled:true},templet:function (d) {
+                //  enabled => true：多选，false：单选。默认为false
+                ,{field:'duoxuan', title: '多选',width:120,event:'duoxuan',config:{type:'select',data:params,enabled:true},templet:function (d) {
                     var str = [];
                     d.duoxuan.forEach(function (e) {
                         str.push(e.value)
@@ -40,16 +42,16 @@
                     return str.join(' || ');
                 }}
                 //dateType表示日期时间格式，date为“yyyy-MM-dd”，datetime为“yyyy-MM-dd HH:ss:mm”
-                ,{field:'birthday', title: '生日',width:120,event:'birthday',date:{dateType:'date'}}
+                ,{field:'birthday', title: '生日',width:120,event:'birthday',config:{type:'date',dateType:'date'}}
                 //cascadeSelectField字段为级联开关字段(存在该字段则级联，否则不级联)
-                ,{field:'xlkjl', title: '下拉框联动(上级)',width:150,event:'xlkjl',select:{data:params,cascadeSelectField:'xialaxiaji'},templet:function (d) {
+                ,{field:'xlkjl', title: '下拉框联动(上级)',width:150,event:'xlkjl',config:{type:'select',data:params,cascadeSelectField:'xialaxiaji'},templet:function (d) {
                     return d.xlkjl && d.xlkjl.value ? d.xlkjl.value : '';
                 }}
-                ,{field:'xialaxiaji', title: '下拉框联动(下级)',width:150,event:'xiaji',select:{data:params},templet:function (d) {
+                ,{field:'xialaxiaji', title: '下拉框联动(下级)',width:150,event:'xiaji',config:{type:'select',data:params},templet:function (d) {
                     return d.xialaxiaji && d.xialaxiaji.value ? d.xialaxiaji.value : '';
                 }}
-                ,{field:'rqjl', title: '日期联动(上级)',width:150,event:'rqjl',date:{dateType:'date',cascadeSelectField:'rqxiaji'}}
-                ,{field:'rqxiaji', title: '日期框联动(下级)',width:150,event:'rqxiaji',select:{data:params},templet:function (d) {
+                ,{field:'rqjl', title: '日期联动(上级)',width:150,event:'rqjl',config:{type:'date',dateType:'date',cascadeSelectField:'rqxiaji'}}
+                ,{field:'rqxiaji', title: '日期框联动(下级)',width:150,event:'rqxiaji',config:{type:'select',data:params},templet:function (d) {
                     return d.rqxiaji && d.rqxiaji.value ? d.rqxiaji.value : '';
                 }}
             ]]
@@ -69,12 +71,18 @@
          * 如果不相同，则可以同时使用。
          **/
         aopTable.on('tool(tableEvent)',function (obj) {
-            var field = $(this).data('field');
-            var thisValue = obj.value;
+            var field = obj.field; //单元格字段
+            var value = obj.value; //修改后的值
+            var data = obj.data; //当前行旧数据
             var update = {};
-            update[field] = thisValue;
+            update[field] = value;
             //把value更新到行中
             obj.update(update);
+            /**
+             *说白了，此obj与table.on('tool(tableEvent)',function (obj) {})
+             *中的obj对象是同一个，所以可以如此操作。
+             *
+             * */
         });
 
 
