@@ -57,7 +57,7 @@ callback  | function| 是       | 事件回调方法
 
 ```json
  [[
-   {"field":"name","title": "输入框","event":"name","config":{"":"input"}}
+   {"field":"name","title": "输入框","event":"name","config":{"type":"input"}}
    ,{"field":"danxuan", "title": "单选","event":"danxuan","config":{"type":"select","data":params,"cascadeSelectField":"name"}}
    ,{"field":"duoxuan", "title": "多选","event":"duoxuan","config":{"type":"select","data":params,"enabled":true}}
    ,{"field":"birthday", "title": "生日","event":"birthday","config":{"type":"date","dateType":"date"}}
