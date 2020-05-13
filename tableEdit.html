@@ -24,21 +24,34 @@
             ,url:'module/json/data.json'
             ,height: 'full-90'
             ,page: true
-            ,size:'lg'
             ,cols: [[
                 {type:'checkbox'}
                 ,{field:'name',title: '姓名',width:120}
                 //select（下拉框）date（时间选择框）
-                ,{field:'danxuan',align:'center', title: '单选',width:120,event:'danxuan',select:{data:params}}
+                ,{field:'danxuan',align:'center', title: '单选',width:120,event:'danxuan',select:{data:params},templet:function (d) {
+                    return d.danxuan && d.danxuan.value ? d.danxuan.value : '';
+                }}
                 //data 为下拉框数据  enabled => true：多选，false：单选。默认为false
-                ,{field:'duoxuan',align:'center', title: '多选',width:120,event:'duoxuan',select:{data:params,enabled:true,isRemove:true}}
+                ,{field:'duoxuan', title: '多选',width:120,event:'duoxuan',select:{data:params,enabled:true},templet:function (d) {
+                    var str = [];
+                    d.duoxuan.forEach(function (e) {
+                        str.push(e.value)
+                    });
+                    return str.join(' || ');
+                }}
                 //dateType表示日期时间格式，date为“yyyy-MM-dd”，datetime为“yyyy-MM-dd HH:ss:mm”
                 ,{field:'birthday', title: '生日',width:120,event:'birthday',date:{dateType:'date'}}
                 //cascadeSelectField字段为级联开关字段(存在该字段则级联，否则不级联)
-                ,{field:'xlkjl', title: '下拉框联动(上级)',width:150,event:'xlkjl',select:{data:params,cascadeSelectField:'xialaxiaji'}}
-                ,{field:'xialaxiaji', title: '下拉框联动(下级)',width:150,event:'xiaji',select:{data:params}}
+                ,{field:'xlkjl', title: '下拉框联动(上级)',width:150,event:'xlkjl',select:{data:params,cascadeSelectField:'xialaxiaji'},templet:function (d) {
+                    return d.xlkjl && d.xlkjl.value ? d.xlkjl.value : '';
+                }}
+                ,{field:'xialaxiaji', title: '下拉框联动(下级)',width:150,event:'xiaji',select:{data:params},templet:function (d) {
+                    return d.xialaxiaji && d.xialaxiaji.value ? d.xialaxiaji.value : '';
+                }}
                 ,{field:'rqjl', title: '日期联动(上级)',width:150,event:'rqjl',date:{dateType:'date',cascadeSelectField:'rqxiaji'}}
-                ,{field:'rqxiaji', title: '日期框联动(下级)',width:150,event:'rqxiaji',select:{data:params}}
+                ,{field:'rqxiaji', title: '日期框联动(下级)',width:150,event:'rqxiaji',select:{data:params},templet:function (d) {
+                    return d.rqxiaji && d.rqxiaji.value ? d.rqxiaji.value : '';
+                }}
             ]]
         }).config.cols;
 
@@ -58,12 +71,8 @@
         aopTable.on('tool(tableEvent)',function (obj) {
             var field = $(this).data('field');
             var thisValue = obj.value;
-            if(thisValue){
-                //这里是测试，所以如果是数组，就取第一个数组元素。
-                thisValue = Array.isArray(thisValue) ? thisValue[0] : thisValue;
-            }
             var update = {};
-            update[field] = thisValue && typeof thisValue === 'string' ? thisValue : thisValue.value;
+            update[field] = thisValue;
             //把value更新到行中
             obj.update(update);
         });
@@ -87,24 +96,24 @@
                 if(cascadeSelectData === '2020-05-11'){
                     reslut = {
                         data:[{name:1,value:'语文'},{name:2,value:'数学'},{name:3,value:'英语'},{name:4,value:'物理'},{name:5,value:'化学'}],
-                        enabled:false //单选
+                        enabled:false //单选 true为多选
                     };
                 }else {
                     reslut = {
                         data:[{name:6,value:'政治'},{name:7,value:'地理'},{name:8,value:'历史'},{name:9,value:'生物'},{name:10,value:'音乐'}],
-                        enabled:true //多选
+                        enabled:false //单选 true为多选
                     };
                 }
             }else {
                 if(cascadeSelectData.name+'' === '1'){
                     reslut = {
                         data:[{name:11,value:'贵州'},{name:12,value:'云南'},{name:13,value:'四川'},{name:14,value:'湖南'}],
-                        enabled:false //单选
+                        enabled:false //单选 true为多选
                     };
                 }else {
                     reslut = {
                         data:[{name:15,value:'荆州'},{name:16,value:'扬州'},{name:17,value:'杭州'},{name:18,value:'苏州'}],
-                        enabled:true //多选
+                        enabled:false //单选 true为多选
                     };
                 }
             }

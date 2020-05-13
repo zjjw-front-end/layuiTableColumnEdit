@@ -1,15 +1,15 @@
 {
   "data": [
-    {"id":1,"name":"张三1","danxuan":"5","duoxuan":"3","birthday":"","xlkjl": "", "rqjl": "","xialaxiaji":"","rqxiaji":""},
-    {"id":2,"name":"张三2","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": "","xialaxiaji":"","rqxiaji":""},
-    {"id":3,"name":"张三3","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": "","xialaxiaji":"","rqxiaji":""},
-    {"id":4,"name":"张三4","danxuan":"张三5","duoxuan":"张三5","birthday":"","xlkjl": "", "rqjl": "","xialaxiaji":"","rqxiaji":""},
-    {"id":5,"name":"张三5","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": "","xialaxiaji":"","rqxiaji":""},
-    {"id":6,"name":"张三6","danxuan":"3","duoxuan":"","birthday":"","xlkjl": "", "rqjl": "","xialaxiaji":"","rqxiaji":""},
-    {"id":7,"name":"张三7","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": "","xialaxiaji":"","rqxiaji":""},
-    {"id":8,"name":"张三8","danxuan":"张三2","duoxuan":"张三2","birthday":"","xlkjl": "", "rqjl": "","xialaxiaji":"","rqxiaji":""},
-    {"id":9,"name":"张三9","danxuan":"","duoxuan":"","birthday":"","xlkjl": "", "rqjl": "","xialaxiaji":"","rqxiaji":""},
-    {"id":10,"name":"张三10","danxuan":"","duoxuan":"1","birthday":"","xlkjl": "", "rqjl": "","xialaxiaji":"","rqxiaji":""}
+    {"id":1,"name":"张三1","danxuan":null,"duoxuan":[{"name":1,"value": "张三1"},{"name":2,"value": "张三2"}],"birthday":"","xlkjl": null, "rqjl": "","xialaxiaji":null,"rqxiaji":null},
+    {"id":2,"name":"张三2","danxuan":null,"duoxuan":[{"name":1,"value": "张三1"},{"name":2,"value": "张三2"}],"birthday":"","xlkjl": null, "rqjl": "","xialaxiaji":null,"rqxiaji":null},
+    {"id":3,"name":"张三3","danxuan":null,"duoxuan":[{"name":1,"value": "张三1"},{"name":2,"value": "张三2"}],"birthday":"","xlkjl": null, "rqjl": "","xialaxiaji":null,"rqxiaji":null},
+    {"id":4,"name":"张三4","danxuan":null,"duoxuan":[{"name":1,"value": "张三1"},{"name":2,"value": "张三2"}],"birthday":"","xlkjl": null, "rqjl": "","xialaxiaji":null,"rqxiaji":null},
+    {"id":5,"name":"张三5","danxuan":null,"duoxuan":[{"name":1,"value": "张三1"},{"name":2,"value": "张三2"}],"birthday":"","xlkjl": null, "rqjl": "","xialaxiaji":null,"rqxiaji":null},
+    {"id":6,"name":"张三6","danxuan":{"name":1,"value": "张三1"},"duoxuan":[{"name":1,"value": "张三1"},{"name":2,"value": "张三2"}],"birthday":"","xlkjl": null, "rqjl": "","xialaxiaji":null,"rqxiaji":null},
+    {"id":7,"name":"张三7","danxuan":null,"duoxuan":[{"name":1,"value": "张三1"},{"name":2,"value": "张三2"}],"birthday":"","xlkjl": null, "rqjl": "","xialaxiaji":null,"rqxiaji":null},
+    {"id":8,"name":"张三8","danxuan":null,"duoxuan":[{"name":1,"value": "张三1"},{"name":2,"value": "张三2"}],"birthday":"","xlkjl": null, "rqjl": "","xialaxiaji":null,"rqxiaji":null},
+    {"id":9,"name":"张三9","danxuan":null,"duoxuan":[{"name":1,"value": "张三1"},{"name":2,"value": "张三2"}],"birthday":"","xlkjl": null, "rqjl": "","xialaxiaji":null,"rqxiaji":null},
+    {"id":10,"name":"张三10","danxuan":null,"duoxuan":[{"name":1,"value": "张三1"},{"name":2,"value": "张三2"}],"birthday":"","xlkjl": null, "rqjl": "","xialaxiaji":null,"rqxiaji":null}
   ],
   "code": 0,
   "msg": "",

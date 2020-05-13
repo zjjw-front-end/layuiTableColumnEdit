@@ -7,7 +7,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 ,'<ul class="layui-tableEdit-ul">'
                     ,'{{# if(d.data){ }}'
                         ,'{{# d.data.forEach(function(item){ }}'
-                            ,'{{# var selectedClass = (item.value === d.selectedValue) || (item.name+"" === d.selectedValue) ? "layui-tableEdit-selected" : "";  }}'
+                            ,'{{# var selectedClass = d.selectedValue && (item.name+"" === d.selectedValue.name+"") ? "layui-tableEdit-selected" : "";  }}'
                             ,'<li class="{{ selectedClass }}" data-name="{{ item.name }}" data-value="{{ item.value }}">'
                                 ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span></div>'
                             ,'</li>'
@@ -24,7 +24,14 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                     ,'<ul>'
                     ,'{{# if(d.data){ }}'
                         ,'{{# d.data.forEach(function(item){ }}'
-                            ,'{{# var selectedClass = (item.value === d.selectedValue) || (item.name+"" === d.selectedValue) ? "layui-tableEdit-selected" : ""; }}'
+                            ,'{{# var isSelected = false;'
+                                ,'if(d.selectedValue) {'
+                                        ,'d.selectedValue.forEach(function(obj){'
+                                            ,'if(isSelected)return; isSelected = ((obj.name+"") === (item.name+""));'
+                                        ,'});'
+                                ,'}'
+                                ,'var selectedClass = isSelected ? "layui-tableEdit-checked layui-tableEdit-selected" : "";'
+                            ,'}}'
                             ,'<li class="{{ selectedClass }}" data-name="{{ item.name }}" data-value="{{ item.value }}">'
                                 ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span><i class="layui-icon layui-icon-ok"></i></div>'
                             ,'</li>'
@@ -52,6 +59,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     thisCss.push('.layui-tableEdit-div li:hover{background-color:#f2f2f2;}');
     thisCss.push('.layui-tableEdit-selected{background-color:#5FB878;}');
     thisCss.push('.layui-tableEdit-selected i{background-color:#60b979!important;}');
+    thisCss.push('.layui-tableEdit-checked i{background-color:#60b979!important;}');
     thisCss.push('.layui-tableEdit-ul div{padding-left:0px!important;}');
     thisCss.push('.layui-tableEdit-input{position:absolute;left:0;bottom:0;width:100%;height:38px;z-index:19910908;}');
     var thisStyle = document.createElement('style');
@@ -128,8 +136,8 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         if(elemY<tableBodyY)tableBody[0].scrollTop = that.offsetTop; //调整滚动条位置
         var style = type+'width: '+thisWidth+'px;left: 0px;'+(othis.enabled ? '':'overflow-y: auto;');
         tableEdit.append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:othis.selectedValue}));
-        var $tableEdit = $('div.layui-tableEdit-div');
-        (thisY+$tableEdit.height()+thisHeight > pageY) && !isType && (tableBody[0].scrollTop = that.offsetTop);//调整滚动条位置
+        var $tableEdit = $('div.layui-tableEdit-div')[0];
+        (thisY+$tableEdit.offsetHeight+thisHeight > pageY) && !isType && (tableBody[0].scrollTop = that.offsetTop);//调整滚动条位置
         othis.events();
     };
 
@@ -151,8 +159,9 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             liArr.unbind('click'),liArr.bind('click',function (e) {
                 _layui.stope(e);
                 if(othis.enabled){//多选
-                    $(this).hasClass("layui-tableEdit-selected") ? $(this).removeClass("layui-tableEdit-selected")
-                        : $(this).addClass("layui-tableEdit-selected")
+                    $(this).hasClass("layui-tableEdit-checked") ? ($(this).removeClass("layui-tableEdit-checked"),
+                          $(this).removeClass("layui-tableEdit-selected"))
+                        : $(this).addClass("layui-tableEdit-checked")
                 }else {//单选
                     othis.deleteAll();
                     if(othis.callback)othis.callback.call(othis.element,{name:$(this).data("name"),value:$(this).data("value")});
@@ -164,7 +173,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 if(eventType === 'close') singleInstance.deleteAll(); //“关闭”按钮
                 if(eventType === 'confirm') { //“确定”按钮
                     $('div.layui-tableEdit-div li').each(function (e) {
-                        if(!$(this).hasClass("layui-tableEdit-selected"))return;
+                        if(!$(this).hasClass("layui-tableEdit-checked"))return;
                         dataList.push({name:$(this).data("name"),value:$(this).data("value")});
                     });
                     othis.deleteAll();
@@ -175,7 +184,6 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         //事件注册
         $(othis.element).find('input.layui-tableEdit-input').bind('input propertychange', function(){searchFunc(this.value)});
         othis.enabled ? (liClickFunc(),btnClickFunc()) : liClickFunc();
-        !$(othis.element).find('div.layui-tableEdit-div')[0] && $('div.layui-tableEdit-div').hover(inFunc,outFunc);
         $(othis.element).hover(inFunc,outFunc);
     };
 
@@ -199,6 +207,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                     $(csElement).attr("cascadeSelect-data",JSON.stringify({data:res,field:field}));
                 }
             };
+            console.log(obj.data[field])
             var csd = $(this).attr("cascadeSelect-data");//联动数据
             if(singleInstance.isEmpty(csd)){ //非联动事件
                 eventType && eventType === 'select' &&
@@ -219,7 +228,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     var active = {
         aopObj:function(cols){return new AopEvent(cols);},
         on:function (event,callback) {
-            var filter = event.match(/\((.*)\)$/),eventName = (filter ? event.replace(filter[0],'') : event)+'_'+(filter ? filter[1] : '');
+            var filter = event.match(/\((.*)\)$/),eventName = (filter ? (event.replace(filter[0],'')+'_'+ filter[1]) : event);
             configs.callbacks[moduleName+'_'+eventName]=callback;
         },
         callbackFn:function (event,params) {
