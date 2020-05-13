@@ -128,7 +128,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         if(elemY<tableBodyY)tableBody[0].scrollTop = that.offsetTop; //调整滚动条位置
         var style = type+'width: '+thisWidth+'px;left: 0px;'+(othis.enabled ? '':'overflow-y: auto;');
         var getClassFn = function(name){
-            if(singleInstance.isEmpty(othis.selectedData) || singleInstance.isEmpty(name))return "";
+            if(othis.isEmpty(othis.selectedData) || othis.isEmpty(name))return "";
             var selectedClass;
             if(typeof othis.selectedData === 'string'){
                 selectedClass = (name+"" === othis.selectedData+"") ? "layui-tableEdit-selected"+(othis.enabled ? " layui-tableEdit-checked":'') : "";
@@ -139,7 +139,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             if(Array.isArray(othis.selectedData)){
                 for(var i=0;i<othis.selectedData.length;i++){
                     selectedClass = (name+"" === othis.selectedData[i].name+"") ? "layui-tableEdit-selected layui-tableEdit-checked" : "";
-                    if(!singleInstance.isEmpty(selectedClass)) break;
+                    if(!othis.isEmpty(selectedClass)) break;
                 }
             }
             return selectedClass;
