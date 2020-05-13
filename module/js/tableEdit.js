@@ -104,9 +104,9 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         $(that).append(input),input.focus();
         //日期时间选择器 (show: true 表示直接显示)
         laydate.render({elem: input[0],type: othis.dateType,show: true,done:function (value, date) {
-                othis.deleteAll();
-                if(othis.callback)othis.callback.call(that,value);
-            }});
+            othis.deleteAll();
+            if(othis.callback)othis.callback.call(that,value);
+        }});
         $('div.layui-laydate').hover(inFunc,outFunc),$(that).hover(inFunc,outFunc);
         _layui.stope();
     };
