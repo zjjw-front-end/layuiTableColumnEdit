@@ -207,7 +207,6 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                     $(csElement).attr("cascadeSelect-data",JSON.stringify({data:res,field:field}));
                 }
             };
-            console.log(obj.data[field])
             var csd = $(this).attr("cascadeSelect-data");//联动数据
             if(singleInstance.isEmpty(csd)){ //非联动事件
                 eventType && eventType === 'select' &&
