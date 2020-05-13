@@ -128,8 +128,6 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         if(elemY<tableBodyY)tableBody[0].scrollTop = that.offsetTop; //调整滚动条位置
         var style = type+'width: '+thisWidth+'px;left: 0px;'+(othis.enabled ? '':'overflow-y: auto;');
         var getClassFn = function(name){
-            console.log(name+'1')
-            console.log(othis.selectedData)
             if(singleInstance.isEmpty(othis.selectedData) || singleInstance.isEmpty(name))return "";
             var selectedClass;
             if(typeof othis.selectedData === 'string'){
@@ -235,6 +233,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
 
         });
     };
+
     var active = {
         aopObj:function(cols){return new AopEvent(cols);},
         on:function (event,callback) {
@@ -248,5 +247,6 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             return func.call(this,params);
         }
     };
+
     exports(moduleName, active);
 });
