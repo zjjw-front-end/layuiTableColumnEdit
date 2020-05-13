@@ -52,6 +52,12 @@ cols      | array     | 是       | table.render(options)中options的cols属性
 event     | string  | 是       | 事件名称
 callback  | function| 是       | 事件回调方法
 
+#### callbackFn
+参数      | 类型    | 是否必填 | 描述 |
+---       | ---     | ---      | ----
+event     | string  | 是       | 事件名称
+params    | object  | 否       | 事件回调方法的参数
+
 
 &emsp;**cols格式**
 
