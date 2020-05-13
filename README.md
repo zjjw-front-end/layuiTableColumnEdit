@@ -70,7 +70,7 @@ callback  | function| 是       | 事件回调方法
 ---       | ---       | ---      | -----
 config    | object    | 是       | aop增强配置字段
 
-&emsp;**select说明**
+&emsp;**config说明**
 
 参数               | 类型      | 是否必填 | 描述 |
 ---                | ---       | ---      | -----
