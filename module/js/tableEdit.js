@@ -128,15 +128,15 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         if(elemY<tableBodyY)tableBody[0].scrollTop = that.offsetTop; //调整滚动条位置
         var style = type+'width: '+thisWidth+'px;left: 0px;'+(othis.enabled ? '':'overflow-y: auto;');
         var getClassFn = function(name){
-            if(singleInstance.isEmpty(othis.selectedData))return "";
+            console.log(name+'1')
+            console.log(othis.selectedData)
+            if(singleInstance.isEmpty(othis.selectedData) || singleInstance.isEmpty(name))return "";
             var selectedClass;
             if(typeof othis.selectedData === 'string'){
-                selectedClass = (name+"" === othis.selectedData+"") ? "layui-tableEdit-selected" : "";
-                selectedClass += othis.enabled ? " layui-tableEdit-checked" : selectedClass;
+                selectedClass = (name+"" === othis.selectedData+"") ? "layui-tableEdit-selected"+(othis.enabled ? " layui-tableEdit-checked":'') : "";
             }
             if(typeof othis.selectedData === 'object'){
-                selectedClass = (name+"" === othis.selectedData.name+"") ? "layui-tableEdit-selected" : "";
-                selectedClass += othis.enabled ? " layui-tableEdit-checked" : selectedClass;
+                selectedClass = (name+"" === othis.selectedData.name+"") ? "layui-tableEdit-selected"+(othis.enabled ? " layui-tableEdit-checked":'') : "";
             }
             if(Array.isArray(othis.selectedData)){
                 for(var i=0;i<othis.selectedData.length;i++){
