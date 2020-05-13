@@ -37,6 +37,7 @@ layui.config({
 ---          | ----
 aopObj       | 获取一个table的aop代理对象方法,一张表对应一个aop对象。
 on           | 事件注册
+callbackFn   | 事件回调
 
 ### 3.参数说明
 
@@ -56,9 +57,10 @@ callback  | function| 是       | 事件回调方法
 
 ```json
  [[
-   {"field":"danxuan", "title": "单选","event":"danxuan","select":{"data":params,"cascadeSelectField":"name"}}
-   ,{"field":"duoxuan", "title": "多选","event":"duoxuan","select":{"data":params,"enabled":true}}
-   ,{"field":"birthday", "title": "生日","event":"birthday","date":{"dateType":"date"}}
+   {"field":"name","title": "输入框","event":"name","config":{"":"input"}}
+   ,{"field":"danxuan", "title": "单选","event":"danxuan","config":{"type":"select","data":params,"cascadeSelectField":"name"}}
+   ,{"field":"duoxuan", "title": "多选","event":"duoxuan","config":{"type":"select","data":params,"enabled":true}}
+   ,{"field":"birthday", "title": "生日","event":"birthday","config":{"type":"date","dateType":"date"}}
  ]]
 ```
 
@@ -66,16 +68,17 @@ callback  | function| 是       | 事件回调方法
 
 参数      | 类型      | 是否必填 | 描述 |
 ---       | ---       | ---      | -----
-select    | object    | 是       | 下拉框
-date      | object    | 是       | 时间选择框
+config    | object    | 是       | aop增强配置字段
 
 &emsp;**select说明**
 
 参数               | 类型      | 是否必填 | 描述 |
 ---                | ---       | ---      | -----
+type               | string    | 是       | 输入框：input 下拉框：select 时间选择框：date
 data               | array     | 是       | 下拉框数据
 enabled            | boolean   | 否       | 多选：true，单选：false，默认单选。
-cascadeSelectField | string    | 否       | 下拉框联动配置字段
+dateType           | string    | 否       | 时间格式 date:yyyy-MM-dd,datetime:yyyy-MM-dd HH:ss:mm,time:HH:ss:mm
+cascadeSelectField | string    | 否       | 联动下拉框配置字段
 
 &emsp;**data格式**
 
@@ -88,13 +91,6 @@ cascadeSelectField | string    | 否       | 下拉框联动配置字段
     {name:5,value:"测试5"}
 ]
 ```
-
-&emsp;**date说明**
-
-参数               | 类型      | 是否必填 | 描述 |
------              | ---       | ---      | -------
-dateType           | string    | 是       | 日期选择框类型，date:yyyy-MM-dd,datetime:yyyy-MM-dd HH:ss:mm,time:HH:ss:mm
-cascadeSelectField | string    | 否       | 下拉框联动配置字段
 
 ### 6.效果图
 ![效果图](https://images.gitee.com/uploads/images/2020/0508/123901_092d3f62_1588195.gif "tableEdit.gif")
