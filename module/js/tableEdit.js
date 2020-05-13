@@ -7,7 +7,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 ,'<ul class="layui-tableEdit-ul">'
                     ,'{{# if(d.data){ }}'
                         ,'{{# d.data.forEach(function(item){ }}'
-                            ,'{{# var selectedClass = d.selectedValue && (item.name+"" === d.selectedValue.name+"") ? "layui-tableEdit-selected" : "";  }}'
+                            ,'{{# var selectedClass = d.callbackFn(item.name) }}'
                             ,'<li class="{{ selectedClass }}" data-name="{{ item.name }}" data-value="{{ item.value }}">'
                                 ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span></div>'
                             ,'</li>'
@@ -24,14 +24,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                     ,'<ul>'
                     ,'{{# if(d.data){ }}'
                         ,'{{# d.data.forEach(function(item){ }}'
-                            ,'{{# var isSelected = false;'
-                                ,'if(d.selectedValue) {'
-                                        ,'d.selectedValue.forEach(function(obj){'
-                                            ,'if(isSelected)return; isSelected = ((obj.name+"") === (item.name+""));'
-                                        ,'});'
-                                ,'}'
-                                ,'var selectedClass = isSelected ? "layui-tableEdit-checked layui-tableEdit-selected" : "";'
-                            ,'}}'
+                            ,'{{# var selectedClass = d.callbackFn(item.name) }}'
                             ,'<li class="{{ selectedClass }}" data-name="{{ item.name }}" data-value="{{ item.value }}">'
                                 ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span><i class="layui-icon layui-icon-ok"></i></div>'
                             ,'</li>'
@@ -111,7 +104,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         var othis = this;
         othis.enabled = options.enabled,othis.callback = options.callback;
         othis.data = options.data,othis.element = options.element;
-        othis.selectedValue = options.selectedValue;
+        othis.selectedData = options.selectedData;
         var that = othis.element;
         if($(that).find('input.layui-tableEdit-input')[0]) return;
         othis.deleteAll(),othis.leaveStat = false;
@@ -134,7 +127,26 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             ,type = isType ? 'top: auto;bottom: '+(thisHeight+2)+'px;' : 'bottom: auto;top: '+(thisHeight+2)+'px;';
         if(elemY<tableBodyY)tableBody[0].scrollTop = that.offsetTop; //调整滚动条位置
         var style = type+'width: '+thisWidth+'px;left: 0px;'+(othis.enabled ? '':'overflow-y: auto;');
-        tableEdit.append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,selectedValue:othis.selectedValue}));
+        var getClassFn = function(name){
+            if(singleInstance.isEmpty(othis.selectedData))return "";
+            var selectedClass;
+            if(typeof othis.selectedData === 'string'){
+                selectedClass = (name+"" === othis.selectedData+"") ? "layui-tableEdit-selected" : "";
+                selectedClass += othis.enabled ? " layui-tableEdit-checked" : selectedClass;
+            }
+            if(typeof othis.selectedData === 'object'){
+                selectedClass = (name+"" === othis.selectedData.name+"") ? "layui-tableEdit-selected" : "";
+                selectedClass += othis.enabled ? " layui-tableEdit-checked" : selectedClass;
+            }
+            if(Array.isArray(othis.selectedData)){
+                for(var i=0;i<othis.selectedData.length;i++){
+                    selectedClass = (name+"" === othis.selectedData[i].name+"") ? "layui-tableEdit-selected layui-tableEdit-checked" : "";
+                    if(!singleInstance.isEmpty(selectedClass)) break;
+                }
+            }
+            return selectedClass;
+        };
+        tableEdit.append(laytpl(othis.enabled ? selectMoreTpl : selectTpl).render({data: othis.data,style: style,callbackFn:getClassFn}));
         var $tableEdit = $('div.layui-tableEdit-div')[0];
         (thisY+$tableEdit.offsetHeight+thisHeight > pageY) && !isType && (tableBody[0].scrollTop = that.offsetTop);//调整滚动条位置
         othis.events();
@@ -209,7 +221,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             var csd = $(this).attr("cascadeSelect-data");//联动数据
             if(singleInstance.isEmpty(csd)){ //非联动事件
                 eventType && eventType === 'select' &&
-                singleInstance.register({data:data,element:zthis,enabled:enabled,selectedValue:obj.data[field],callback:callbackFn});
+                singleInstance.register({data:data,element:zthis,enabled:enabled,selectedData:obj.data[field],callback:callbackFn});
                 eventType && eventType === 'date' && singleInstance.date({dateType:dateType,element:zthis,callback:callbackFn});
                 !eventType && othis.config.callback.call(zthis,obj);
             } else {//联动事件
@@ -218,7 +230,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 var filter = $(zthis).parents('div.layui-table-view').eq(0).prev().attr('lay-filter')
                     ,rs = active.callbackFn.call(zthis,'clickBefore('+filter+')',JSON.parse(csd));
                     rs = singleInstance.isEmpty(rs) ? {} : rs;
-                singleInstance.register({data:rs.data,element:zthis,enabled:rs.enabled,selectedValue:obj.data[field],callback:callbackFn});
+                singleInstance.register({data:rs.data,element:zthis,enabled:rs.enabled,selectedData:obj.data[field],callback:callbackFn});
             }
 
         });
