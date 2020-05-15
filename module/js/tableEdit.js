@@ -257,8 +257,15 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 //获取当前单元格的table表格的lay-filter属性值
                 var filter = $(zthis).parents('div.layui-table-view').eq(0).prev().attr('lay-filter')
                     ,rs = active.callbackFn.call(zthis,'clickBefore('+filter+')',JSON.parse(csd));
-                    rs = singleInstance.isEmpty(rs) ? {} : rs;
-                singleInstance.register({data:rs.data,element:zthis,enabled:rs.enabled,selectedData:obj.data[field],callback:callbackFn});
+                    //异步操作,由使用者调用。
+                    //判断条件为rs为空时。
+                    if(singleInstance.isEmpty(rs)){
+                        active.on("async("+filter+")",function (result) {
+                            singleInstance.register({data:result.data,element:zthis,enabled:result.enabled,selectedData:obj.data[field],callback:callbackFn});
+                        })
+                    }else {
+                        singleInstance.register({data:rs.data,element:zthis,enabled:rs.enabled,selectedData:obj.data[field],callback:callbackFn});
+                    }
             }
 
         });
@@ -277,6 +284,10 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             return func.call(this,params);
         }
     };
+
+    active.on("tableEdit(getEntity)",function () {
+        return singleInstance;
+    });
 
     exports(moduleName, active);
 });
