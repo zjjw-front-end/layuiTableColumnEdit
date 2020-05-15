@@ -53,7 +53,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     thisCss.push('.layui-tableEdit-selected{background-color:#5FB878;}');
     thisCss.push('.layui-tableEdit-checked i{background-color:#60b979!important;}');
     thisCss.push('.layui-tableEdit-ul div{padding-left:0px!important;}');
-    thisCss.push('.layui-tableEdit-input{position:absolute;left:0;bottom:0;width:100%;height:38px;z-index:19910908;}');
+    thisCss.push('.layui-tableEdit-input{position:absolute;left:0;bottom:0;width:100%;height:38px;z-index: 999999999999;}');
     var thisStyle = document.createElement('style');
     thisStyle.innerHTML = thisCss.join('\n'),document.getElementsByTagName('head')[0].appendChild(thisStyle);
 
@@ -119,13 +119,12 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         var that = options.element;
         if ($(that).find('input').length>0)return;
         othis.deleteAll(),othis.leaveStat = false;
-        var input = $('<input class="layui-input layui-tableEdit-input" value="'+othis.oldValue+'" type="text">');
+        var input = $('<input class="layui-input layui-tableEdit-input"  value="'+othis.oldValue+'" type="text">');
         (39 - that.offsetHeight > 3) && input.css('height','30px');
         (that.offsetHeight - 39 > 3) && input.css('height','50px');
         $(that).append(input),input.focus();
-        input.blur(function (e) {
-            _layui.stope(e);
-            othis.callback.call(othis.element,this.value);
+        input.click(function (e) {
+           _layui.stope(e);
         });
         input.bind('change', function(e){othis.callback.call(othis.element,this.value)});
         $(that).hover(inFunc,outFunc);
@@ -166,7 +165,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         var getClassFn = function(name){
             if(othis.isEmpty(othis.selectedData) || othis.isEmpty(name))return "";
             var selectedClass;
-            if(typeof othis.selectedData === 'string'){
+            if(typeof othis.selectedData === 'string' || Object.prototype.toString.call(othis.selectedData) === '[object Number]'){
                 selectedClass = (name+"" === othis.selectedData+"") ? "layui-tableEdit-selected"+(othis.enabled ? " layui-tableEdit-checked":'') : "";
             }
             if(typeof othis.selectedData === 'object'){
