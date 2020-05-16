@@ -119,7 +119,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         var that = options.element;
         if ($(that).find('input').length>0)return;
         othis.deleteAll(),othis.leaveStat = false;
-        var input = $('<input class="layui-input layui-tableEdit-input"  value="'+othis.oldValue+'" type="text">');
+        var input = $('<input class="layui-input layui-tableEdit-input" style="z-index: 99999999999"  value="'+othis.oldValue+'" type="text">');
         (39 - that.offsetHeight > 3) && input.css('height','30px');
         (that.offsetHeight - 39 > 3) && input.css('height','50px');
         $(that).append(input),input.focus();
