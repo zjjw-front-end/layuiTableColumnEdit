@@ -53,7 +53,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     thisCss.push('.layui-tableEdit-selected{background-color:#5FB878;}');
     thisCss.push('.layui-tableEdit-checked i{background-color:#60b979!important;}');
     thisCss.push('.layui-tableEdit-ul div{padding-left:0px!important;}');
-    thisCss.push('.layui-tableEdit-input{position:absolute;left:0;bottom:0;width:100%;height:38px;z-index: 999999999999;}');
+    thisCss.push('.layui-tableEdit-input{position:absolute;left:0;bottom:0;width:100%;height:38px;z-index: 19910908;}');
     var thisStyle = document.createElement('style');
     thisStyle.innerHTML = thisCss.join('\n'),document.getElementsByTagName('head')[0].appendChild(thisStyle);
 
