@@ -116,6 +116,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         var othis = this;
         othis.callback = options.callback,othis.element = options.element;
         othis.oldValue = options.oldValue;
+        othis.oldValue = othis.oldValue ? othis.oldValue : '';
         var that = options.element;
         if ($(that).find('input').length>0)return;
         othis.deleteAll(),othis.leaveStat = false;
