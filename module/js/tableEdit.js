@@ -7,7 +7,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                 ,'<ul class="layui-tableEdit-ul">'
                     ,'{{# if(d.data){ }}'
                         ,'{{# d.data.forEach(function(item){ }}'
-                            ,'{{# var selectedClass = d.callbackFn(item.name) }}'
+                            ,'{{# var selectedClass = d.callbackFn(item) }}'
                             ,'<li class="{{ selectedClass }}" data-name="{{ item.name }}" data-value="{{ item.value }}">'
                                 ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span></div>'
                             ,'</li>'
@@ -24,7 +24,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                     ,'<ul>'
                     ,'{{# if(d.data){ }}'
                         ,'{{# d.data.forEach(function(item){ }}'
-                            ,'{{# var selectedClass = d.callbackFn(item.name) }}'
+                            ,'{{# var selectedClass = d.callbackFn(item) }}'
                             ,'<li class="{{ selectedClass }}" data-name="{{ item.name }}" data-value="{{ item.value }}">'
                                 ,'<div class="layui-unselect layui-form-checkbox" lay-skin="primary"><span>{{ item.value }}</span><i class="layui-icon layui-icon-ok"></i></div>'
                             ,'</li>'
@@ -163,18 +163,18 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             ,type = isType ? 'top: auto;bottom: '+(thisHeight+2)+'px;' : 'bottom: auto;top: '+(thisHeight+2)+'px;';
         if(elemY<tableBodyY)tableBody[0].scrollTop = that.offsetTop; //调整滚动条位置
         var style = type+'width: '+thisWidth+'px;left: 0px;'+(othis.enabled ? '':'overflow-y: auto;');
-        var getClassFn = function(name){
-            if(othis.isEmpty(othis.selectedData) || othis.isEmpty(name))return "";
+        var getClassFn = function(item){
+            if(othis.isEmpty(othis.selectedData) || othis.isEmpty(item.name))return "";
             var selectedClass;
             if(typeof othis.selectedData === 'string' || Object.prototype.toString.call(othis.selectedData) === '[object Number]'){
-                selectedClass = (name+"" === othis.selectedData+"") ? "layui-tableEdit-selected"+(othis.enabled ? " layui-tableEdit-checked":'') : "";
+                selectedClass = (item.name+"" === othis.selectedData+"") || (item.value+"" === othis.selectedData+"") ? "layui-tableEdit-selected"+(othis.enabled ? " layui-tableEdit-checked":'') : "";
             }
             if(typeof othis.selectedData === 'object'){
-                selectedClass = (name+"" === othis.selectedData.name+"") ? "layui-tableEdit-selected"+(othis.enabled ? " layui-tableEdit-checked":'') : "";
+                selectedClass = (item.name+"" === othis.selectedData.name+"") ? "layui-tableEdit-selected"+(othis.enabled ? " layui-tableEdit-checked":'') : "";
             }
             if(Array.isArray(othis.selectedData)){
                 for(var i=0;i<othis.selectedData.length;i++){
-                    selectedClass = (name+"" === othis.selectedData[i].name+"") ? "layui-tableEdit-selected layui-tableEdit-checked" : "";
+                    selectedClass = (item.name+"" === othis.selectedData[i].name+"") ? "layui-tableEdit-selected layui-tableEdit-checked" : "";
                     if(!othis.isEmpty(selectedClass)) break;
                 }
             }
