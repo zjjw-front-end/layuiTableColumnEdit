@@ -123,6 +123,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
         var input = $('<input class="layui-input layui-tableEdit-input" style="z-index: 99999999999"  value="'+othis.oldValue+'" type="text">');
         (39 - that.offsetHeight > 3) && input.css('height','30px');
         (that.offsetHeight - 39 > 3) && input.css('height','50px');
+        input[0].setSelectionRange(othis.oldValue.length,othis.oldValue.length);
         $(that).append(input),input.focus();
         input.click(function (e) {
            _layui.stope(e);
