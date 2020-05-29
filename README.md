@@ -1,7 +1,6 @@
 # tableEdit
 &emsp;ayui table edit编辑功能
 <br/>
-&emsp;不会使用请加qq：374506838
 
 ## 一、介绍
 &emsp;&emsp; 基于aop编程思想对layui table工具条事件tool(lay-filter)进行封装而成的table单元格编辑器。
