@@ -1,7 +1,7 @@
-layui.define(["laydate","laytpl","table"],function(exports) {
+layui.define(["laydate","laytpl","table","layer"],function(exports) {
     "use strict";
     var moduleName = 'tableEdit',_layui = layui,laytpl = _layui.laytpl
-        ,$ = _layui.$,laydate = _layui.laydate,table = _layui.table
+        ,$ = _layui.$,laydate = _layui.laydate,table = _layui.table,layer = _layui.layer
         ,selectTpl = [ //单选下拉框模板
             '<div class="layui-tableEdit-div" style="{{d.style}}">'
                 ,'<ul class="layui-tableEdit-ul">'
@@ -60,7 +60,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
     var configs = {
         callbacks:{}
         ,parseConfig:function (cols,field) {
-            var type,data,enabled,dateType,csField;
+            var type,data,enabled,dateType,csField,verify;
             cols.forEach(function (ite) {
                 ite.forEach(function (item) {
                     if(field !== item.field || !item.config)return;
@@ -70,9 +70,40 @@ layui.define(["laydate","laytpl","table"],function(exports) {
                     enabled = config.enabled;
                     dateType = config.dateType;
                     csField = config.cascadeSelectField;
+                    verify = config.verify;
                 });
             });
-            return {type:type,data:data,enabled:enabled,dateType:dateType,cascadeSelectField:csField};
+            return {type:type,data:data,enabled:enabled,dateType:dateType,cascadeSelectField:csField,verify:verify};
+        },
+        verify: {
+            required: [
+                /[\S]+/
+                ,'必填项不能为空'
+            ]
+            ,phone: [
+                /^1\d{10}$/
+                ,'请输入正确的手机号'
+            ]
+            ,email: [
+                /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/
+                ,'邮箱格式不正确'
+            ]
+            ,url: [
+                /(^#)|(^http(s*):\/\/[^\s]+\.[^\s]+)/
+                ,'链接格式不正确'
+            ]
+            ,number:[
+                /(^[-+]?\d+$)|(^[-+]?\d+\.\d+$)/
+                ,'只能填写数字'
+            ]
+            ,date: [
+                /^(\d{4})[-\/](\d{1}|0\d{1}|1[0-2])([-\/](\d{1}|0\d{1}|[1-2][0-9]|3[0-1]))*$/
+                ,'日期格式不正确'
+            ]
+            ,identity: [
+                /(^\d{15}$)|(^\d{17}(x|X|\d)$)/
+                ,'请输入正确的身份证号'
+            ]
         }
     };
 
@@ -240,6 +271,7 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             var zthis = this,field = $(zthis).data('field'),config = configs.parseConfig(othis.config.cols,field);
             obj.field = field;
             var callbackFn = function (res) {
+                if(config.verify && !othis.verify(res,config.verify,this))return; //验证为空
                 obj.value = Array.isArray(res) ? (res.length>0 ? res : [{name:'',value:''}]) : res;
                 othis.config.callback.call(zthis,obj);
                 if(!singleInstance.isEmpty(config.cascadeSelectField)){
@@ -271,6 +303,56 @@ layui.define(["laydate","laytpl","table"],function(exports) {
             }
 
         });
+    };
+
+    /**
+     * 验证数据是否符合要求
+     * @param data 被验证数据
+     * @param verify 正则参数
+     * @param td 当前单元格
+     * @returns {boolean} true验证通过 false验证未通过
+     */
+    AopEvent.prototype.verify = function (data,verify,td) {
+        var verifyObj = configs.verify[verify.type];
+        var verifyMsg = verify.msg;
+        verifyMsg = verifyMsg ? verifyMsg : (verifyObj ? verifyObj[1] : '必填项不能为空');
+        if(singleInstance.isEmpty(data)){
+            layer.tips(verifyMsg, td);
+            return false;
+        }
+        if(Array.isArray(data) && data.length <= 0){
+            layer.tips(verifyMsg, td);
+            return false;
+        }
+        if((typeof data === 'object' && singleInstance.isEmpty(data.name))
+            || data.name === 'undefined'){
+            layer.tips(verifyMsg, td);
+            return false;
+        }
+        if(!verifyObj && !verify.regx){
+            return true;
+        }
+        if(verify.regx){ //自定义正则判断
+            if(typeof verify.regx === "function"){//为函数时
+                if(verify.regx(data))return true;
+                layer.tips(verifyMsg, td);
+                return false;
+            }
+            if(typeof verify.regx === "string"){ //为字符串正则时
+                var regx = new RegExp(verify.regx);
+                if(regx.test(data))return true;
+                layer.tips(verifyMsg, td);
+                return false;
+            }
+            if(verify.regx.test(data))return true; //为正则时
+            layer.tips(verifyMsg, td);
+            return false;
+        }
+        if(!verifyObj[0].test(data)){
+            layer.tips(verifyMsg, td);
+            return false;
+        }
+        return true;
     };
 
     var active = {

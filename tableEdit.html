@@ -17,7 +17,7 @@
         tableEdit:'js/tableEdit'
     }).use(['table','tableEdit','layer'], function () {
         var table = layui.table,tableEdit = layui.tableEdit,$ = layui.$;
-        var params = [{name:1,value:"张三1"},{name:2,value:"张三2"},{name:3,value:"张三3"},{name:4,value:"张三4"},{name:5,value:"张三5"}];
+        var params = [{name:undefined,value:""},{name:1,value:"张三1"},{name:2,value:"张三2"},{name:3,value:"张三3"},{name:4,value:"张三4"},{name:5,value:"张三5"}];
         var cols = table.render({
             elem: '#tableId'
             ,id:'id'
@@ -28,10 +28,10 @@
                 {type:'checkbox'}
                 //type的类型值：select（下拉框）date（时间选择框）input(输入框)
                 //input为输入框，失去焦点会触发回调，aopTable.on()中触发的回调
-                ,{field:'name',title: '输入框',width:120,event:'name',config:{type:'input'}}
+                ,{field:'name',title: '输入框',width:120,event:'name',config:{type:'input',verify:{type:'required'}}}
                 //data 为下拉框数据
                 ,{field:'danxuan',align:'center', title: '单选',width:120
-                    ,event:'danxuan',config:{type:'select',data:params}
+                    ,event:'danxuan',config:{type:'select',data:params,verify:true}
                     ,templet:function (d) {
                         if(d.danxuan){
                             if(d.danxuan.value){
@@ -44,7 +44,7 @@
                 }
                 //  enabled => true：多选，false：单选。默认为false
                 ,{field:'duoxuan', title: '多选',width:120,event:'duoxuan'
-                    ,config:{type:'select',data:params,enabled:true}
+                    ,config:{type:'select',data:params,enabled:true,verify:true}
                     ,templet:function (d) {
                         var str = [];
                         d.duoxuan.forEach(function (e) {
@@ -56,7 +56,7 @@
                 //dateType表示日期时间格式，date为“yyyy-MM-dd”
                 // ，datetime为“yyyy-MM-dd HH:ss:mm”
                 ,{field:'birthday', title: '生日',width:120,event:'birthday'
-                    ,config:{type:'date',dateType:'date'}}
+                    ,config:{type:'date',dateType:'date',verify:{type:'date'}}}
                 //cascadeSelectField字段为级联开关字段(存在该字段则级联，否则不级联)
                 ,{field:'xlkjl', title: '下拉框联动(上级)',width:150,event:'xlkjl',
                     config:{type:'select',data:params,cascadeSelectField:'xialaxiaji'}
