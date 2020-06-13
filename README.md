@@ -110,7 +110,7 @@ identity               | 身份证验证
 
 类型                   | 描述   |
 ---                    | -----
-function               | 自定义函数验证 需return验证结果  true成功 false识别
+function               | 自定义函数验证 需return验证结果  true成功 false失败
 string                 | 字符串类型正则   
 regExp                 | 正则表达式 
 
