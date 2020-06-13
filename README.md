@@ -60,7 +60,7 @@ params    | object  | 否       | 事件回调方法的参数
 
 &emsp;**tableEdit配置格式**
 
-- 在cols中加上一下配置
+- 在cols中加上config属性
 ```json
 {"field":"name","event":"name","config":{}}
 ```
@@ -90,7 +90,7 @@ verify             | object/boolean       | 否       | 字段数据验证
 
 属性               | 类型                         | 是否必填       | 描述    |
 ---                | -----                        | ---            | -----
-type               | string                       | 否             | 验证类型
+type               | string                       | 否             | 内置验证类型
 regx               | regExp/string/function       | 否             | 自定义正则类型
 msg                | string                       | 否             | 自定义提示消息
 
