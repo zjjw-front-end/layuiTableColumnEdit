@@ -4,14 +4,13 @@
 
 ## 一、介绍
 &emsp;&emsp; 基于aop编程思想对layui table工具条事件tool(lay-filter)进行封装而成的table单元格编辑器。
-<br/>
-支持编辑器类型：
-<br/>
-a.下拉框（单或多选）
-<br/>
-b.时间选择框
-<br/>
-c.单元格下拉框联动（下拉框联动下拉框、时间选择框联动下拉框）
+
+### 功能
+
+- 下拉框（单或多选）
+- 时间选择框
+- 单元格下拉框联动（下拉框联动下拉框、时间选择框联动下拉框）
+- 编辑数据校验
 
 ## 二、使用说明
 
@@ -86,6 +85,9 @@ verify             | object/boolean       | 否       | 字段数据验证
 &emsp;**verify说明**
 
 - verify => boolean true开启验证，false关闭验证
+```json
+{"field":"name","event":"name","config":{"type":"input","verify":true}}
+```
 - verify => object
 
 属性               | 类型                         | 是否必填       | 描述    |
@@ -95,6 +97,9 @@ regx               | regExp/string/function       | 否             | 自定义�
 msg                | string                       | 否             | 自定义提示消息
 
 &emsp;**内置type说明**
+```json
+{"field":"name","event":"name","config":{"type":"input","verify":{"type":"required"}}}
+```
 
 类型                   | 描述                
 ---                    | -----               
@@ -114,6 +119,28 @@ function               | 自定义函数验证 需return验证结果  true成功
 string                 | 字符串类型正则   
 regExp                 | 正则表达式 
 
+- function
+```json
+{"field":"name","event":"name","config":{"type":"input","verify":{"regx":function(data){
+     //data为验证数据
+     // true为验证成功  false为验证失败
+      return true；
+}}}}
+```
+
+string
+```json
+{"field":"name","event":"name","config":{"type":"input","verify":{"regx":"(^[-+]?\\d+$)|(^[-+]?\\d+\\.\\d+$)","msg":"请输入整数或者小数"}}}
+```
+
+regExp
+```json
+{"field":"name","event":"name","config":{"type":"input","verify":{"regx":/(^[-+]?\d+$)|(^[-+]?\d+\.\d+$)/,msg:"请输入整数或者小数"}}}
+```
+- 自定义提示
+```json
+{"field":"name","event":"name","config":{"type":"input","verify":{"type":"required","msg":"必填项不能为空"}}}
+```
 &emsp;**data格式**
 
 ```json
