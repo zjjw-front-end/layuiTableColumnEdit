@@ -59,23 +59,18 @@ params    | object  | 否       | 事件回调方法的参数
 
 
 &emsp;**tableEdit配置格式**
-&emsp;&emsp;&emsp;在cols中加上一下配置
-```text
-    输入框
-   config:{"type":"input"}
+
+- 在cols中加上一下配置
+```json
+{"field":"name","event":"name","config":{}}
 ```
-```text
-   下拉框联动
-   config:{"type":"select","data":params,"cascadeSelectField":"name"}
-```
-```text
-   多选下拉框
-   config":{"type":"select","data":params,"enabled":true}
-```
-```text
-   日期选择框
-   config":{"type":"date","dateType":"date"}
-```
+- 输入框          config:{"type":"input"}
+- 单选下拉框      config:{"type":"select","data":params}
+- 多选下拉框      config:{"type":"select","data":params,"enabled":true}
+- 输入框          config:{"type":"input"}
+- 下拉框联动      config:{"type":"select","data":params,"cascadeSelectField":"name"}
+- 日期选择框      config":{"type":"date","dateType":"date"}
+- 日期选择框联动  config:{type:'date',dateType:'date',cascadeSelectField:'name'}
 
 &emsp;**config说明**
 
@@ -90,11 +85,8 @@ verify             | object/boolean       | 否       | 字段数据验证
 
 &emsp;**verify说明**
 
-verify => boolean true开启验证，false关闭验证
-
-&emsp;**-----------------**
-
-verify => object
+- verify => boolean true开启验证，false关闭验证
+- verify => object
 
 属性               | 类型                         | 是否必填       | 描述    |
 ---                | -----                        | ---            | -----
