@@ -369,12 +369,11 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
      * @returns {*}
      */
     AopEvent.prototype.submitValidate = function (options) {
-        var that = this;
+        var that = this,failedTds = [];
         if(!options || singleInstance.isEmpty(options.verifyKey)
             || singleInstance.isEmpty(options.data)
-            || singleInstance.isEmpty(options.elem))return;
+            || singleInstance.isEmpty(options.elem))return failedTds;
         var body = $(options.elem).next().find('div.layui-table-box div.layui-table-body tr');
-        var failedTds = [];
         options.data.forEach(function (item) {
             for(var field in item){
                 var config = that.config.colsConfig[field];
