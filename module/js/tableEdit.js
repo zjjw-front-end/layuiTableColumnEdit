@@ -272,6 +272,9 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
         var othis = this;othis.config.event = event,othis.config.callback = callback;
         table.on(othis.config.event,function (obj) {
             var zthis = this,field = $(zthis).data('field'),config = othis.config.colsConfig[field];
+            if(!config){
+                othis.config.callback.call(zthis,obj);return;
+            }
             obj.field = field;
             var callbackFn = function (res) {
                 if(config.verify && !othis.verify(res,config.verify,this))return; //验证为空
