@@ -157,5 +157,7 @@ regExp
 
 ### 6.效果图
 ![效果图](https://images.gitee.com/uploads/images/2020/0508/123901_092d3f62_1588195.gif "tableEdit.gif")
-- 数据验证
+- 编辑数据验证
 ![啊啊](https://images.gitee.com/uploads/images/2020/0614/042738_bacccaf7_1588195.gif "tableEdit.gif")
+- 提交数据验证
+![哎哎哎](https://images.gitee.com/uploads/images/2020/0614/160955_3036ab33_1588195.gif "tableEdit.gif")
