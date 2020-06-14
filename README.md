@@ -27,7 +27,9 @@ layui.config({
     
 });
 ```
-&emsp; 测试页面tableEdit.html
+#### 测试页面
+- tableEdit.html 编辑测试页面
+- verifyTest.html 数据校验测试页面
 
 
 ### 2.方法说明

@@ -59,22 +59,7 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
 
     var configs = {
         callbacks:{}
-        ,parseConfig:function (cols,field) {
-            var type,data,enabled,dateType,csField,verify;
-            cols.forEach(function (ite) {
-                ite.forEach(function (item) {
-                    if(field !== item.field || !item.config)return;
-                    var config = item.config;
-                    type = config.type;
-                    data = config.data;
-                    enabled = config.enabled;
-                    dateType = config.dateType;
-                    csField = config.cascadeSelectField;
-                    verify = config.verify;
-                });
-            });
-            return {type:type,data:data,enabled:enabled,dateType:dateType,cascadeSelectField:csField,verify:verify};
-        },
+        ,
         verify: {
             required: [
                 /[\S]+/
@@ -264,11 +249,30 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
         $(othis.element).hover(inFunc,outFunc);
     };
 
-    var AopEvent = function(cols){this.config = {cols:cols};};//aop构造器
+    var AopEvent = function(cols){this.config = {colsConfig:{}};this.parseCols(cols)};//aop构造器
+    /**
+     * 解析出tableEdit组件所需要的配置信息
+     * @param cols
+     */
+    AopEvent.prototype.parseCols = function(cols){
+        var that = this;
+        cols.forEach(function (ite) {
+            ite.forEach(function (item) {
+                if(!item.config)return;
+                that.config.colsConfig[item.field] = item.config;
+            });
+        });
+    };
+    /**
+     * aop代理event
+     * @param event 事件名称
+     * @param callback 回调函数
+     */
     AopEvent.prototype.on = function(event,callback){
+        console.log(event)
         var othis = this;othis.config.event = event,othis.config.callback = callback;
         table.on(othis.config.event,function (obj) {
-            var zthis = this,field = $(zthis).data('field'),config = configs.parseConfig(othis.config.cols,field);
+            var zthis = this,field = $(zthis).data('field'),config = othis.config.colsConfig[field];
             obj.field = field;
             var callbackFn = function (res) {
                 if(config.verify && !othis.verify(res,config.verify,this))return; //验证为空
@@ -317,16 +321,16 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
         var verifyMsg = verify.msg;
         verifyMsg = verifyMsg ? verifyMsg : (verifyObj ? verifyObj[1] : '必填项不能为空');
         if(singleInstance.isEmpty(data)){
-            layer.tips(verifyMsg, td);
+            layer.tips(verifyMsg, td,{tipsMore:true});
             return false;
         }
         if(Array.isArray(data) && data.length <= 0){
-            layer.tips(verifyMsg, td);
+            layer.tips(verifyMsg, td,{tipsMore:true});
             return false;
         }
         if((typeof data === 'object' && singleInstance.isEmpty(data.name))
             || data.name === 'undefined'){
-            layer.tips(verifyMsg, td);
+            layer.tips(verifyMsg, td,{tipsMore:true});
             return false;
         }
         if(!verifyObj && !verify.regx){
@@ -335,24 +339,58 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
         if(verify.regx){ //自定义正则判断
             if(typeof verify.regx === "function"){//为函数时
                 if(verify.regx(data))return true;
-                layer.tips(verifyMsg, td);
+                layer.tips(verifyMsg, td,{tipsMore:true});
                 return false;
             }
             if(typeof verify.regx === "string"){ //为字符串正则时
                 var regx = new RegExp(verify.regx);
                 if(regx.test(data))return true;
-                layer.tips(verifyMsg, td);
+                layer.tips(verifyMsg, td,{tipsMore:true});
                 return false;
             }
             if(verify.regx.test(data))return true; //为正则时
-            layer.tips(verifyMsg, td);
+            layer.tips(verifyMsg, td,{tipsMore:true});
             return false;
         }
         if(!verifyObj[0].test(data)){
-            layer.tips(verifyMsg, td);
+            layer.tips(verifyMsg, td,{tipsMore:true});
             return false;
         }
         return true;
+    };
+
+    /**
+     * 提交数据的验证
+     * @param options {elem:'#test',data:[],verifyKey:'id'}
+     * elem: 表格id,带井号  data: 验证数据,数组类型。
+     * verifyKey: data中的元素的唯一值字段，且必须在表格中有此字段的单元格。
+     * @returns {*}
+     */
+    AopEvent.prototype.submitValidate = function (options) {
+        var that = this;
+        if(!options || singleInstance.isEmpty(options.verifyKey)
+            || singleInstance.isEmpty(options.data)
+            || singleInstance.isEmpty(options.elem))return;
+        var body = $(options.elem).next().find('div.layui-table-box div.layui-table-body tr');
+        var failedTds = [];
+        options.data.forEach(function (item) {
+            for(var field in item){
+                var config = that.config.colsConfig[field];
+                if(!config || !config.verify)continue;
+                var verify = config.verify;
+                var tds = body.find('td[data-field="'+options.verifyKey+'"]');
+                var thisTd;
+                tds.each(function () {
+                    if($(this).text().indexOf(item[options.verifyKey]) > -1){
+                        thisTd = $(this);
+                    }
+                });
+                if(!thisTd)continue;
+                var td = thisTd.parent().children('td[data-field="'+field+'"]');
+                if(!that.verify(item[field],verify,td))failedTds.push(td[0]);
+            }
+        });
+        return failedTds;
     };
 
     var active = {
