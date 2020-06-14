@@ -269,7 +269,6 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
      * @param callback 回调函数
      */
     AopEvent.prototype.on = function(event,callback){
-        console.log(event)
         var othis = this;othis.config.event = event,othis.config.callback = callback;
         table.on(othis.config.event,function (obj) {
             var zthis = this,field = $(zthis).data('field'),config = othis.config.colsConfig[field];
@@ -382,7 +381,7 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
                 var thisTd;
                 tds.each(function () {
                     var text = $(this).find('div.layui-table-cell').text();
-                    if(text === item[options.verifyKey]){
+                    if(text+'' === item[options.verifyKey]+''){
                         thisTd = $(this);
                     }
                 });
