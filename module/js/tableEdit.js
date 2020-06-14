@@ -66,7 +66,7 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
                 ,'必填项不能为空'
             ]
             ,phone: [
-                /^1\d{10}$/
+                /^1[34578]\d{9}$/
                 ,'请输入正确的手机号'
             ]
             ,email: [
