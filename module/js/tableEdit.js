@@ -381,7 +381,8 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
                 var tds = body.find('td[data-field="'+options.verifyKey+'"]');
                 var thisTd;
                 tds.each(function () {
-                    if($(this).text().indexOf(item[options.verifyKey]) > -1){
+                    var text = $(this).find('div.layui-table-cell').text();
+                    if(text === item[options.verifyKey]){
                         thisTd = $(this);
                     }
                 });
