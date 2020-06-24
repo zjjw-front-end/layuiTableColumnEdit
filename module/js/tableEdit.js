@@ -53,7 +53,9 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
     thisCss.push('.layui-tableEdit-selected{background-color:#5FB878;}');
     thisCss.push('.layui-tableEdit-checked i{background-color:#60b979!important;}');
     thisCss.push('.layui-tableEdit-ul div{padding-left:0px!important;}');
-    thisCss.push('.layui-tableEdit-input{position:absolute;left:0;bottom:0;width:100%;height:38px;z-index: 19910908;}');
+    thisCss.push('.layui-tableEdit-input{text-align:center;position:absolute;left:0;bottom:0;width:100%;height:38px;z-index: 19910908;}');
+    thisCss.push('.layui-tableEdit-add{position: absolute;right: 3px;top: 21px;margin-top: -15px;z-index: 199109084;}')
+    thisCss.push('.layui-tableEdit-sub{position: absolute;left: 3px;top: 21px;margin-top: -15px;z-index: 199109084;}')
     var thisStyle = document.createElement('style');
     thisStyle.innerHTML = thisCss.join('\n'),document.getElementsByTagName('head')[0].appendChild(thisStyle);
 
@@ -142,11 +144,54 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
         input.val(othis.oldValue);
         $(that).append(input),input.focus();
         input.click(function (e) {
-           _layui.stope(e);
+            _layui.stope(e);
         });
         input.bind('change', function(e){othis.callback.call(othis.element,this.value)});
         $(that).hover(inFunc,outFunc);
         _layui.stope();
+    };
+
+    //带加号和减号的输入框(只支持输入数字)
+    Class.prototype.signedInput = function(options){
+        var othis = this;
+        othis.callback = options.callback,othis.element = options.element;
+        othis.oldValue = options.oldValue;
+        othis.oldValue = othis.oldValue ? othis.oldValue : '';
+        var that = options.element;
+        if ($(that).find('input').length>0)return;
+        othis.deleteAll(),othis.leaveStat = false;
+        var thisWidth = that.offsetWidth-49;
+        var input = $('<input class="layui-input layui-tableEdit-input" style="left: 25px;width: '+thisWidth+'px" type="text">');//
+        var leftBtn = $('<button type="button" class="layui-btn layui-btn-sm layui-tableEdit-sub"><i class="layui-icon layui-icon-subtraction" style="margin-top:-14px!important;position: absolute;left:2px!important"></i></button>');
+        var rightBtn = $('<button type="button" class="layui-btn layui-btn-sm layui-tableEdit-add"><i class="layui-icon layui-icon-addition" style="margin-top:-14px!important;position: absolute;right:-1px!important"></i></button>');
+        if(39 - that.offsetHeight > 3){
+            input.css('height','30px');leftBtn.css('top','16px');rightBtn.css('top','16px');
+        }
+        if(that.offsetHeight - 39 > 3){
+            input.css('height','50px');leftBtn.css('top','25px');rightBtn.css('top','25px');
+        }
+        input.val(othis.oldValue);
+        $(that).append(leftBtn);leftBtn.find('i').html('');
+        $(that).append(input),input.focus();$(that).append(rightBtn);rightBtn.find('i').html('');
+        input.click(function (e) {
+            _layui.stope(e);
+        });
+        input.bind('change', function(e){othis.callback.call(othis.element,this.value)});
+        $(that).hover(inFunc,outFunc);
+        _layui.stope();
+        $(that).find('button.layui-tableEdit-sub,button.layui-tableEdit-add').bind('click',function () {
+            var input = $(that).find('input.layui-tableEdit-input');
+            var val = input.val();
+            if(!val || val.length<=0)val=0;
+            val = parseInt(val);
+            if($(this).hasClass('layui-tableEdit-add')){
+                ++val;input.val(val);
+                othis.callback.call(othis.element,val)
+            }else{
+                --val;input.val(val);
+                othis.callback.call(othis.element,val)
+            }
+        })
     };
 
     //判断是否为空函数
@@ -205,7 +250,7 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
 
     //删除所有下拉框和时间选择框
     Class.prototype.deleteAll = function(){
-        $('div.layui-tableEdit-div,div.layui-tableEdit,div.layui-laydate,input.layui-tableEdit-input').remove();
+        $('div.layui-tableEdit-div,div.layui-tableEdit,div.layui-laydate,input.layui-tableEdit-input,button.layui-tableEdit-sub,button.layui-tableEdit-add').remove();
         delete this.leaveStat;//清除（离开状态属性）
     };
 
@@ -287,11 +332,15 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
             };
             var csd = $(this).attr("cascadeSelect-data");//联动数据
             if(singleInstance.isEmpty(csd)){ //非联动事件
-                config.type === 'select' &&
-                singleInstance.register({data:config.data,element:zthis,enabled:config.enabled,selectedData:obj.data[field],callback:callbackFn});
-                config.type === 'date' && singleInstance.date({dateType:config.dateType,element:zthis,callback:callbackFn});
-                config.type === 'input'&& singleInstance.input({element:zthis,oldValue:obj.data[field],callback:callbackFn})
-                !config.type && othis.config.callback.call(zthis,obj);
+                if(config.type === 'select'){
+                    singleInstance.register({data:config.data,element:zthis,enabled:config.enabled,selectedData:obj.data[field],callback:callbackFn});
+                }else if(config.type === 'date'){
+                    singleInstance.date({dateType:config.dateType,element:zthis,callback:callbackFn});
+                }else if(config.type === 'input'){
+                    singleInstance.input({element:zthis,oldValue:obj.data[field],callback:callbackFn});
+                }else if(config.type === 'signedInput'){
+                    singleInstance.signedInput({element:zthis,oldValue:obj.data[field],callback:callbackFn});
+                }else othis.config.callback.call(zthis,obj);
             } else {//联动事件
                 if(config.type === 'date') return;
                 //获取当前单元格的table表格的lay-filter属性值
