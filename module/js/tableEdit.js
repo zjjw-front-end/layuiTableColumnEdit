@@ -161,7 +161,7 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
         if ($(that).find('input').length>0)return;
         othis.deleteAll(),othis.leaveStat = false;
         var thisWidth = that.offsetWidth-49;
-        var input = $('<input class="layui-input layui-tableEdit-input" style="left: 25px;width: '+thisWidth+'px" type="text">');//
+        var input = $('<input class="layui-input layui-tableEdit-input" style="left: 24px;width: '+thisWidth+'px" type="text">');//
         var leftBtn = $('<button type="button" class="layui-btn layui-btn-sm layui-tableEdit-sub"><i class="layui-icon layui-icon-subtraction" style="margin-top:-14px!important;position: absolute;left:2px!important"></i></button>');
         var rightBtn = $('<button type="button" class="layui-btn layui-btn-sm layui-tableEdit-add"><i class="layui-icon layui-icon-addition" style="margin-top:-14px!important;position: absolute;right:-1px!important"></i></button>');
         if(39 - that.offsetHeight > 3){

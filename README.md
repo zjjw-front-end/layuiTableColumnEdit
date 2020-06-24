@@ -66,9 +66,9 @@ params    | object  | 否       | 事件回调方法的参数
 {"field":"name","event":"name","config":{}}
 ```
 - 输入框          config:{"type":"input"}
+- 带(+和-)输入框  config:{"type":"signedInput"}
 - 单选下拉框      config:{"type":"select","data":params}
 - 多选下拉框      config:{"type":"select","data":params,"enabled":true}
-- 输入框          config:{"type":"input"}
 - 下拉框联动      config:{"type":"select","data":params,"cascadeSelectField":"name"}
 - 日期选择框      config":{"type":"date","dateType":"date"}
 - 日期选择框联动  config:{type:'date',dateType:'date',cascadeSelectField:'name'}
