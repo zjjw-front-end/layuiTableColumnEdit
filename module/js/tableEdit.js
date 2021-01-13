@@ -5,7 +5,7 @@ layui.define(["laydate","laytpl","table","layer"],function(exports) {
         ,selectTpl = [ //单选下拉框模板
             '<div class="layui-tableEdit-div" style="{{d.style}}">'
                 ,'<ul class="layui-tableEdit-ul">'
-                    ,'{{# if(d.data){ }}'
+                    ,'{{# d.data = typeof(d.data) === "function"? d.data(d):d.data; if(d.data){ }}'
                         ,'{{# d.data.forEach(function(item){ }}'
                             ,'{{# var selectedClass = d.callbackFn(item) }}'
                             ,'<li class="{{ selectedClass }}" data-name="{{ item.name }}" data-value="{{ item.value }}">'
